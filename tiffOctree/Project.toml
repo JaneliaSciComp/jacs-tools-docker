@@ -1,0 +1,10 @@
+name = "OctreeBuilder"
+uuid = "9440282d-adf2-44b3-85bb-cbae1e06d576"
+authors = ["Cristian Goina <goinac@hhmi.org>"]
+version = "0.1.0"
+
+[deps]
+ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+QuartzImageIO = "dca85d43-d64c-5e67-8c65-017450d5d020"
