@@ -6,15 +6,13 @@ RUN apt-get update && apt-get install -y build-essential && apt-get install -y \
     python3-opengl \
     git
 
-
-WORKDIR /app
-
-COPY src src
-COPY setup.py setup.py
-
 RUN /opt/conda/bin/activate
 
 ENV PYTHONPATH=/app/src:${PYTHONPATH}
+
+# clone pyktx repo
+WORKDIR /app
+RUN git clone https://github.com/JaneliaSciComp/pyktx.git .
 
 RUN pip install numpy
 RUN conda install -y libtiff=4.0.10
