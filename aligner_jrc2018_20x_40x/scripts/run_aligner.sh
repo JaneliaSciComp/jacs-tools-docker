@@ -14,7 +14,6 @@ objective=
 template_dirname=
 input_filepath=
 output_dir=
-start_display_port=10000
 shape=
 
 help_cmd="$0 
@@ -31,7 +30,6 @@ help_cmd="$0
     --shape <Brain shape - Valid values: {Intact, Both_OL_missing (40x), Unknown}>
     -i <input file stack>
     -o <output directory>
-    --display-port <start display port>
     -h"
 while [[ $# > 0 ]]; do
     key="$1"
@@ -92,10 +90,6 @@ while [[ $# > 0 ]]; do
             output_dir=$1
             shift # past value
             ;;
-        --display-port)
-            start_display_port=$1
-            shift # past value
-            ;;
         -h|--help)
             echo "${help_cmd}"
             exit 0
@@ -108,6 +102,8 @@ while [[ $# > 0 ]]; do
 done
 
 WORKING_DIR=${output_dir}/temp
+mkdir -p ${WORKING_DIR}
+cd ${WORKING_DIR}
 
 function cleanTemp {
     if [[ ${DEBUG_MODE} =~ "debug" ]]; then
@@ -119,11 +115,10 @@ function cleanTemp {
     fi
 }
 
-mkdir -p ${output_dir}
-
 if [[ $FB_MODE =~ "xvfb" ]]; then
     echo "initialize virtual framebuffer"
-    . $DIR/init_xvfb.sh ${start_display_port} ${output_dir}
+    START_PORT=`shuf -i 5000-6000 -n 1`
+    . $DIR/init_xvfb.sh ${START_PORT} ${WORKING_DIR}
     function exitHandler() { cleanXvfb; cleanTemp; }
     trap exitHandler EXIT
 else
@@ -149,4 +144,15 @@ inputs:
 EOL
 
 
-/opt/aligner/20xBrain_Align_CMTK.sh ${YAML_CONFIG_FILE} ${output_dir} ${shape}
+/opt/aligner/20xBrain_Align_CMTK.sh ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}
+
+cd ${output_dir}
+echo ""
+echo "~ Listing working files:"
+echo ""
+ls -lR $WORKING_DIR
+
+echo "~ Moving final output to ${output_dir}"
+mv ${WORKING_DIR}/FinalOutputs/* ${output_dir}
+
+echo "~ Finished"

@@ -23,7 +23,7 @@ fi
 DISPLAY_PORT=$1
 X_WORK_DIR="${2:-"/tmp"}"
 
-echo "Finding a port for Xvfb, starting at $DISPLAY_PORT..."
+echo "Finding a port for Xvfb, starting at ${DISPLAY_PORT} and using ${X_WOKR_DIR}"
 PORT=$DISPLAY_PORT
 COUNTER=0
 RETRIES=10
@@ -31,25 +31,21 @@ RETRIES=10
 # Clean up Xvfb on any exit
 function cleanXvfb {
     kill $MYPID
-    if [[ ${DEBUG_MODE} =~ "debug" ]]; then
-        echo "Leaving X lock files"
-    else
-        rm -f ${X_WORK_DIR}/.X${PORT}-lock
-        rm -f ${X_WORK_DIR}/.X11-unix/X${PORT}
-        echo "Cleaned up Xvfb"
-    fi
+    rm -f ${X_WORK_DIR}/.X${PORT}-lock
+    rm -f ${X_WORK_DIR}/.X11-unix/X${PORT}
+    echo "Cleaned up Xvfb"
 }
 trap cleanXvfb EXIT
 
 while [ "$COUNTER" -lt "$RETRIES" ]; do
     
-    while (test -f "${X_WORK_DIR}/.X${PORT}-lock") || (test -f "${X_WORK_DIR}/.X11-unix/X${PORT}") || (netstat -atwn | grep "^.*:${PORT}.*:\*\s*LISTEN\s*$")
+    while (test -f "/tmp/.X${PORT}-lock") || (test -f "/tmp/.X11-unix/X${PORT}") || (netstat -atwn | grep "^.*:${PORT}.*:\*\s*LISTEN\s*$")
         do PORT=$(( ${PORT} + 1 ))
     done
     echo "Found the first free port: $PORT"
 
     # Run Xvfb (virtual framebuffer) on the chosen port
-    /usr/bin/Xvfb :${PORT} -screen 0 1280x1024x24 -fp /usr/share/X11/fonts/misc > Xvfb.${PORT}.log 2>&1 &
+    /usr/bin/Xvfb :${PORT} -screen 0 1280x1024x24 > ${X_WORK_DIR}/Xvfb.${PORT}.log 2>&1 &
     echo "Started Xvfb on port $PORT"
 
     # Save the PID so that we can kill it when we're done

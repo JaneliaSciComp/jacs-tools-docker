@@ -25,7 +25,7 @@ RUN yum install -y libXtst-devel libXrender
 # Install Fiji
 ENV FIJI_FILE=fiji-1.52c.tgz
 RUN curl -s http://workstation.int.janelia.org/files/fiji/{$FIJI_FILE} -o ${FIJI_FILE}
-RUN tar xvfz $FIJI_FILE && /bin/rm -rf $FIJI_FILE
+RUN tar xvf $FIJI_FILE && /bin/rm -rf $FIJI_FILE
 RUN rm -rf Fiji
 RUN mv Fiji.app Fiji
 
