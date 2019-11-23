@@ -1,10 +1,13 @@
 FROM scientificlinux/sl:7
 
 COPY aligner /opt/aligner
+COPY color_depth /opt/color_depth
 COPY scripts /opt/aligner-scripts
 
 RUN chmod 755 /opt/aligner/*.sh
 RUN chmod 755 /opt/aligner-scripts/*.sh
+
+ENV FB_MODE=
 
 RUN echo "Installing dependencies"
 ENV EPEL_FILE=epel-release-latest-7.noarch.rpm
@@ -14,6 +17,17 @@ RUN yum install -y python-pip jq bc
 RUN pip install --upgrade pip
 RUN pip install yq
 
+# s3 fuse so that we could mount an S3 bucket
+RUN echo "Installing S3 FUSE"
+RUN yum install -y fuse-devel s3fs-fuse
+
+ENV S3_TEMPLATES_MOUNTPOINT=/data/s3/templates
+ENV S3_INPUTS_MOUNTPOINT=/data/s3/inputs
+ENV S3_OUTPUTS_MOUNTPOINT=/data/s3/outputs
+
+RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}
+RUN mkdir -p ${S3_INPUTS_MOUNTPOINT}
+RUN mkdir -p ${S3_OUTPUTS_MOUNTPOINT}
 
 WORKDIR /opt
 
@@ -37,10 +51,18 @@ RUN tar xvf $FIJI_FILE && /bin/rm -rf $FIJI_FILE
 RUN rm -rf Fiji
 RUN mv Fiji.app Fiji
 
-RUN echo "Installing Fiji plugins"
+RUN echo "Installing Fiji plugins for the aligner"
 ENV PLUGINS_SOURCE=/opt/aligner/fiji_plugins
 ENV PLUGINS_TARGET=/opt/Fiji/plugins
 RUN cp -R $PLUGINS_SOURCE/* $PLUGINS_TARGET && /bin/rm -rf $PLUGINS_SOURCE
+RUN echo "Installing Fiji plugins for color depth"
+ENV PLUGINS_SOURCE=/opt/color_depth/fiji_plugins
+RUN cp -R $PLUGINS_SOURCE/* $PLUGINS_TARGET && /bin/rm -rf $PLUGINS_SOURCE
+
+RUN echo "Installing Fiji LUTs for color depth"
+ENV LUTS_SOURCE=/opt/color_depth/fiji_luts
+ENV LUTS_TARGET=/opt/Fiji/luts
+RUN cp -R $LUTS_SOURCE/* $LUTS_TARGET && /bin/rm -rf $LUTS_SOURCE
 
 RUN echo "Installing CMTK"
 # Prereqs for CMTK

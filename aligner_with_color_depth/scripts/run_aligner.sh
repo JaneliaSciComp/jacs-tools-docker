@@ -133,7 +133,9 @@ function cleanTemp {
 if [[ $FB_MODE =~ "xvfb" ]]; then
     echo "initialize virtual framebuffer"
     START_PORT=`shuf -i 5000-6000 -n 1`
-    . $DIR/init_xvfb.sh ${START_PORT} ${WORKING_DIR}
+    XVFB_WORKING_DIR=${output_dir}/xvfb_temp
+    mkdir -p ${XVFB_WORKING_DIR}
+    . $DIR/init_xvfb.sh ${START_PORT} ${XVFB_WORKING_DIR}
     function exitHandler() { cleanXvfb; cleanTemp; }
     trap exitHandler EXIT
 else
@@ -141,7 +143,7 @@ else
     trap exitHandler EXIT
 fi
 
-YAML_CONFIG_FILE=${output_dir}/align.yml
+YAML_CONFIG_FILE=${output_dir}/align.yml ${output_dir} ${area}
 
 cat > ${YAML_CONFIG_FILE} <<EOL
 template_dir: ${template_dirname}
@@ -158,7 +160,7 @@ inputs:
   voxel_size: ${voxel_size}
 EOL
 
-
+echo "~ Run alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
 /opt/aligner/20xBrain_Align_CMTK.sh ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}
 
 cd ${output_dir}
@@ -169,5 +171,15 @@ ls -lR $WORKING_DIR
 
 echo "~ Moving final output to ${output_dir}"
 mv ${WORKING_DIR}/FinalOutputs/* ${output_dir}
+
+echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+
+cleanTemp
+
+# setup color depth output directory - make sure that it ends with a slash because 
+# the fiji macro simply appends the output filename to this
+COLOR_DEPTH_MIPS_OUTPUT_DIR="${output_dir}/color_depth_mips/"
+echo "~ Generate color depth mips ${area} ${output_dir} ${COLOR_DEPTH_MIPS_OUTPUT_DIR}"
+/opt/color_depth/color_depth.sh ${area} ${output_dir} ${COLOR_DEPTH_MIPS_OUTPUT_DIR}
 
 echo "~ Finished"
