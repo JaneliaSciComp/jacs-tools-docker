@@ -95,7 +95,7 @@ mkdir -p ${results_dir}
 
 input_filename=`basename ${input_filepath}`
 echo "Copy s3://${inputs_s3bucket_name}${input_filepath} -> ${inputs_dir}"
-#!!!!!! aws s3 cp "s3://${inputs_s3bucket_name}${input_filepath}" ${inputs_dir}
+aws s3 cp "s3://${inputs_s3bucket_name}${input_filepath}" ${inputs_dir}
 working_input_filepath="${inputs_dir}/${input_filename}"
 
 if [[ "${neuron_mask}" != "" ]] ; then
@@ -125,4 +125,5 @@ echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
 /opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
 
 # copy the results to the s3 output bucket
+echo "Copy ${results_dir}/color_depth_mips -> s3://${outputs_s3bucket_name}${output_dir}"
 aws s3 cp --recursive "${results_dir}/color_depth_mips" "s3://${outputs_s3bucket_name}${output_dir}"
