@@ -17,17 +17,12 @@ RUN yum install -y python-pip jq bc
 RUN pip install --upgrade pip
 RUN pip install yq
 
-# s3 fuse so that we could mount an S3 bucket
-RUN echo "Installing S3 FUSE"
-RUN yum install -y fuse-devel s3fs-fuse
+RUN echo "Installing S3 FUSE and AWS CLI"
+RUN yum install -y fuse-devel s3fs-fuse awscli
 
 ENV S3_TEMPLATES_MOUNTPOINT=/data/s3/templates
-ENV S3_INPUTS_MOUNTPOINT=/data/s3/inputs
-ENV S3_OUTPUTS_MOUNTPOINT=/data/s3/outputs
 
 RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}
-RUN mkdir -p ${S3_INPUTS_MOUNTPOINT}
-RUN mkdir -p ${S3_OUTPUTS_MOUNTPOINT}
 
 WORKDIR /opt
 
