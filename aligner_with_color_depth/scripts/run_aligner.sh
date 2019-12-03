@@ -164,6 +164,9 @@ EOL
 echo "~ Run alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
 /opt/aligner/20xBrain_Align_CMTK.sh ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}
 
+echo "~ Display preproc log"
+cat "${WORKING_DIR}/FinalOutputs/debug/preproc.log"
+
 cd ${output_dir}
 echo ""
 echo "~ Listing working files:"
@@ -173,9 +176,14 @@ ls -lR $WORKING_DIR
 echo "~ Moving final output to ${output_dir}"
 mv ${WORKING_DIR}/FinalOutputs/* ${output_dir}
 
-echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
-
-cleanTemp
+alignment_results=(${output_dir}/*.v3dpbd)
+if [ ${#alignment_results[@]} -gt 0 ]; then 
+    echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+    cleanTemp
+else
+    echo "~ No alignment were found after alignment of ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+    exit 1
+fi
 
 # setup color depth output directory - make sure that it ends with a slash because 
 # the fiji macro simply appends the output filename to this

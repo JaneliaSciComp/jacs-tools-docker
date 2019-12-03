@@ -87,14 +87,6 @@ WORKING_DIR="/scratch/alignworkspace"
 echo "Create local working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 
-testfile="atestfile.txt"
-echo "Test writing to ${testfile}"
-cat > "${WORKING_DIR}/${testfile}" <<@EOF
-Test writing
-@EOF
-ls -la ${WORKING_DIR}
-cat "${WORKING_DIR}/${testfile}"
-
 function cleanWorkingDir {
     if [[ ${DEBUG_MODE} =~ "debug" ]] ; then
         echo "~ Debugging mode - Leaving working directory"
@@ -132,9 +124,6 @@ if [[ "${neuron_mask}" != "" ]] ; then
 else
     nmask_arg=
 fi
-
-echo "Working dir content before copying the inputs from S3"
-tree ${WORKING_DIR}
 
 echo "Mount the S3 buckets using s3fs"
 
