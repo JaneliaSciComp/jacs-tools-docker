@@ -260,7 +260,6 @@ function writeErrorProperties() {
     echo "alignment.objective=$_objective" >> $META
 }
 
-
 function banner() {
     echo "------------------------------------------------------------------------------------------------------------"
     echo " $1"
@@ -314,7 +313,6 @@ elif [[ $RESX == "0.5189161" ]]; then
 elif [[ $RESX == "0.4413373" ]]; then
     TRESOLUTION="40x"
 else
-
     gapGen1=$(echo "$RESX-0.621481" | bc -l)
     gapMCFO=$(echo "$RESX-0.5189161" | bc -l)
     gap40x=$(echo "$RESX-0.4413373" | bc -l)
@@ -372,7 +370,6 @@ elif [[ $INPUT1_GENDER == "m" ]]; then
 fi
 
 # "Somehow, 20x_gen1 is the best aligned result than the 40x alignment"
-
 
 # -------------------------------------------------------------------------------------------
 OLSHAPE="$OUTPUT/OL_shape.txt"

@@ -10,15 +10,18 @@ neuron_mask=
 output_dir=
 other_args=()
 mounting_protocol=
+use_iam_role=
 
 help_cmd="$0 
     --templates-s3bucket-name <template S3 bucket name>
+    --use-iam-role <iam role to be used by S3FS or auto, if not specified AWS keys must be set>
     --inputs-s3bucket-name <inputs S3 bucket name>
     --outputs-s3bucket-name <outputs S3 bucket name>
     --nmask <neuron mask path in the inputs bucket>
     -i <input filepath in the inputs bucket>
     -o <output path in the outputs bucket>
     <other aligner args (see run_aligner.sh)>
+    -debug <{true|false}>
     -h"
 
 while [[ $# > 0 ]]; do
@@ -53,9 +56,16 @@ while [[ $# > 0 ]]; do
             output_dir="$1"
             shift # past value
             ;;
+        --use-iam-role)
+            use_iam_role="$1"
+            shift
+            ;;
         -debug)
-            export DEBUG_MODE=debug
-            # no need to shif
+            debug_flag="$1"
+            if [[ "${debug_flag}" =~ "true" ]] ; then
+                export DEBUG_MODE=debug
+            fi
+            shift
             ;;
         -h|--help)
             echo "${help_cmd}"
@@ -74,6 +84,16 @@ template_dirname=${S3_TEMPLATES_MOUNTPOINT}
 
 # the script assumes there is a /scratch directory available
 WORKING_DIR="/scratch/alignworkspace"
+echo "Create local working directory ${WORKING_DIR}"
+mkdir -p ${WORKING_DIR}
+
+testfile="atestfile.txt"
+echo "Test writing to ${testfile}"
+cat > "${WORKING_DIR}/${testfile}" <<@EOF
+Test writing
+@EOF
+ls -la ${WORKING_DIR}
+cat "${WORKING_DIR}/${testfile}"
 
 function cleanWorkingDir {
     if [[ ${DEBUG_MODE} =~ "debug" ]] ; then
@@ -90,8 +110,13 @@ trap cleanWorkingDir EXIT
 inputs_dir="${WORKING_DIR}/inputs"
 results_dir="${WORKING_DIR}/results"
 
+echo "Create local inputs directory ${inputs_dir}"
 mkdir -p ${inputs_dir}
+echo "Create local results directory ${results_dir}"
 mkdir -p ${results_dir}
+
+echo "Working dir content before copying the inputs from S3"
+tree ${WORKING_DIR}
 
 input_filename=`basename ${input_filepath}`
 echo "Copy s3://${inputs_s3bucket_name}${input_filepath} -> ${inputs_dir}"
@@ -108,10 +133,21 @@ else
     nmask_arg=
 fi
 
+echo "Working dir content before copying the inputs from S3"
+tree ${WORKING_DIR}
+
 echo "Mount the S3 buckets using s3fs"
 
 s3fs_opts="-o use_path_request_style,nosscache"
+if [[ "${use_iam_role}" != "" ]] ; then
+    s3fs_opts="${s3fs_opts} -o iam_role=${use_iam_role}"
+fi
+
+echo "/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
 /usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}
+
+echo "Test ls ${S3_TEMPLATES_MOUNTPOINT}"
+ls -l ${S3_TEMPLATES_MOUNTPOINT}
 
 run_align_cmd_args=(
     --templatedir ${template_dirname}

@@ -13,7 +13,7 @@ RUN echo "Installing dependencies"
 ENV EPEL_FILE=epel-release-latest-7.noarch.rpm
 RUN curl -s http://dl.fedoraproject.org/pub/epel/{$EPEL_FILE} -o '#1'
 RUN rpm -ivh $EPEL_FILE && /bin/rm -f $EPEL_FILE
-RUN yum install -y python-pip jq bc
+RUN yum install -y python-pip jq bc tree
 RUN pip install --upgrade pip
 RUN pip install yq
 
