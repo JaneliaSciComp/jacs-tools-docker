@@ -46,7 +46,7 @@ FINALOUTPUT=$WORK_DIR"/FinalOutputs"
 TempDir=`realpath $TEMPLATE_DIR/jrc2018_20x_40x_templates`
 testmode=0
 
-DEBUG_DIR=$FINALOUTPUT"/debug"
+DEBUG_DIR="${OUTPUT}/debug"
 mkdir -p $DEBUG_DIR
 
 #
@@ -389,6 +389,11 @@ else
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
     echo "Otsuna_Brain preprocessing stop: $STOP"
+    if [[ ${DEBUG_MODE} =~ "debug" ]]; then
+        echo "~ Preprocessing output"
+        cat $DEBUG_DIR/preproc.log
+    fi
+
     # check for prealigner errors
     LOGFILE="${OUTPUT}/20x_brain_pre_aligner_log.txt"
     cp $LOGFILE $DEBUG_DIR
