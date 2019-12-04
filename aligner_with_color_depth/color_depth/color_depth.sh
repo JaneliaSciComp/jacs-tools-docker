@@ -13,7 +13,11 @@ function run_cd_mips {
     input_file=`basename $1`
     run_fiji_cmd="/opt/Fiji/ImageJ-linux64 -macro /opt/color_depth/fiji_macros/Color_Depth_MIP_batch_For_Pipeline.ijm ${current_input_dir},${input_file},${output_dir},${masks_dir},${area}"
     echo "Execute $run_fiji_cmd"
+    start_time=`date '+%F %T'`
     `$run_fiji_cmd`
+    finish_time=`date '+%F %T'`
+    echo "Color depth MIP for ${input_file} start: ${start_time}"
+    echo "Color depth MIP for ${input_file} stop: ${finish_time}"
 }
 
 for i in `find $input_dir -name "*.v3dpbd"`; do 
