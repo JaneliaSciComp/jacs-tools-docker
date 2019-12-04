@@ -185,7 +185,7 @@ mv ${WORKING_DIR}/FinalOutputs/* ${ALIGNMENT_OUTPUT}
 
 alignment_results=(${ALIGNMENT_OUTPUT}/*.v3dpbd)
 echo "Alignment results: ${alignment_results[@]}"
-if ((${#alignment_results[@]} == 0)); then
+if ((${#alignment_results[@]} > 0)); then
     echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
     cleanTemp
 else
