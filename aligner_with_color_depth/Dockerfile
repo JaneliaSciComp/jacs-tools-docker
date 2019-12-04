@@ -26,7 +26,7 @@ RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}
 
 WORKDIR /opt
 
-RUN yum install -y net-tools xorg-x11-server-Xorg libX11-devel Xvfb 
+RUN yum install -y net-tools libX11-devel Xvfb 
 
 RUN echo "Installing Vaa3d"
 # Prereqs for Vaa3d
