@@ -139,8 +139,8 @@ echo "/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs
 /usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}
 
 echo "Test ls ${S3_TEMPLATES_MOUNTPOINT}"
-templates_dir_content=(${S3_TEMPLATES_MOUNTPOINT}/*)
-if ((${#templates_dir_content[@]} == 0)); then 
+templates_dir_content=$(shopt -s nullglob dotglob; echo ${S3_TEMPLATES_MOUNTPOINT}/*)
+if ((${#templates_dir_content} == 0)); then
     echo "~ Templates bucket could not be mounted"
     exit 1
 else
@@ -157,6 +157,11 @@ run_align_cmd_args=(
 )
 echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
 /opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
+alignment_exit_code=$?
+if (($alignment_exit_code != 0)) ; then
+    echo "Alignment exited with $alignment_exit_code";
+    exit $alignment_exit_code
+fi
 
 # copy the results to the s3 output bucket
 echo "Copy ${results_dir}/color_depth_mips -> s3://${outputs_s3bucket_name}${output_dir}"

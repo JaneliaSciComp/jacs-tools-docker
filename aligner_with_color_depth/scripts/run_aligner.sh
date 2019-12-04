@@ -183,9 +183,9 @@ mkdir -p ${ALIGNMENT_OUTPUT}
 echo "~ Moving final output to ${ALIGNMENT_OUTPUT}"
 mv ${WORKING_DIR}/FinalOutputs/* ${ALIGNMENT_OUTPUT}
 
-alignment_results=(${ALIGNMENT_OUTPUT}/*.v3dpbd)
+alignment_results=$(shopt -s nullglob dotglob; echo ${ALIGNMENT_OUTPUT}/*.v3dpbd)
 echo "Alignment results: ${alignment_results[@]}"
-if ((${#alignment_results[@]} > 0)); then
+if (( ${#alignment_results} )); then
     echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
     cleanTemp
 else
