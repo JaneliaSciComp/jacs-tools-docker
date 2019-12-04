@@ -17,9 +17,11 @@ RUN pip install yq
 
 WORKDIR /opt
 
+RUN yum install -y net-tools libX11-devel Xvfb 
+
 RUN echo "Installing Vaa3d"
 # Prereqs for Vaa3d
-RUN yum install -y net-tools Xvfb mesa-libGLU qt qt-x11 libXv numactl-libs
+RUN yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs
 
 # Install Vaa3d
 ENV VAA3D_FILE=vaa3d-redhat-mark10.tgz

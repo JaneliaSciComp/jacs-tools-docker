@@ -82,8 +82,11 @@ export AWSSECRETACCESSKEY=${AWSSECRETACCESSKEY:-$AWS_SECRET_ACCESS_KEY}
 
 template_dirname=${S3_TEMPLATES_MOUNTPOINT}
 
+
 # the script assumes there is a /scratch directory available
-WORKING_DIR="/scratch/alignworkspace"
+# the working directory is based on the output directory last component name
+output_basename=`basename ${output_dir}`
+WORKING_DIR="/scratch/${output_basename}"
 echo "Create local working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 
@@ -136,7 +139,13 @@ echo "/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs
 /usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}
 
 echo "Test ls ${S3_TEMPLATES_MOUNTPOINT}"
-ls -l ${S3_TEMPLATES_MOUNTPOINT}
+templates_dir_content=(${S3_TEMPLATES_MOUNTPOINT}/*)
+if ((${#templates_dir_content[@]} == 0)); then 
+    echo "~ Templates bucket could not be mounted"
+    exit 1
+else
+    echo "~ Templates bucket mounted successfully"
+fi
 
 run_align_cmd_args=(
     --templatedir ${template_dirname}

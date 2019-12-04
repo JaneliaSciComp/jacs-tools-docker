@@ -116,10 +116,17 @@ default_fb_mode="xvfb"
 export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
 
-WORKING_DIR=${output_dir}/temp
+WORKING_DIR="${output_dir}/temp"
 echo "Create working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 cd ${WORKING_DIR}
+
+JAVA_PREFS_DIR="${WORKING_DIR}/.java"
+echo "Set java preferences directory to ${JAVA_PREFS_DIR}"
+mkdir -p "${JAVA_PREFS_DIR}/sprefs"
+mkdir -p "${JAVA_PREFS_DIR}/uprefs"
+
+export JAVA_OPTS="-Djava.util.prefs.systemRoot=${JAVA_PREFS_DIR}/sprefs -Djava.util.prefs.userRoot=${JAVA_PREFS_DIR}/uprefs"
 
 function cleanTemp {
     if [[ ${DEBUG_MODE} =~ "debug" ]]; then
@@ -134,7 +141,7 @@ function cleanTemp {
 if [[ $FB_MODE =~ "xvfb" ]]; then
     echo "initialize virtual framebuffer"
     START_PORT=`shuf -i 5000-6000 -n 1`
-    XVFB_WORKING_DIR=${output_dir}/xvfb_temp
+    XVFB_WORKING_DIR=${WORKING_DIR}/xvfb_temp
     mkdir -p ${XVFB_WORKING_DIR}
     . $DIR/init_xvfb.sh ${START_PORT} ${XVFB_WORKING_DIR}
     function exitHandler() { cleanXvfb; cleanTemp; }
@@ -164,20 +171,21 @@ EOL
 echo "~ Run alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
 /opt/aligner/20xBrain_Align_CMTK.sh ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}
 
-echo "~ Display preproc log"
-cat "${WORKING_DIR}/FinalOutputs/debug/preproc.log"
-
 cd ${output_dir}
 echo ""
 echo "~ Listing working files:"
 echo ""
 ls -lR $WORKING_DIR
 
-echo "~ Moving final output to ${output_dir}"
-mv ${WORKING_DIR}/FinalOutputs/* ${output_dir}
+ALIGNMENT_OUTPUT="${output_dir}/aligned"
+mkdir -p ${ALIGNMENT_OUTPUT}
 
-alignment_results=(${output_dir}/*.v3dpbd)
-if [ ${#alignment_results[@]} -gt 0 ]; then 
+echo "~ Moving final output to ${ALIGNMENT_OUTPUT}"
+mv ${WORKING_DIR}/FinalOutputs/* ${ALIGNMENT_OUTPUT}
+
+alignment_results=(${ALIGNMENT_OUTPUT}/*.v3dpbd)
+echo "Alignment results: ${alignment_results[@]}"
+if ((${#alignment_results[@]} == 0)); then
     echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
     cleanTemp
 else
@@ -188,7 +196,7 @@ fi
 # setup color depth output directory - make sure that it ends with a slash because 
 # the fiji macro simply appends the output filename to this
 COLOR_DEPTH_MIPS_OUTPUT_DIR="${output_dir}/color_depth_mips/"
-echo "~ Generate color depth mips ${area} ${output_dir} ${COLOR_DEPTH_MIPS_OUTPUT_DIR}"
-/opt/color_depth/color_depth.sh ${area} ${output_dir} ${COLOR_DEPTH_MIPS_OUTPUT_DIR}
+echo "~ Generate color depth mips ${area} ${ALIGNMENT_OUTPUT} ${COLOR_DEPTH_MIPS_OUTPUT_DIR}"
+/opt/color_depth/color_depth.sh ${area} ${ALIGNMENT_OUTPUT} ${COLOR_DEPTH_MIPS_OUTPUT_DIR}
 
-echo "~ Finished"
+echo "~ Finished generating color depth masks"
