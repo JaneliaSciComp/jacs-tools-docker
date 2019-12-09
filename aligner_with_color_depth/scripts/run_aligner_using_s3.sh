@@ -166,3 +166,15 @@ fi
 # copy the results to the s3 output bucket
 echo "Copy ${results_dir}/color_depth_mips -> s3://${outputs_s3bucket_name}${output_dir}"
 aws s3 cp --recursive "${results_dir}/color_depth_mips" "s3://${outputs_s3bucket_name}${output_dir}"
+
+# delete the input
+echo "Remove s3://${inputs_s3bucket_name}${input_filepath}"
+aws s3 rm "s3://${inputs_s3bucket_name}${input_filepath}"
+rm -f ${working_input_filepath}
+
+if [[ "${neuron_mask}" != "" ]] ; then
+    # delete the mask if there was one
+    echo "Remove neuron mask from s3://${inputs_s3bucket_name}${neuron_mask}"
+    aws s3 rm "s3://${inputs_s3bucket_name}${neuron_mask}"
+    rm -f ${working_neuron_mask}
+fi
