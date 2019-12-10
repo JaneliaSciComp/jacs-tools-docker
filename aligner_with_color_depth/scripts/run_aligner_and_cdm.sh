@@ -138,18 +138,9 @@ function cleanTemp {
     fi
 }
 
-if [[ $FB_MODE =~ "xvfb" ]]; then
-    echo "initialize virtual framebuffer"
-    START_PORT=`shuf -i 5000-6000 -n 1`
-    XVFB_WORKING_DIR=${WORKING_DIR}/xvfb_temp
-    mkdir -p ${XVFB_WORKING_DIR}
-    . $DIR/init_xvfb.sh ${START_PORT} ${XVFB_WORKING_DIR}
-    function exitHandler() { cleanXvfb; cleanTemp; }
-    trap exitHandler EXIT
-else
-    function exitHandler() { cleanTemp; }
-    trap exitHandler EXIT
-fi
+source ${COMMON_TOOLS_DIR}/setup_xvfb.sh
+function exitHandler() { exitXvfb; cleanTemp; }
+trap exitHandler EXIT
 
 YAML_CONFIG_FILE=${output_dir}/align.yml
 
@@ -189,7 +180,7 @@ if (( ${#alignment_results} )); then
     echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
     cleanTemp
 else
-    echo "~ No alignment were found after alignment of ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+    echo "~ No alignment results were found after alignment of ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
     exit 1
 fi
 

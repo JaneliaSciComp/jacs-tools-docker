@@ -117,8 +117,16 @@ export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
 
 WORKING_DIR=${output_dir}/temp
+echo "Create working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 cd ${WORKING_DIR}
+
+JAVA_PREFS_DIR="${WORKING_DIR}/.java"
+echo "Set java preferences directory to ${JAVA_PREFS_DIR}"
+mkdir -p "${JAVA_PREFS_DIR}/sprefs"
+mkdir -p "${JAVA_PREFS_DIR}/uprefs"
+
+export JAVA_OPTS="-Djava.util.prefs.systemRoot=${JAVA_PREFS_DIR}/sprefs -Djava.util.prefs.userRoot=${JAVA_PREFS_DIR}/uprefs"
 
 function cleanTemp {
     if [[ ${DEBUG_MODE} =~ "debug" ]]; then
@@ -130,16 +138,9 @@ function cleanTemp {
     fi
 }
 
-if [[ $FB_MODE =~ "xvfb" ]]; then
-    echo "initialize virtual framebuffer"
-    START_PORT=`shuf -i 5000-6000 -n 1`
-    . $DIR/init_xvfb.sh ${START_PORT} ${WORKING_DIR}
-    function exitHandler() { cleanXvfb; cleanTemp; }
-    trap exitHandler EXIT
-else
-    function exitHandler() { cleanTemp; }
-    trap exitHandler EXIT
-fi
+source ${COMMON_TOOLS_DIR}/setup_xvfb.sh
+function exitHandler() { exitXvfb; cleanTemp; }
+trap exitHandler EXIT
 
 YAML_CONFIG_FILE=${output_dir}/align.yml
 
@@ -158,7 +159,7 @@ inputs:
   voxel_size: ${voxel_size}
 EOL
 
-
+echo "~ Run alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
 /opt/aligner/20xBrain_Align_CMTK.sh ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}
 
 cd ${output_dir}
@@ -169,5 +170,14 @@ ls -lR $WORKING_DIR
 
 echo "~ Moving final output to ${output_dir}"
 mv ${WORKING_DIR}/FinalOutputs/* ${output_dir}
+
+alignment_results=$(shopt -s nullglob dotglob; echo ${output_dir}/*.v3dpbd)
+echo "Alignment results: ${alignment_results[@]}"
+if (( ${#alignment_results} )); then
+    echo "~ Finished alignment: ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+else
+    echo "~ No alignment results were found after alignment of ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+    exit 1
+fi
 
 echo "~ Finished"

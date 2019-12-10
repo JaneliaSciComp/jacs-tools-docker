@@ -1,4 +1,4 @@
-FROM scientificlinux/sl:7
+FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
 COPY aligner /opt/aligner
 COPY color_depth /opt/color_depth
@@ -7,14 +7,6 @@ COPY scripts /opt/aligner-scripts
 RUN chmod 755 /opt/aligner/*.sh
 RUN chmod 755 /opt/aligner-scripts/*.sh
 
-ENV FB_MODE=
-
-RUN echo "Installing dependencies"
-ENV EPEL_FILE=epel-release-latest-7.noarch.rpm
-RUN curl -s http://dl.fedoraproject.org/pub/epel/{$EPEL_FILE} -o '#1'
-RUN rpm -ivh $EPEL_FILE && /bin/rm -f $EPEL_FILE
-RUN yum install -y python-pip jq bc tree
-RUN pip install --upgrade pip
 RUN pip install yq
 
 RUN echo "Installing S3 FUSE and AWS CLI"
@@ -25,8 +17,6 @@ ENV S3_TEMPLATES_MOUNTPOINT=/data/s3/templates
 RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}
 
 WORKDIR /opt
-
-RUN yum install -y net-tools libX11-devel Xvfb 
 
 RUN echo "Installing Vaa3d"
 # Prereqs for Vaa3d

@@ -155,8 +155,8 @@ run_align_cmd_args=(
     --mprotocol "\"${mounting_protocol}\""
     "${other_args[@]}"
 )
-echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
-/opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
+echo "Run: /opt/aligner-scripts/run_aligner_and_cdm.sh ${run_align_cmd_args[@]}"
+/opt/aligner-scripts/run_aligner_and_cdm.sh "${run_align_cmd_args[@]}"
 alignment_exit_code=$?
 if (($alignment_exit_code != 0)) ; then
     echo "Alignment exited with $alignment_exit_code";

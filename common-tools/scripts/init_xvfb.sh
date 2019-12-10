@@ -35,7 +35,13 @@ function cleanXvfb {
     rm -f ${X_WORK_DIR}/.X11-unix/X${PORT}
     echo "Cleaned up Xvfb"
 }
-trap cleanXvfb EXIT
+
+function screenSnapshot {
+    # take a screenshot
+    echo "Taking a screen snapshot -> ${X_WORK_DIR}/screenshot_${PORT}.png"
+    DISPLAY=:$PORT import -window root ${X_WORK_DIR}/screenshot_${PORT}.png
+}
+trap screenSnapshot SIGINT SIGQUIT SIGKILL SIGTERM SIGHUP
 
 while [ "$COUNTER" -lt "$RETRIES" ]; do
     
