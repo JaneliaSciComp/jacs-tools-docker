@@ -36,33 +36,30 @@ help_cmd="$0
     -h"
 while [[ $# > 0 ]]; do
     key="$1"
-    if [ "$key" == "" ] ; then
-	    break
-    fi
     shift # past the key
     case $key in
         --area)
-            area=$1
+            area="$1"
             shift # past value
             ;;
         --shape)
-            shape=$1
+            shape="$1"
             shift # past value
             ;;
         --gender)
-            gender=$1
+            gender="$1"
             shift # past value
             ;;
         --isize)
-            image_size=$1
+            image_size="$1"
             shift # past value
             ;;
         --vsize)
-            voxel_size=$1
+            voxel_size="$1"
             shift # past value
             ;;
         --mprotocol)
-            mounting_protocol=$1
+            mounting_protocol="$1"
             shift # past value
             ;;
         --nchannels)
@@ -74,7 +71,7 @@ while [[ $# > 0 ]]; do
             shift # past value
             ;;
         --objective)
-            objective=$1
+            objective="$1"
             shift # past value
             ;;
         --nslots)
@@ -82,30 +79,31 @@ while [[ $# > 0 ]]; do
             shift
             ;;
         --templatedir)
-            template_dirname=$1
+            template_dirname="$1"
             shift # past value
             ;;
         -i|--input)
-            input_filepath=$1
+            input_filepath="$1"
             shift # past value
             ;;
         --nmask)
-            neuron_mask=$1
+            neuron_mask="$1"
             shift # past value
             ;;
         -o|--output)
-            output_dir=$1
+            output_dir="$1"
             shift # past value
             ;;
         -debug)
             export DEBUG_MODE=debug
-            # no need to shif
+            # no need to shift
             ;;
         -h|--help)
             echo "${help_cmd}"
             exit 0
             ;;
         *)
+            echo "Unknown flag ${key}"
             echo "${help_cmd}"
             exit 1
             ;;
@@ -116,7 +114,7 @@ default_fb_mode="xvfb"
 export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
 
-WORKING_DIR=${output_dir}/temp
+WORKING_DIR="${output_dir}/temp"
 echo "Create working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 cd ${WORKING_DIR}

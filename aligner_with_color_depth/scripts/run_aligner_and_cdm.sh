@@ -98,7 +98,7 @@ while [[ $# > 0 ]]; do
             ;;
         -debug)
             export DEBUG_MODE=debug
-            # no need to shif
+            # no need to shift
             ;;
         -h|--help)
             echo "${help_cmd}"
