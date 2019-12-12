@@ -2,6 +2,7 @@ FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
 COPY aligner /opt/aligner
 COPY scripts /opt/aligner-scripts
+COPY cwls /etc/cwls
 
 RUN chmod 755 /opt/aligner/*.sh
 RUN chmod 755 /opt/aligner-scripts/*.sh
