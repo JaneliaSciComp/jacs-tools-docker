@@ -110,6 +110,11 @@ while [[ $# > 0 ]]; do
     esac
 done
 
+if [ ! -e "${input_filepath}" ]; then
+    echo "Input file path ${input_filepath} not found"
+    exit 1
+fi
+
 default_fb_mode="xvfb"
 export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
