@@ -8,9 +8,16 @@ function build {
     shift
     local _otherTags="$@"
 
-    CDIR=${_name}
+    CDIR=''
+    for i in $(find . -name "${_name}" );  do
+        if [[ -f ${i}/Dockerfile ]]; then
+            echo "Found container directory ${CDIR}"
+            CDIR=${i}
+            break            
+        fi
+    done
 
-    if [[ ! -d ${CDIR} ]]; then
+    if [[ -z ${CDIR} ]]; then
         echo "Container directory not found -> ${CDIR}"
         exit 1
     fi
