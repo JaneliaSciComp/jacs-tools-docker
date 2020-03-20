@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 RUN apt-get update
 RUN apt-get install -y curl
 
-# install Matlab-2017a
+# download c3d
 WORKDIR /c3d-download
 
 RUN curl -sSL "http://downloads.sourceforge.net/project/c3d/c3d/1.0.0/c3d-1.0.0-Linux-x86_64.tar.gz" \
