@@ -28,6 +28,7 @@ RUN cmake -DPyCA_DIR:PATH=/pyca-build -DPyCA_SOURCE:PATH=/pyca-src \
           -DBUILD_ALL_ANTS_APPS:BOOL=ON \
           -DRUN_LONG_TESTS:BOOL=OFF \
           -DRUN_SHORT_TESTS:BOOL=OFF \
+          -DSuperBuild_ANTS_USE_GIT_PROTOCOL:BOOL=OFF \
           /ANTs-src
 RUN make -j 8
 

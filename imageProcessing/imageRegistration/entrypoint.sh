@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-helpmsg="<ANTs-tool|regiprep|deformImage> [<tool-specific-args>]"
+helpmsg="<ANTs-tool|regiprep|deformImage|antsRegistration|WarpImageMultiTransform|> [<tool-specific-args>]"
 
 if [ $# == 0 ] ; then
     echo "${helpmsg}"
