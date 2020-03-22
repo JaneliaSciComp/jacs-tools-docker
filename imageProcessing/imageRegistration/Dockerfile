@@ -8,6 +8,7 @@ RUN apt-get install -y \
     python-numpy \
    	libz-dev \
  	python3 python3-pip \
+    gcc-8 g++-8 \
     cmake
 
 # clone pyca repo
@@ -24,19 +25,19 @@ WORKDIR /ANTs-src
 RUN git clone https://github.com/GFleishman/ANTs.git .
 # build ANTs
 WORKDIR /ANTs-build
-RUN cmake -DPyCA_DIR:PATH=/pyca-build -DPyCA_SOURCE:PATH=/pyca-src \
+RUN cmake -DPyCA_DIR:PATH=/pyca-build \
+          -DPyCA_SOURCE:PATH=/pyca-src \
           -DBUILD_ALL_ANTS_APPS:BOOL=ON \
           -DRUN_LONG_TESTS:BOOL=OFF \
           -DRUN_SHORT_TESTS:BOOL=OFF \
           -DSuperBuild_ANTS_USE_GIT_PROTOCOL:BOOL=OFF \
           /ANTs-src
-RUN make -j 8
+RUN make -j 4
 
 # install regiprep python scripts
 WORKDIR /regiprep
 RUN git clone https://github.com/GFleishman/regiprep.git .
 RUN pip3 install numpy scipy nibabel h5py
-
 
 WORKDIR /app
 
