@@ -1,8 +1,10 @@
 #!/bin/bash
 
-SUDO=echo
+DEFAULT_NAMESPACE=
+DEFAULT_SUDO=echo
+SUDO=${SUDO:-${DEFAULT_SUDO}}
 DOCKER=docker
-NAMESPACE=
+NAMESPACE=${NAMESPACE:-${DEFAULT_NAMESPACE}}
 
 container_dirs=()
 
@@ -58,6 +60,7 @@ function build {
                 BUILD_ARGS="${BUILD_ARGS} -t ${t}"
             done
         fi
+
         for t in ${_otherTags[@]}; do
             BUILD_ARGS="${BUILD_ARGS} -t ${t}"
         done
@@ -84,6 +87,8 @@ function push {
             fi
             local lname=${NAMESPACE}/${container_name}:"latest"
             $SUDO $DOCKER push $lname
+        else
+            echo "No namespace defined for pushing $container_name"
         fi
     done
 }
@@ -94,14 +99,12 @@ function pushTags {
     findContainerDirs "${_name}"
 
     for cdir in ${container_dirs[@]}; do
-
         if [[ -e "${cdir}/TAGS" ]]; then
             local local_container_tags=($(awk '{ print($1)}' "$cdir/TAGS"))
             for t in ${local_container_tags[@]}; do
                 $SUDO $DOCKER push ${t}
             done
         fi
-
     done
 }
 
@@ -110,84 +113,43 @@ CMDARR=(${COMMANDS//+/ })
 shift 1 # remove command parameter from args
 
 helpmsg="$0 
-    build <buildargs> 
+    build <buildargs>
+    push <containers>
+    pushTags <containers>
     help
 "
+container_names=()
+container_tags=()
+while [[ $# > 0 ]]; do
+    key="$1"
+    shift # past the key
+    case $key in
+        -t)
+            container_tag="$1"
+            shift
+            container_tags=("${container_tags[@]}" ${container_tag})
+            ;;
+        *)
+            container_names=("${container_names[@]}" ${key})
+            ;;
+    esac
+done
 
 for COMMAND in "${CMDARR[@]}" ; do
     case $COMMAND in
         build)
-            container_names=()
-            container_tags=()
-            while [[ $# > 0 ]]; do
-                key="$1"
-                shift # past the key
-                case $key in
-                    -t)
-                        container_tag="$1"
-                        shift
-                        container_tags=("${container_tags[@]}" ${container_tag})
-                        ;;
-                    *)
-                        container_names=("${container_names[@]}" ${key})
-                        ;;
-                esac
-            done
             for container_name in "${container_names[@]}"; do
                 echo "Build $container_name ${container_tags[@]}"
                 build ${container_name} ${container_tags[@]}
             done
             ;;
-        find)
-            container_names=()
-            container_tags=()
-            while [[ $# > 0 ]]; do
-                key="$1"
-                shift # past the key
-                case $key in
-                    -t)
-                        container_tag="$1"
-                        shift
-                        container_tags=("${container_tags[@]}" ${container_tag})
-                        ;;
-                    *)
-                        container_names=("${container_names[@]}" ${key})
-                        ;;
-                esac
-            done
-            for container_name in "${container_names[@]}"; do
-                echo "Lookup $container_name"
-                findContainerDirs ${container_name}
-                echo "${container_dirs[@]}"
-            done
-            ;;
         push)
-            container_names=()
-            while [[ $# > 0 ]]; do
-                key="$1"
-                shift # past the key
-                case $key in
-                    *)
-                        container_names=("${container_names[@]}" ${key})
-                        ;;
-                esac
-            done
             for container_name in "${container_names[@]}"; do
                 echo "Push $container_name"
                 push ${container_name}
             done
             ;;
         pushTags) # push the tags defined in the TAGS file under the container folder
-            container_names=()
-            while [[ $# > 0 ]]; do
-                key="$1"
-                shift # past the key
-                case $key in
-                    *)
-                        container_names=("${container_names[@]}" ${key})
-                        ;;
-                esac
-            done
             for container_name in "${container_names[@]}"; do
                 echo "Push all tags from $container_name"
                 pushTags ${container_name}
