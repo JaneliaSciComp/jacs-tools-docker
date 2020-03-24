@@ -31,4 +31,4 @@ COPY clusterTF_fn /app
 
 RUN chmod 755 /app/entrypoint.sh /app/clusterTF_fn
 
-CMD [ "/app/entrypoint.sh" ]
+ENTRYPOINT [ "/app/entrypoint.sh" ]
