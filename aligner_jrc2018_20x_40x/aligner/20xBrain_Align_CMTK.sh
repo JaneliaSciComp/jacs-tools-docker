@@ -506,8 +506,6 @@ if [[ -e $Global_Aligned_Separator_Result ]]; then
     rm $RAWOUT_NEURON
 fi
 
-
-
 if [[ $TRESOLUTION == "20x_gen1" ]]; then
     voxel_size="0.6214809x0.6214809x1.0"
     voxel_size_uni="0.5189161x0.5189161x1.0"
@@ -544,7 +542,6 @@ fi
 
 writeProperties "$RAWOUT" "" "JRC2018_${genderT}_${TRESOLUTION}" "$TRESOLUTION" "$voxel_size" "$image_size" "$score2018" ""
 
-
 ########################################################################################################
 # JRC2018 unisex alignment
 ########################################################################################################
@@ -575,8 +572,6 @@ if [[ $TRESOLUTION != "20x_gen1" ]]; then
     writeProperties "$RAWOUT" "$FLIP_NEURON" "JRC2018_Unisex_${TRESOLUTION}" "$TRESOLUTION" "$voxel_size_uni" "$image_size_uni" "" "$main_aligned_file"
 fi
 
-
-
 ########################################################################################################
 # JFRC2010 alignment
 ########################################################################################################
@@ -599,7 +594,6 @@ scoreGen $sig"_01.nrrd" "$SCORETEMP" "score2010"
 
 writeProperties "$RAWOUT" "" "$UNIFIED_SPACE" "20x" "0.62x0.62x1.00" "1024x512x218" "$score2010" "$main_aligned_file"
 
-
 ########################################################################################################
 # JFRC2013/JFRC2014 aligmment
 ########################################################################################################
@@ -619,7 +613,6 @@ fi
 
 writeProperties "$RAWOUT" "" "$ALIGNMENT_SPACE" "20x" "0.4653716x0.4653716x0.76" "1184x592x218" "" "$main_aligned_file"
 
-
 ########################################################################################################
 # JFRC2018 Unisex High-resolution (for color depth search)
 ########################################################################################################
@@ -633,17 +626,13 @@ if [[ $TRESOLUTION != "20x_HR" ]]; then
     reformatAll "$gsig" "$TEMP" "$DEFFIELD" "$sig" "RAWOUT"
 
     writeProperties "$RAWOUT" "" "JRC2018_Unisex_20x_HR" "20x" "0.5189161x0.5189161x1.0" "1210x566x174" "" "$main_aligned_file"
-
 fi
 
 # -------------------------------------------------------------------------------------------
-
 echo "Converting all v3draw files to v3dpbd format"
 compressAllRaw "$Vaa3D" "$OUTPUT"
 
-
 # -------------------------------------------------------------------------------------------
-
 echo "+----------------------------------------------------------------------+"
 echo "| Copying files to final destination"
 echo "+----------------------------------------------------------------------+"
