@@ -44,7 +44,6 @@ objective=$INPUT1_OBJECTIVE
 OUTPUT=$WORK_DIR"/Output"
 FINALOUTPUT=$WORK_DIR"/FinalOutputs"
 TempDir=`realpath $TEMPLATE_DIR/jrc2018_20x_40x_templates`
-testmode=0
 
 DEBUG_DIR="${OUTPUT}/debug"
 mkdir -p $DEBUG_DIR
@@ -412,12 +411,6 @@ elif [[ "$OL" == "Both_OL_missing" ]]; then
     iniT=$JRC2018_20x_noOL
 elif [[ "$OL" == "Both_OL_missing (40x)" ]]; then
     iniT=$JRC2018_20x_noOL
-fi
-
-# For TEST ############################################
-if [[ $testmode == 1 ]]; then
-    gloval_nc82_nrrd=$OUTPUT"/JRC2018MALE_JFRC2014_63x_DistCorrected_01_warp.nrrd"
-    iniT=$TempDir"/JFRC2014_63x_DistCorrected_G15.nrrd"
 fi
 
 echo "iniT; "$iniT
