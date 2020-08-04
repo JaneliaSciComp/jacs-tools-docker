@@ -3,3 +3,5 @@
 *.bak
 # local files
 local
+# nextflow hidden files
+.nextflow*

@@ -1,7 +1,9 @@
-FROM continuumio/miniconda3:4.6.14
+FROM continuumio/miniconda3:4.8.2
 
 RUN conda create -n py3 python=3 h5py=2.8.0 PyYAML=3.13 -y \
-    && conda clean --tarballs
+    && conda clean --tarballs \
+    && conda env config vars set TMPDIR=/tmp \
+    && conda init bash
 
 WORKDIR /app
 COPY src .
