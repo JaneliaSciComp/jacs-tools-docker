@@ -9,15 +9,15 @@ docker build . -t jacs-tools/fiji_convert:latest
 
 ## Usage
 
-The parameter to the macro is "<input file>,<output file>,<split channels>" where <split channels> is a 0 or 1.
+The parameter to the macro is "\<input file>,\<output file>,\<split channels>" where \<split channels> is a 0 or 1.
 ```
 DIR=/path/to/your/image/files
-docker run --user `id -u` -v $DIR:$DIR jacs-tools/fiji_convert:latest $DIR/tile-2816195289193381909.v3draw,$DIR/tile-2816195289193381909.nrrd,1
+docker run --user `id -u` -v $DIR:$DIR jacs-tools/fiji_convert:latest $DIR/tile.v3draw,$DIR/tile.nrrd,1
 ```
 
-To run with Singularity, you need to use `exec` command and explicitly specify the entrypoint script, because otherwise Singularity will look for it in the current directory, since it doesn't respect Docker's WORKDIR.
+To run with Singularity, convert to SIF first, and then bind the directory into the container when running:
 ```
 singularity build /tmp/out.sif docker-daemon://jacs-tools/fiji_convert:latest
-singularity exec -B $DIR /tmp/out.sif $DIR/tile-2816195289193381909.v3draw,$DIR/tile-2816195289193381909.nrrd,1
+singularity run -B $DIR /tmp/out.sif $DIR/tile.v3draw,$DIR/tile.nrrd,1
 ```
 
