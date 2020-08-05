@@ -7,7 +7,7 @@ Build
 docker build . -t jacs-scripts/h5j_metadata:1.0.0
 ```
 
-Local Usage
+Run with Docker
 ```
 export DIR=/path/to/your/h5j/file
 # Read metadata from H5J and write metadata.yaml
@@ -27,5 +27,5 @@ Distribution using Docker Registry
 docker build . -t registry.int.janelia.org/jacs-scripts/h5j_metadata:1.0.0
 docker push registry.int.janelia.org/jacs-scripts/h5j_metadata:1.0.0
 export DIR=/dir/to/your/file
-docker run -it -v $DIR:$DIR registry.int.janelia.org/jacs-scripts/h5j_metadata:1.0.0 -d $DIR/tile-2607115756248236069.h5j > metadata.yaml
+docker run -it -v $DIR:$DIR registry.int.janelia.org/jacs-scripts/h5j_metadata:1.0.0 -i $DIR/tile-2607115756248236069.h5j
 ```
