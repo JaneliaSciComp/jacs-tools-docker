@@ -13,7 +13,7 @@ RESZ=$5
 ForceUseVxSize=$6
 
 InputFileName=$(basename ${InputFilePath})
-InputName==${InputFileName%.*}
+InputName=${InputFileName%.*}
 InputFileParentPath=$(dirname ${InputFilePath})
 
 WORKING_DIR=${WORKING_DIR:-"${InputFileParentPath}/${InputName}_TMP"}
@@ -25,6 +25,8 @@ TEMPLATE_DIR=${TEMPLATE_DIR:-"/data/templates"}
 TempDir=`realpath ${TEMPLATE_DIR}`
 
 echo "InputFilePath: ${InputFilePath}"
+echo "InputFileName: ${InputFileName}"
+echo "InputName: ${InputName}"
 echo "ForceUseVxSize: ${ForceUseVxSize}"
 echo "Channels: ${NCHANNELS}"
 echo "NSlots: ${NSLOTS}"
