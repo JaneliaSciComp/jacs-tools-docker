@@ -3,40 +3,18 @@ cwlVersion: v1.0
 baseCommand: /opt/aligner-scripts/run_aligner_using_s3.sh
 
 inputs:
-    area:
+    xyres:
         type: string
         inputBinding:
-            prefix: --area
-            valueFrom: $("/Brain/VNC".split('/').slice(-1)[0])
-    shape:
+            prefix: --xyres
+    zres:
         type: string
         inputBinding:
-            prefix: --shape
-    gender:
-        type: string
-        inputBinding:
-            prefix: --gender
-            valueFrom: $("/f/m".split('/').slice(-1)[0])
-    imageSize:
-        type: string
-        inputBinding:
-            prefix: --isize
-    voxelSize:
-        type: string
-        inputBinding:
-            prefix: --vsize
-    mountingProtocol:
-        type: string
-        inputBinding:
-            prefix: --mprotocol
+            prefix: --zres
     numberOfChannels:
         type: int
         inputBinding:
             prefix: --nchannels
-    referenceChannel:
-        type: int
-        inputBinding:
-            prefix: --refchannel
     templatesBucket:
         type: Directory
         inputBinding:
@@ -49,10 +27,6 @@ inputs:
         type: File
         inputBinding:
             prefix: -i
-    neuronMaskPath:
-        type: File
-        inputBinding:
-            prefix: -nmask
     outputsBucket:
         type: Directory
         inputBinding:
@@ -74,7 +48,3 @@ outputs:
         type: File
         outputBinding:
             glob: s3://$(inputs.outputsBucket)/$(inputs.outputDirectory)/*.v3dpbd
-    resultsMetadata:
-        type: File
-        outputBinding:
-            glob: s3://$(inputs.outputsBucket)/$(inputs.outputDirectory)/*.properties

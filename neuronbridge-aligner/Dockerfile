@@ -1,14 +1,11 @@
 FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
 COPY aligner /opt/aligner
-COPY color_depth /opt/color_depth
 COPY scripts /opt/aligner-scripts
 COPY cwls /etc/cwls
 
 RUN chmod 755 /opt/aligner/*.sh
 RUN chmod 755 /opt/aligner-scripts/*.sh
-
-RUN pip install yq
 
 RUN echo "Installing S3 FUSE and AWS CLI"
 RUN yum install -y fuse-devel s3fs-fuse awscli
@@ -43,12 +40,9 @@ RUN echo "Installing Fiji plugins for the aligner"
 ENV PLUGINS_SOURCE=/opt/aligner/fiji_plugins
 ENV PLUGINS_TARGET=/opt/Fiji/plugins
 RUN cp -R $PLUGINS_SOURCE/* $PLUGINS_TARGET && /bin/rm -rf $PLUGINS_SOURCE
-RUN echo "Installing Fiji plugins for color depth"
-ENV PLUGINS_SOURCE=/opt/color_depth/fiji_plugins
-RUN cp -R $PLUGINS_SOURCE/* $PLUGINS_TARGET && /bin/rm -rf $PLUGINS_SOURCE
 
 RUN echo "Installing Fiji LUTs for color depth"
-ENV LUTS_SOURCE=/opt/color_depth/fiji_luts
+ENV LUTS_SOURCE=/opt/aligner/fiji_luts
 ENV LUTS_TARGET=/opt/Fiji/luts
 RUN cp -R $LUTS_SOURCE/* $LUTS_TARGET && /bin/rm -rf $LUTS_SOURCE
 

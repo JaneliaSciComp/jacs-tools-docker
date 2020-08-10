@@ -16,10 +16,10 @@ InputFileName=$(basename ${InputFilePath})
 InputName==${InputFileName%.*}
 InputFileParentPath=$(dirname ${InputFilePath})
 
-WORK_DIR=${WORKDIR:-"${InputFileParentPath}/${InputName}_TMP"}
-DEBUG_DIR="${WORK_DIR}/Debug"
-OUTPUT="${WORK_DIR}/Output"
-FINALOUTPUT="${WORK_DIR}/FinalOutput"
+WORKING_DIR=${WORKING_DIR:-"${InputFileParentPath}/${InputName}_TMP"}
+DEBUG_DIR="${WORKING_DIR}/Debug"
+OUTPUT="${WORKING_DIR}/Output"
+FINALOUTPUT=${FINALOUTPUT:-"${WORKING_DIR}/FinalOutputs"}
 
 TEMPLATE_DIR=${TEMPLATE_DIR:-"/data/templates"}
 TempDir=`realpath ${TEMPLATE_DIR}`
@@ -31,7 +31,7 @@ echo "NSlots: ${NSLOTS}"
 echo "RESX ${RESX}"
 echo "RESZ: ${RESZ}"
 echo "TEMPLATE_DIR: ${TEMPLATE_DIR}"
-echo "WORK_DIR: ${WORK_DIR}"
+echo "WORKING_DIR: ${WORKING_DIR}"
 echo "OUTPUT: ${OUTPUT}"
 
 # Tools
@@ -141,7 +141,7 @@ function banner() {
 
 
 # Main Script
-mkdir -p ${WORK_DIR}
+mkdir -p ${WORKING_DIR}
 mkdir -p ${DEBUG_DIR}
 mkdir -p ${OUTPUT}
 mkdir -p ${FINALOUTPUT}
@@ -302,7 +302,7 @@ gsig="${OUTPUT}/${InputName}"
 reformatAll "${gsig}" "${TEMPLATE}" "${DEFFIELD}" "${sig}" "RAWOUT"
 scoreGen "${sig}_01.nrrd" ${TEMPLATE} "score2018" 
 
-${FIJI} --headless -macro ${MIPGENERATION} "${OUTPUT}/,${sig}_02.nrrd,${WORK_DIRPRE}/MIP/,${TempDir}/,Brain" &
+${FIJI} --headless -macro ${MIPGENERATION} "${OUTPUT}/,${sig}_02.nrrd,${WORKING_DIR}/MIP/,${TempDir}/,Brain" &
 
 rm ${gsig}_01.nrrd
 rm ${gsig}_02.nrrd

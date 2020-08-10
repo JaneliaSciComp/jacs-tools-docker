@@ -6,10 +6,8 @@ templates_s3bucket_name=
 inputs_s3bucket_name=
 outputs_s3bucket_name=
 input_filepath=
-neuron_mask=
 output_dir=
 other_args=()
-mounting_protocol=
 use_iam_role=
 
 help_cmd="$0 
@@ -17,7 +15,6 @@ help_cmd="$0
     --use-iam-role <iam role to be used by S3FS or auto, if not specified AWS keys must be set>
     --inputs-s3bucket-name <inputs S3 bucket name>
     --outputs-s3bucket-name <outputs S3 bucket name>
-    --nmask <neuron mask path in the inputs bucket>
     -i <input filepath in the inputs bucket>
     -o <output path in the outputs bucket>
     <other aligner args (see run_aligner.sh)>
@@ -28,10 +25,6 @@ while [[ $# > 0 ]]; do
     key="$1"
     shift # past the key
     case $key in
-        --mprotocol)
-            mounting_protocol="$1"
-            shift # past value
-            ;;
         --templates-s3bucket-name)
             templates_s3bucket_name="$1"
             shift # past value
@@ -46,10 +39,6 @@ while [[ $# > 0 ]]; do
             ;;
         -i|--input)
             input_filepath="$1"
-            shift # past value
-            ;;
-        --nmask)
-            neuron_mask="$1"
             shift # past value
             ;;
         -o|--output)

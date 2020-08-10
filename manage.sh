@@ -155,7 +155,7 @@ for COMMAND in "${CMDARR[@]}" ; do
                 pushTags ${container_name}
             done
             ;;
-        help)
+        -h|help)
             echo $helpmsg
             exit 0
             ;;
