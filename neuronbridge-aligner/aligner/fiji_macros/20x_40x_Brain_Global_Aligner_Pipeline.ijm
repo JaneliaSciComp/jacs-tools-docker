@@ -7,9 +7,9 @@ MIPsave=1;
 ShapeAnalysis=1;//perform shape analysis and kick strange sample
 CLAHEwithMASK=1;
 Batch=1;
-BWd=0; //BW decision at 793 line
+BWd=0; // BW decision at 793 line
 PrintSkip=0;
-templateBr="JFRC2014";//JFRC2013, JFRC2014, JRC2018
+templateBr="JFRC2014";// JFRC2013, JFRC2014, JRC2018
 ForceUSE=false;
 nrrdEx=true;
 revstack=false;
@@ -46,38 +46,13 @@ testArg=0;
 reverseR=1;
 APcheck=1;
 
-//nameFile="VT044948_GAL4_attP2_2.lsm"
-
-// 40x
-
-//testArg="/Users/otsunah/test/20x_brain_alignment/Failed_/,VT006863_GAL4_attP2_5.lsm,/Users/otsunah/test/20x_brain_alignment/Failed_/VT006863_GAL4_attP2_5.lsm,/Volumes/otsuna/template/,0.5,1,11,40x,JRC2018,Both_OL_missing (40x),/test/20x_brain_alignment/fail/ConsolidatedLabel.v3dpbd"
-
-//testArg= "/test/20x_brain_alignment/fail/,tile-2598433930730274853.v3draw,/test/20x_brain_alignment/fail/tile-2598433930730274853.v3draw,/Users/otsunah/Documents/otsunah/20x_brain_aligner/,0.44,0.44,11,40x,JRC2018,Both_OL_missing (40x),/test/20x_brain_alignment/fail/ConsolidatedLabel.v3dpbd"
-
-//testArg= "/test/20x_brain_alignment/fail/,tile-2597686417454792738.v3draw,/Users/otsunah/Dropbox\ \(HHMI\)/40x_project/tile-2597686417454792738.v3draw,/Users/otsunah/Documents/otsunah/20x_brain_aligner,0.44,0.44,11,40x,JRC2018,Both_OL_missing (40x),??"
-
-
-//for 20x
-//<<<<<<< HEAD
-//testArg= "/Registration/Output/,"+nameFile+",/Registration/"+nameFile+",/Users/otsunah/Registration/JRC2018_align_test/Template,0.4763198,1,11,20x,JRC2018,Both_OL_missing (40x),??"
-//=======
-//testArg= "/test/20x_brain_alignment/TwoChannel/,JRC_SS31881_20180615_24_B2_Brain.h5j,/Users/otsunah/Downloads/Workstation/JRC_SS31881/JRC_SS31881_20180615_24_B2_Brain.h5j,/Users/otsunah/Documents/otsunah/20x_brain_aligner/,0.52,1,7,20x,JRC2018,Unknown,??"
-
-//0.46
-//testArg= "/Users/otsunah/test/20x_brain_alignment/,VT002213_GAL4_attP2_1.lsm,/Users/otsunah/test/20x_brain_alignment/VT002213_GAL4_attP2_1.lsm,/Users/otsunah/Registration/JRC2018_align_test/Template,0.46,1,11,40x,JRC2018,JRC2018,Both_OL_missing (40x),??"
-
-
 //-Lop
-//testArg= "/test/20x_brain_alignment/NoLop/,GMR_13D08_AE_01_13-fA01b_C080304_20080305233708703.zip,/test/20x_brain_alignment/pre_Align_Test_Vol/-Lop/GMR_13D08_AE_01_13-fA01b_C080304_20080305233708703.zip,/Users/otsunah/Documents/otsunah/20x_brain_aligner/,0.46,1,7,20x,JRC2018,Unknown,??"
 flipchannel=0;
 PNGsave=0;
 opticlobeMASKcheck=0;
 nc82usecolor=0;
 //-Rop
 
-if(testArg!=0)
-args = split(testArg,",");
-else
 args = split(getArgument(),",");
 
 savedir = args[0];// save dir
@@ -100,7 +75,6 @@ LateralMIPPath = MatchingFilesDir+"Lateral_JFRC2010_5time_smallerMIP.tif";//  fu
 Slice50pxPath = MatchingFilesDir+"JFRC2010_50pxSlice.tif";//  full file path for "JFRC2010_50pxSlice.tif"
 ShapeMatchingMaskPath = MatchingFilesDir+"JFRC2010_ShapeMatchingMask.tif";//"JFRC2010_ShapeMatchingMask.tif";
 
-
 widthVx=parseFloat(widthVx);//Chaneg string to number
 depth=parseFloat(depth);//Chaneg string to number
 heightVx=widthVx;
@@ -108,7 +82,6 @@ NumCPU= parseFloat(NumCPU);//Chaneg string to number
 
 Ori_widthVx = widthVx;
 Ori_heightVx = widthVx;
-
 
 print("savedir; "+savedir);
 print("filename; "+filename);
@@ -196,18 +169,18 @@ ShapeMatchingMaskPath=FilePathArray[0];
 
 comparisonP="Median";//"Median";//"Max";//"Median"
 
-if(comparisonP=="Average"){// average is not good 13D08
+if(comparisonP=="Average") { // average is not good 13D08
 	JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_AvePro.png"; //"JFRC2010_AvePro.png"
 	FilePathArray=newArray(JFRC2010MedProPath, "JFRC2010_AvePro.png");
 	projectionSt="JFRC2010_AvePro.png";
 }
-if(comparisonP=="Median"){// good for izoom adjustment, but not good for optic lobe detection
+if(comparisonP=="Median") {// good for izoom adjustment, but not good for optic lobe detection
 	JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_MedPro.tif"; //"JFRC2010_AvePro.png"
 	FilePathArray=newArray(JFRC2010MedProPath, "JFRC2010_MedPro.tif");
 	projectionSt="JFRC2010_MedPro.tif";
 }
 
-if(comparisonP=="Max"){
+if(comparisonP=="Max") {
 	JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_MIP.tif"; //"JFRC2010_AvePro.png"
 	FilePathArray=newArray(JFRC2010MedProPath, "JFRC2010_MIP.tif");
 	projectionSt="JFRC2010_MIP.tif";
@@ -2000,45 +1973,35 @@ if(SizeM!=0){
 									resultstring=split(resultstringST,"  ");
 									
 									OBJScore=substring(resultstring[4],6,lengthOf(resultstring[4]));
-									
-									//	totalLog=getInfo("log");
-									//	OBJindex = lastIndexOf(totalLog, "score;");
-									//	xindex = lastIndexOf(totalLog,"shiftx");
-									//	yindex = lastIndexOf(totalLog,"shifty");
-									//	rotindex = lastIndexOf(totalLog,"rotation");
-									
-									//	OBJScore=substring(totalLog,OBJindex+6, lengthOf(totalLog));//getResult("OBJ score", 0);
+																		
 									OBJScore=parseFloat(OBJScore);//Chaneg string to number
 									
 									selectWindow("SingleSamp.tif");
 									close();
 									
-									if(OBJScore>MaxOBJ3Dscan){
+									if (OBJScore>MaxOBJ3Dscan) {
 										print("slice; "+inSlice);
 										MaxinSlice=inSlice;
 										MaxOBJ3Dscan=OBJScore;
 										
 										Rot=substring(resultstring[2],9,lengthOf(resultstring[2]));
-										//	Rot= substring(totalLog,rotindex+9, OBJindex-6);//getResult("rotation", 0);
 										Rot=parseFloat(Rot);//Chaneg string to number
 										
 										elipsoidAngle2=parseFloat(Rot);
 										if (elipsoidAngle2>90) 
-										elipsoidAngle2 = -(180 - elipsoidAngle2);
+											elipsoidAngle2 = -(180 - elipsoidAngle2);
 										
 										maxX=substring(resultstring[0],7,lengthOf(resultstring[0]));
-										//	maxX= substring(totalLog,xindex+7, yindex-2);//getResult("shiftx", 0);
 										maxX=parseFloat(maxX);//Chaneg string to number
 										
 										maxY=substring(resultstring[1],7,lengthOf(resultstring[1]));
-										//	maxY=substring(totalLog,yindex+7, rotindex-2);//getResult("shifty", 0);
 										maxY=parseFloat(maxY);//Chaneg string to number
 									}
 								}
 								print("MaxinSliceAN; "+MaxinSlice+"   MaxOBJ3DscanAN; "+MaxOBJ3Dscan+"  elipsoidAngle2; "+elipsoidAngle2);
 								
 								
-								if(MaxinSlice>finslice/2 && MaxOBJ3Dscan>580){
+								if(MaxinSlice>finslice/2 && MaxOBJ3Dscan>580) {
 									APinv=1;
 									print("AP_inverted!!");
 								}
@@ -2736,36 +2699,33 @@ function fileOpen(FilePathArray){
 	FilePath=FilePathArray[0];
 	MIPname=FilePathArray[1];
 	
-	//	print(MIPname+"; "+FilePath);
-	if(isOpen(MIPname)){
+	if (isOpen(MIPname)) {
 		selectWindow(MIPname);
 		tempMask=getDirectory("image");
 		FilePath=tempMask+MIPname;
-	}else{
-		if(FilePath==0){
-			
+	} else {
+		if (FilePath==0) {
 			FilePath=getDirectory("plugins")+MIPname;
-			
 			tempmaskEXI=File.exists(FilePath);
 			if(tempmaskEXI!=1)
-			FilePath=getDirectory("plugins")+"Brain_Aligner_Plugins"+File.separator+MIPname;
+				FilePath=getDirectory("plugins")+"Brain_Aligner_Plugins"+File.separator+MIPname;
 			
 			tempmaskEXI=File.exists(FilePath);
 			
-			if(tempmaskEXI==1){
+			if(tempmaskEXI==1) {
 				open(FilePath);
-			}else{
+			} else {
 				print("no file ; "+FilePath);
 			}
-		}else{
+		} else {
 			tempmaskEXI=File.exists(FilePath);
-			if(tempmaskEXI==1)
-			open(FilePath);
-			else{
+			if(tempmaskEXI==1) {
+				open(FilePath);
+			} else {
 				print("no file ; "+FilePath);
 			}
 		}
-	}//if(isOpen("JFRC2013_63x_Tanya.nrrd")){
+	}
 	
 	FilePathArray[0]=FilePath;
 }

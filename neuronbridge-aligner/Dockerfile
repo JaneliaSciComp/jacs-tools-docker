@@ -16,8 +16,6 @@ RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}
 
 WORKDIR /opt
 
-RUN echo "Installing Vaa3d"
-# Prereqs for Vaa3d
 RUN yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs wget
 
 RUN echo "Installing Fiji"
@@ -40,19 +38,12 @@ ENV LUTS_SOURCE=/opt/aligner/fiji_luts
 ENV LUTS_TARGET=/opt/Fiji/luts
 RUN cp -R $LUTS_SOURCE/* $LUTS_TARGET && /bin/rm -rf $LUTS_SOURCE
 
-# Install Vaa3d
-RUN echo "Download Vaa3d"
-ENV VAA3D_FILE=vaa3d-redhat-mark10.tgz
-RUN wget -q http://workstation.int.janelia.org/files/tools/${VAA3D_FILE}
-RUN tar xvf ${VAA3D_FILE} && /bin/rm -f ${VAA3D_FILE}
-RUN ln -s /opt/vaa3d-redhat-mark10 Vaa3D
-
 RUN echo "Installing CMTK"
 # Prereqs for CMTK
 RUN yum install -y fftw-libs-double
 # Install CMTK
 ENV CMTK_FILE=cmtk-20171001-sl7avx.tgz
-RUN wget -q http://workstation.int.janelia.org/files/tools/{$CMTK_FILE}
+RUN wget -q http://workstation.int.janelia.org/files/tools/${CMTK_FILE}
 RUN tar xvf $CMTK_FILE && /bin/rm -f $CMTK_FILE
 RUN ln -s cmtk-scm-2017-10-01 CMTK
 
