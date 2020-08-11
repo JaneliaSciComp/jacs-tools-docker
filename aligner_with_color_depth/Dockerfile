@@ -34,7 +34,7 @@ RUN echo "Installing Fiji"
 RUN yum install -y libXtst-devel libXrender
 # Install Fiji
 ENV FIJI_FILE=fiji-1.52c.tgz
-RUN curl -s http://workstation.int.janelia.org/files/fiji/{$FIJI_FILE} -o ${FIJI_FILE}
+RUN curl -s http://workstation.int.janelia.org/files/fiji/${FIJI_FILE} -o ${FIJI_FILE}
 RUN tar xvf $FIJI_FILE && /bin/rm -rf $FIJI_FILE
 RUN rm -rf Fiji
 RUN mv Fiji.app Fiji
@@ -57,7 +57,7 @@ RUN echo "Installing CMTK"
 RUN yum install -y fftw-libs-double
 # Install CMTK
 ENV CMTK_FILE=cmtk-20171001-sl7avx.tgz
-RUN curl -s http://workstation.int.janelia.org/files/tools/{$CMTK_FILE} -o '#1'
+RUN curl -s http://workstation.int.janelia.org/files/tools/${CMTK_FILE} -o '#1'
 RUN tar xvf $CMTK_FILE && /bin/rm -f $CMTK_FILE
 RUN ln -s cmtk-scm-2017-10-01 CMTK
 
