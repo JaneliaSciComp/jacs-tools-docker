@@ -163,23 +163,23 @@ fi
 Unaligned_Neuron_Separator_Result_V3DPBD=
 
 # "-------------------Template----------------------"
-JRC2018_Unisex_Onemicron1=$TemplatesDir"/JRC2018_UNISEX_20x_onemicron.nrrd"
-JRC2018_Unisex_OnemicronNoOL=$TemplatesDir"/JRC2018_UNISEX_20x_gen1_noOPonemicron.nrrd"
-JRC2018_Unisexgen1CROPPED=$OUTPUT"/TempCROPPED.nrrd"
+JRC2018_Unisex_Onemicron1="${TemplatesDir}/JRC2018_UNISEX_20x_onemicron.nrrd"
+JRC2018_Unisex_OnemicronNoOL="${TemplatesDir}/JRC2018_UNISEX_20x_gen1_noOPonemicron.nrrd"
+JRC2018_Unisexgen1CROPPED="${OUTPUT}/TempCROPPED.nrrd"
 
 # "-------------------Global aligned files----------------------"
-gloval_nc82_nrrd=$OUTPUT"/"$InputName"_01.nrrd"
-gloval_signalNrrd1=$OUTPUT"/"$InputName"_02.nrrd"
-gloval_signalNrrd2=$OUTPUT"/"$InputName"_03.nrrd"
-gloval_signalNrrd3=$OUTPUT"/"$InputName"_04.nrrd"
+gloval_nc82_nrrd="${OUTPUT}/${InputName}_01.nrrd"
+gloval_signalNrrd1="${OUTPUT}/${InputName}_02.nrrd"
+gloval_signalNrrd2="${OUTPUT}/${InputName}_03.nrrd"
+gloval_signalNrrd3="${OUTPUT}/$InputName}_04.nrrd"
 
 # "-------------------Deformation fields----------------------"
-registered_initial_xform=$OUTPUT"/initial.xform"
-registered_affine_xform=$OUTPUT"/affine.xform"
-registered_warp_xform=$OUTPUT"/warp.xform"
+registered_initial_xform="${OUTPUT}/initial.xform"
+registered_affine_xform="${OUTPUT}/affine.xform"
+registered_warp_xform="${OUTPUT}/warp.xform"
 
 # -------------------------------------------------------------------------------------------
-OLSHAPE="$OUTPUT/OL_shape.txt"
+OLSHAPE="${OUTPUT}/OL_shape.txt"
 
 if [[ -e $OLSHAPE ]]; then
     echo "Already exists: $OLSHAPE" &
@@ -218,15 +218,14 @@ if [[ ! -e ${JRC2018_Unisexgen1CROPPED} ]]; then
     cp ${JRC2018_Unisex_Onemicron1} ${JRC2018_Unisexgen1CROPPED}
 fi
 
-echo "iniT; "$iniT
-echo "gloval_nc82_nrrd; "$gloval_nc82_nrrd
+echo "iniT: $iniT"
+echo "gloval_nc82_nrrd: $gloval_nc82_nrrd"
 echo ""
 
 # -------------------------------------------------------------------------------------------
 if [[ -e ${registered_affine_xform} ]]; then
     echo "Already exists: $registered_affine_xform"
 else
-    echo " "
     echo "+----------------------------------------------------------------------+"
     echo "| Running CMTK registration"
     echo "| $CMTK/registration --threads $NSLOTS --initial $registered_initial_xform --dofs 6,9 --auto-multi-levels 4 --accuracy 0.8 -o $registered_affine_xform $iniT $gloval_nc82_nrrd "
@@ -241,7 +240,7 @@ else
     echo "cmtk_registration start: $START"
     echo "cmtk_registration stop: $STOP"
 
-    sig=$OUTPUT"/Affine_${InputName}_01.nrrd"
+    sig="${OUTPUT}/Affine_${InputName}_01.nrrd"
     DEFFIELD=${registered_affine_xform}
     TEMP=${JRC2018_Unisexgen1CROPPED}
     gsig=${gloval_nc82_nrrd}
@@ -255,10 +254,8 @@ fi
 if [[ -e $registered_warp_xform ]]; then
     echo "Already exists: $registered_warp_xform"
 else
-   
     iniT=${JRC2018_Unisexgen1CROPPED}
     
-    echo " "
     echo "+----------------------------------------------------------------------+"
     echo "| Running CMTK warping"
     echo "| $CMTK/warp --threads $NSLOTS -o $registered_warp_xform --grid-spacing 80 --exploration 30 --coarsest 4 --accuracy 0.8 --refine 4 --energy-weight 1e-1 --initial $registered_affine_xform $iniT $gloval_nc82_nrrd"
@@ -288,15 +285,15 @@ $FIJI --headless -macro $TWELVEBITCONV "${OUTPUT}/,${InputName}_01.nrrd,${gloval
 ########################################################################################################
 
 banner "JFRC2018 Unisex High-resolution (for color depth search)"
-sig=$OUTPUT"/"${InputName}"_U_20x_HR"
+sig="${OUTPUT}/${InputName}_U_20x_HR"
 DEFFIELD=${registered_warp_xform}
 
-TEMPLATE=$TemplatesDir"/JRC2018_UNISEX_20x_HR.nrrd"
+TEMPLATE="${TemplatesDir}/JRC2018_UNISEX_20x_HR.nrrd"
 
-gsig=$OUTPUT"/"${InputName}
+gsig="${OUTPUT}/${InputName}"
 
-reformatAll "$gsig" "$TEMPLATE" "$DEFFIELD" "$sig" "RAWOUT"
-scoreGen $sig"_01.nrrd" ${TEMPLATE} "score2018" 
+reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT
+scoreGen "${sig}_01.nrrd" ${TEMPLATE} "score2018"
 
 $FIJI --headless -macro ${MIPGENERATION} "${OUTPUT}/,${sig}_02.nrrd,${WORKING_DIR}/MIP/,${TemplatesDir}/,Brain" &
 
