@@ -189,13 +189,12 @@ if [[ -e $OLSHAPE ]]; then
 else
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
-    echo "| ${FIJI} -macro $PREPROCIMG \"${OUTPUT}/,${InputName}.,$InputFilePath,$TempDir,$RESX,$RESZ,${NSLOTS},$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD$ForceUseVxSize.\""
+    echo "| ${FIJI} -macro $PREPROCIMG \"${OUTPUT}/,${InputName},$InputFilePath,$TempDir,$RESX,$RESZ,${NSLOTS},$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize.\""
     echo "+---------------------------------------------------------------------------------------+"
     START=`date '+%F %T'`
-    # Expect to take far less than 1 hour
     #timeout --preserve-status 6000m 
     # Note that this macro does not seem to work in --headless mode
-    ${FIJI} -macro $PREPROCIMG "${OUTPUT}/,${InputName}.,$InputFilePath,$TempDir/,$RESX,$RESZ,${NSLOTS},$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize" > $DEBUG_DIR/preproc.log 2>&1
+    ${FIJI} -macro $PREPROCIMG "${OUTPUT}/,${InputName},$InputFilePath,$TempDir/,$RESX,$RESZ,${NSLOTS},$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize" > $DEBUG_DIR/preproc.log 2>&1
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"

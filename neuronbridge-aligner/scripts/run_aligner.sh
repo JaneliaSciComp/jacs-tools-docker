@@ -10,6 +10,7 @@ num_channels=2
 nslots=2
 input_filepath=
 output_dir=
+forceVxSizeUse=false
 
 help_cmd="$0 
     --xyres <xy resolution in um>
@@ -19,6 +20,7 @@ help_cmd="$0
     --templatedir <template config directory>
     -i <input file stack>
     -o <output directory>
+    -forceVxSize
     -debug
     -h"
 while [[ $# > 0 ]]; do
@@ -56,6 +58,9 @@ while [[ $# > 0 ]]; do
         -debug)
             export DEBUG_MODE=debug
             # no need to shift
+            ;;
+        -forceVxSize)
+            forceVxSizeUse=true
             ;;
         -h|--help)
             echo "${help_cmd}"
@@ -108,8 +113,8 @@ mkdir -p ${ALIGNMENT_OUTPUT}
 
 export FINALOUTPUT=${ALIGNMENT_OUTPUT}
 
-echo "~ Run alignment: ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres}"
-/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres}
+echo "~ Run alignment: ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres} ${forceVxSizeUse}"
+/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres} ${forceVxSizeUse}
 
 cd ${output_dir}
 echo ""
