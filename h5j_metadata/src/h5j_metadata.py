@@ -23,27 +23,47 @@ DEBUG = False
 ATTRS = "attrs"
 GROUPS = "groups"
 
+parser = argparse.ArgumentParser(description='Read or write HDF5 attributes')
+parser.add_argument('-i', '--input', help='HDF5 file to read')
+parser.add_argument('-o', '--output', help='HDF5 file to write')
+parser.add_argument('-m', '--metadata', help='Metadta JSON file to read or write')
+parser.add_argument('-d', '--debug', dest="debug", action="store_true", 
+        help='Print debug output instead of writing to the file')
+
 def parse_cmd_args():
-    parser = argparse.ArgumentParser(description='Read or write HDF5 attributes')
-    parser.add_argument('input', help='Target HDF5 file')
-    parser.add_argument('-d', '--debug', dest="debug", action="store_true", 
-            help='Print debug output instead of writing to the file')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
-
-def process(filename, debug=False):
+def process(args):
 
     global DEBUG
     DEBUG = args.debug
+    filename = args.input
+    output = sys.stdout
 
-    if not sys.stdin.isatty():
-        data = yaml.load(sys.stdin)
+    if args.output:
+        filename = args.output
+        if args.metadata:
+            with open(args.metadata) as file:
+                data = yaml.load(file)
+        else:
+            data = yaml.load(sys.stdin)
         write_metadata(filename, data)
         if DEBUG: print()
 
-    if DEBUG: print("Reading attributes from %s"%filename)
-    read_metadata(filename)
+    elif args.input:
+        if args.metadata:
+            output = open(args.metadata, 'w')
+
+    else:
+        parser.print_help()
+        sys.exit(1)
+
+    if DEBUG: 
+        print("Reading attributes from %s"%filename)
+        print("Writing metadata to %s" % (args.metadata or "STDOUT"))
+
+    read_metadata(filename, output)
+    output.close()
 
 
 def write_metadata(filename, data):
@@ -162,5 +182,5 @@ def read_attrs(g):
 
 if __name__ == "__main__":
     args = parse_cmd_args()
-    process(args.input, args.debug)
+    process(args)
 
