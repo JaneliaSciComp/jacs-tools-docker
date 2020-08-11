@@ -124,7 +124,7 @@ function scoreGen() {
 
         START=`date '+%F %T'`
         # Expect to take far less than 1 hour
-	      # Alignment Score generation:ZNCC, does not need Xvfb
+	    # Alignment Score generation:ZNCC can run in headless mode and does not need Xvfb
 	
         $FIJI --headless -macro ${SCOREGENERATION} $OUTPUT/,$_outname,$NSLOTS,$_scoretemp
         STOP=`date '+%F %T'`
