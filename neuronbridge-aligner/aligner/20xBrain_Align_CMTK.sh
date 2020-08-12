@@ -311,9 +311,6 @@ gsig="${OUTPUT}/${InputName}"
 reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT
 scoreGen "${sig}_01.nrrd" ${TEMPLATE} "score2018"
 
-# sleep for 10s to make sure file 
-sleep 10
-
 # Generate MIPs
 MIPS_OUTPUT=${MIPS_OUTPUT:-"${OUTPUT}/MIP"}
 generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT}
