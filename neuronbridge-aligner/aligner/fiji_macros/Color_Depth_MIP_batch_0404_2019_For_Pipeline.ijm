@@ -28,17 +28,16 @@ pluginDir=getDirectory("plugins");
 
 if(argstr==" ") {
     argstr = getArgument();
-    print("ARG string: " + argstr);
+    print(argstr);
 }
 
 args = split(argstr,",");
 
 if (lengthOf(args)>1) {
-    dir=args[0];//input directory
-    print("!!!!!!!"+dir);
-    DataName = args[1];//input file Name
-    dirCOLOR = args[2];//save directory
-    MaskDir = args[3];//Directory of masks.tif
+    dir=args[0]; // input directory
+    DataName = args[1]; // input file Name
+    dirCOLOR = args[2]; // save directory
+    MaskDir = args[3]; // Directory of masks.tif
 }
 
 filesep=lastIndexOf(DataName,"/");
@@ -120,7 +119,6 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
   }
 
   path = dir + DataName;
-  print(path)
   print("Check if file " + dir + DataName + "->" + path + " exists");
   PathExt=File.exists(path);
   print("File " + path + " exists: " + PathExt);

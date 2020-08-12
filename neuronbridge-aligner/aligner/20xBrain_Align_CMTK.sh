@@ -45,11 +45,11 @@ MACRO_DIR=/opt/aligner/fiji_macros
 
 # Fiji macros
 MIPGENERATION="${MACRO_DIR}/Color_Depth_MIP_batch_0404_2019_For_Pipeline.ijm"
-NRRDCONV=$MACRO_DIR"/nrrd2v3draw.ijm"
-PREPROCIMG=$MACRO_DIR"/20x_40x_Brain_Global_Aligner_Pipeline.ijm"
-TWELVEBITCONV=$MACRO_DIR"/12bit_Conversion.ijm"
-SCOREGENERATION=$MACRO_DIR"/Score_Generator_Cluster.ijm"
-REGCROP="$MACRO_DIR/TempCrop_after_affine.ijm"
+NRRDCONV="${MACRO_DIR}/nrrd2v3draw.ijm"
+PREPROCIMG="${MACRO_DIR}/20x_40x_Brain_Global_Aligner_Pipeline.ijm"
+TWELVEBITCONV="${MACRO_DIR}/12bit_Conversion.ijm"
+SCOREGENERATION="${MACRO_DIR}/Score_Generator_Cluster.ijm"
+REGCROP="${MACRO_DIR}/TempCrop_after_affine.ijm"
 
 BrainShape="Both_OL_missing (40x)"
 objective="20x"
@@ -112,7 +112,7 @@ function scoreGen() {
 
     tempfilename=`basename $_scoretemp`
     tempname=${tempfilename%%.*}
-    scorepath="$OUTPUT/${tempname}_Score.properties"
+    scorepath="$OUTPUT/${tempname}_Score.property"
 
      if [[ -e ${scorepath} ]]; then
         echo "Already exists: $scorepath"
@@ -135,14 +135,15 @@ function scoreGen() {
 }
 
 function generateAllMIPs() {
-    local _sigDir="$1"
-    local _sigBaseName="$2"
-    local _mipsOutput = "$3"
+    local _sigDir=$1
+    local _sigBaseName=$2
+    local _mipsOutput=$3
     local area="Brain"
     # generate MIPs for all signal channels 2...
     echo "Generate MIPs for all signal channels to ${_mipsOutput}"
     for ((i=2; i<=$NCHANNELS; i++)); do
-        mipsCmd="$FIJI --headless -macro ${MIPGENERATION} \"${_sigDir}/,${_sigBaseName}_0${i}.nrrd,${_mipsOutput}/,${TemplatesDir}/,${area}\""
+        mipCmdArgs="${_sigDir}/,${_sigBaseName}_0${i}.nrrd,${_mipsOutput}/,${TemplatesDir}/,${area}"
+        mipsCmd="$FIJI --headless -macro ${MIPGENERATION} ${mipCmdArgs}"
         echo "Generate MIPS for channel ${i}: ${mipsCmd}"
         ${mipsCmd}
         echo "Generated MIPS for channel ${i}"
@@ -317,9 +318,9 @@ sleep 10
 MIPS_OUTPUT=${MIPS_OUTPUT:-"${OUTPUT}/MIP"}
 generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT}
 
-cp $OUTPUT/*.{png,jpg,log,txt,nrrd} $DEBUG_DIR || true
+cp $OUTPUT/*.{png,jpg,txt,nrrd} $DEBUG_DIR
 cp -R $OUTPUT/*.xform $DEBUG_DIR
-cp $OUTPUT/*.properties $FINALOUTPUT
+cp $OUTPUT/*.property $FINALOUTPUT
 cp $OUTPUT/*.nrrd $FINALOUTPUT
 cp -a $MIPS_OUTPUT $FINALOUTPUT
 
