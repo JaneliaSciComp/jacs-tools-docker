@@ -22,7 +22,7 @@ DEBUG_DIR="${WORKING_DIR}/Debug"
 OUTPUT="${WORKING_DIR}/Output"
 FINALOUTPUT=${FINALOUTPUT:-"${WORKING_DIR}/FinalOutputs"}
 
-TEMPLATE_DIR=${TEMPLATE_DIR:-"/data/templates"}
+TEMPLATE_DIR=${TEMPLATE_DIR:-"/data/alignment_templates"}
 TemplatesDir=`realpath ${TEMPLATE_DIR}`
 
 echo "InputFilePath: ${InputFilePath}"
@@ -58,7 +58,7 @@ templateBr="JRC2018"
 # Reformat a single NRRD file to the target deformation field
 function reformat() {
     local _gsig="$1"
-    local _TEMP="$2"
+    local _TEMPLATE="$2"
     local _DEFFIELD="$3"
     local _sig="$4"
     local _channel="$5"
@@ -69,10 +69,10 @@ function reformat() {
         echo "Already exists: $_sig"
     else
         echo "--------------"
-        echo "Running CMTK reformatting on channel $_channel"
-        echo "$CMTK/reformatx --threads $NSLOTS -o $_sig $_opts --floating $_gsig $_TEMP $_DEFFIELD"
+        echo "Running CMTK reformatting on channel ${_channel}"
+        echo "$CMTK/reformatx --threads ${NSLOTS} -o ${_sig} ${_opts} --floating ${_gsig} ${_TEMPLATE} ${_DEFFIELD}"
         START=`date '+%F %T'`
-        $CMTK/reformatx -o "$_sig" $_opts --floating $_gsig $_TEMP $_DEFFIELD
+        $CMTK/reformatx -o "${_sig}" ${_opts} --floating ${_gsig} ${_TEMPLATE} ${_DEFFIELD}
         STOP=`date '+%F %T'`
 
         if [[ ! -e $_sig ]]; then
@@ -81,8 +81,8 @@ function reformat() {
         fi
 
         echo "--------------"
-        echo "cmtk_reformatting $TSTRING $_channel start: $START"
-        echo "cmtk_reformatting $TSTRING $_channel stop: $STOP"
+        echo "cmtk_reformatting ${_channel} start: $START"
+        echo "cmtk_reformatting ${_channel} stop: $STOP"
         echo " "
     fi
 }
@@ -90,7 +90,7 @@ function reformat() {
 # Reformat all the channels to the same template
 function reformatAll() {
     local _gsig="$1"
-    local _TEMP="$2"
+    local _TEMPLATE="$2"
     local _DEFFIELD="$3"
     local _sig="$4"
     local _result_var="$5"
@@ -100,7 +100,7 @@ function reformatAll() {
     for ((i=1; i<=$NCHANNELS; i++)); do
         GLOBAL_NRRD="${_gsig}_0${i}.nrrd"
         OUTPUT_NRRD="${_sig}_0${i}.nrrd"
-        reformat "$GLOBAL_NRRD" "$_TEMP" "$_DEFFIELD" "$OUTPUT_NRRD" "$i" "ignore" "$opts"
+        reformat "${GLOBAL_NRRD}" "${_TEMPLATE}" "${_DEFFIELD}" "${OUTPUT_NRRD}" "${i}" "ignore" "${opts}"
     done
 }
 
@@ -112,21 +112,21 @@ function scoreGen() {
 
     tempfilename=`basename $_scoretemp`
     tempname=${tempfilename%%.*}
-    scorepath="$OUTPUT/${tempname}_Score.property"
+    scorepath="$OUTPUT/${tempname}_Score.properties"
 
      if [[ -e ${scorepath} ]]; then
         echo "Already exists: $scorepath"
     else
         echo "+---------------------------------------------------------------------------------------+"
         echo "| Running Score generation"
-        echo "| $FIJI --headless -macro $SCOREGENERATION $OUTPUT/,$_outname,$NSLOTS,$_scoretemp"
+        echo "| $FIJI --headless -macro ${SCOREGENERATION} ${OUTPUT}/,${_outname},${NSLOTS},${_scoretemp}"
         echo "+---------------------------------------------------------------------------------------+"
 
         START=`date '+%F %T'`
         # Expect to take far less than 1 hour
 	    # Alignment Score generation:ZNCC can run in headless mode and does not need Xvfb
 	
-        $FIJI --headless -macro ${SCOREGENERATION} $OUTPUT/,$_outname,$NSLOTS,$_scoretemp
+        $FIJI --headless -macro ${SCOREGENERATION} ${OUTPUT}/,${_outname},${NSLOTS},${_scoretemp}
         STOP=`date '+%F %T'`
 
         echo "ZNCC JRC2018 score generation start: $START"
@@ -134,12 +134,27 @@ function scoreGen() {
     fi
 }
 
+function generateAllMIPs() {
+    local _sigDir="$1"
+    local _sigBaseName="$2"
+    local _mipsOutput = "$3"
+    local area="Brain"
+    # generate MIPs for all signal channels 2...
+    echo "Generate MIPs for all signal channels to ${_mipsOutput}"
+    for ((i=2; i<=$NCHANNELS; i++)); do
+        mipsCmd="$FIJI --headless -macro ${MIPGENERATION} \"${_sigDir}/,${_sigBaseName}_0${i}.nrrd,${_mipsOutput}/,${TemplatesDir}/,${area}\""
+        echo "Generate MIPS for channel ${i}: ${mipsCmd}"
+        ${mipsCmd}
+        echo "Generated MIPS for channel ${i}"
+    done
+    echo "Finished MIPs generation for all signal channels"
+}
+
 function banner() {
     echo "------------------------------------------------------------------------------------------------------------"
     echo " $1"
     echo "------------------------------------------------------------------------------------------------------------"
 }
-
 
 # Main Script
 
@@ -182,7 +197,7 @@ registered_warp_xform="${OUTPUT}/warp.xform"
 OLSHAPE="${OUTPUT}/OL_shape.txt"
 
 if [[ -e $OLSHAPE ]]; then
-    echo "Already exists: $OLSHAPE" &
+    echo "Already exists: $OLSHAPE"
 else
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
@@ -295,15 +310,17 @@ gsig="${OUTPUT}/${InputName}"
 reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT
 scoreGen "${sig}_01.nrrd" ${TEMPLATE} "score2018"
 
-$FIJI --headless -macro ${MIPGENERATION} "${OUTPUT}/,${sig}_02.nrrd,${WORKING_DIR}/MIP/,${TemplatesDir}/,Brain" &
+# sleep for 10s to make sure file 
+sleep 10
 
-rm $gsig_01.nrrd
-rm $gsig_02.nrrd
+# Generate MIPs
+MIPS_OUTPUT=${MIPS_OUTPUT:-"${OUTPUT}/MIP"}
+generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT}
 
-
-cp $OUTPUT/*.{png,jpg,log,txt} $DEBUG_DIR
+cp $OUTPUT/*.{png,jpg,log,txt,nrrd} $DEBUG_DIR || true
 cp -R $OUTPUT/*.xform $DEBUG_DIR
-cp $OUTPUT/REG*.v3dpbd $FINALOUTPUT
-cp $OUTPUT/REG*.properties $FINALOUTPUT
+cp $OUTPUT/*.properties $FINALOUTPUT
+cp $OUTPUT/*.nrrd $FINALOUTPUT
+cp -a $MIPS_OUTPUT $FINALOUTPUT
 
 echo "$0 done"

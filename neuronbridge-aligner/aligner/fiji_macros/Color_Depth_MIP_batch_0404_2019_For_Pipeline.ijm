@@ -2,7 +2,7 @@
 
 setBatchMode(true);
 
-AutoBRV=false;//true;false
+AutoBRV=false;
 desiredmean=190;
 usingLUT="PsychedelicRainBow2";
 
@@ -18,7 +18,7 @@ startMIP=1;
 endMIP=1000;
 argstr=" ";
 
-DeleteOrMove="Move";//"Delete", "Move","DontMove"
+DeleteOrMove="DontMove";//"Delete", "Move","DontMove"
 logsave=0;
 FolderNameAdd=false;
 saveFormat="png";//"tif"
@@ -26,13 +26,16 @@ saveFormat="png";//"tif"
 run("Close All");
 pluginDir=getDirectory("plugins");
 
-if(argstr==" ")
-    argstr = getArgument();//Argument
+if(argstr==" ") {
+    argstr = getArgument();
+    print("ARG string: " + argstr);
+}
 
 args = split(argstr,",");
 
 if (lengthOf(args)>1) {
     dir=args[0];//input directory
+    print("!!!!!!!"+dir);
     DataName = args[1];//input file Name
     dirCOLOR = args[2];//save directory
     MaskDir = args[3];//Directory of masks.tif
@@ -49,7 +52,7 @@ print("MaskDir: "+MaskDir);
 
 startT=getTime();
 
-if (FolderNameAdd==true){
+if (FolderNameAdd==true) {
     dirsub=substring(dir,0, lengthOf(dir)-1);
     filesepindex=lastIndexOf(dirsub,"/");
     addingname=substring(dirsub,filesepindex+1, lengthOf(dirsub));
@@ -59,41 +62,35 @@ if (FolderNameAdd==true){
 savedirext=File.exists(dirCOLOR);
 
 if(savedirext!=1){
-  File.makeDirectory(dirCOLOR);
-  print("made save directory!");
+    File.makeDirectory(dirCOLOR);
+    print("Created output directory!");
 }
 
-
 run("Close All");
-filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
+filepath=dirCOLOR + DataName + "Color_depthMIP_log.txt";
 
 JFRCexist=File.exists(MaskDir);
-if(JFRCexist==0){
-    print("MaskDir is not exist; "+MaskDir);
-  
+if (JFRCexist==0) {
+    print("MaskDir does not exist: " + MaskDir);
     logsum=getInfo("log");
     filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
     File.saveString(logsum, filepath);
-  
     run("Quit");
 }
 
+mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, CropYN, usingLUT, lowerweight, lowthreM, startMIP, endMIP, unsharp, secondjump, MaskDir, logsave);
 
-mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,usingLUT,lowerweight,lowthreM,startMIP,endMIP,unsharp,secondjump,MaskDir,logsave);
-
-
-
-if(DeleteOrMove=="Move"){
+if(DeleteOrMove=="Move") {
   doneExt=File.exists(dir+"Done/");
   
   if(doneExt!=1)
-  File.makeDirectory(dir+"Done/");
+    File.makeDirectory(dir+"Done/");
   
   File.rename(dir+DataName, dir+"Done/"+DataName); // - Renames, or moves, a file or directory. Returns "1" (true) if successful. 
-}else if(DeleteOrMove=="Delete")
-File.delete(dir+DataName);
+} else if(DeleteOrMove=="Delete")
+  File.delete(dir+DataName);
 
-if(logsave==1){
+if(logsave==1) {
   logsum=getInfo("log");
   filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
   File.saveString(logsum, filepath);
@@ -104,36 +101,33 @@ print((end-startT)/1000+" sec");
 
 run("Quit");
 
-
-
 /////////Function//////////////////////////////////////////////////////////////////
-function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,usingLUT,lowerweight,lowthreM,startMIP,endMIP,unsharp,secondjump,MaskDir,logsave){ 
-  
+function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, CropYN, usingLUT, lowerweight, lowthreM, startMIP, endMIP, unsharp, secondjump, MaskDir, logsave) {
   KeiNrrdShrink=0;
   GradientDim=false;
   CLAHE=true;
   colorcoding=true;
   neuronimg=0;
-  autothre=0;//1 is FIJI'S threshold, 0 is DSLT thresholding
+  autothre=0; // 1 is FIJI'S threshold, 0 is DSLT thresholding
   colorscale=true;
   reverse0=false;
-  multiDSLT=1;// 1 is multi step DSLT for better thresholding sensitivity
-  DSLTver="Line";//"normal";
-  GammaON=true;//true
-  
-  easyADJ=false;//false;true
-  if(AutoBRV==false){
-    easyADJ=true;//false;true
-    //	GammaON=false;//true
+  multiDSLT=1; // 1 is multi step DSLT for better thresholding sensitivity
+  DSLTver="Line"; // "normal";
+  GammaON=false; // no gamma
+  easyADJ=false;
+  if(AutoBRV==false) {
+    easyADJ=true;
   }
-  
-  
-  path = dir+DataName;
+
+  path = dir + DataName;
+  print(path)
+  print("Check if file " + dir + DataName + "->" + path + " exists");
   PathExt=File.exists(path);
+  print("File " + path + " exists: " + PathExt);
+
   filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
   
-  if(PathExt==1){
-    
+  if (PathExt==1) {
     titlelistOri=getList("image.titles");
     IJ.redirectErrorMessages();
     
@@ -149,19 +143,13 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
     }
     
     print(DataName+"  opened");
-  }else{
-    print("File is not existing; "+path);
+  } else {
+    print("File does not exist: " + path);
     logsum=getInfo("log");
     
     File.saveString(logsum, filepath);
     run("Quit");
-  }
-  //	}else{
-  //		print("file size is too small, "+filesize/10000000+" MB, less than 60MB.  "+listP+"	 ;	 "+i+" / "+endn);
-  //	print(listP+"	 ;	 "+i+" / "+endn+"  too small");
-  //	}
-  
-  
+  }  
   
   if(nImages>0){
     
@@ -342,10 +330,7 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
               Inimax=round(Inimax*1.1);
             }
           }
-          
-          
-          
-          
+
           selectWindow(MIPtitle);
           
           setMinAndMax(0, Inimax);
@@ -415,7 +400,6 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
             MaskName2D="MAX_JRC2018_UNISEX_20x_HR_2DMASK.tif"; Mask3D="JRC2018_UNISEX_20x_HR_3DMASK.nrrd";
           }else if(width==1010 && height==473 && slices==174){
             MaskName2D="MAX_JRC2018_UNISEX_20x_gen1_2DMASK.tif"; Mask3D="JRC2018_UNISEX_20x_gen1_3DMASK.nrrd";
-            
           }else if(width==3333 && height==1550 && slices==478){
             MaskName2D="MAX_JRC2018_FEMALE_63x_2DMASK.tif"; Mask3D="JRC2018_FEMALE_63x_3DMASK.nrrd";
           }else if(width==1652 && height==768 && slices==478){
@@ -426,7 +410,6 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
             MaskName2D="MAX_JRC2018_FEMALE_20x_HR_2DMASK.tif"; Mask3D="JRC2018_FEMALE_20x_HR_3DMASK.nrrd";
           }else if(width==1010 && height==470 && slices==182){
             MaskName2D="MAX_JRC2018_FEMALE_20x_gen1_2DMASK.tif"; Mask3D="JRC2018_FEMALE_20x_gen1_3DMASK.nrrd";
-            
           }else if(width==3150 && height==1500 && slices==476){//3150x1500x476, JRC2018 BRAIN 63x MALE
             MaskName2D="MAX_JRC2018_MALE_63x_2DMASK.tif"; Mask3D="JRC2018_MALE_63x_3DMASK.nrrd";
           }else if(width==1561 && height==744 && slices==476){//1561x744x476, JRC2018 BRAIN 63xDW MALE
@@ -437,12 +420,10 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
             MaskName2D="MAX_JRC2018_MALE_20xHR_2DMASK.tif"; Mask3D="JRC2018_MALE_20xHR_3DMASK.nrrd";
           }else if(width==955 && height==455 && slices==181){
             MaskName2D="MAX_JRC2018_MALE_20x_gen1_2DMASK.tif"; Mask3D="JRC2018_MALE_20x_gen1_3DMASK.nrrd";
-            
           }else if(width==1184 && height==592 && slices==218){
             MaskName2D="MAX_JFRC2013_20x_New_dist_G16_2DMASK.tif"; Mask3D="JFRC2013_20x_New_dist_G16_3DMASK.nrrd";
           }else if(width==1450 && height==725 && slices==436){
             MaskName2D="MAX_JFRC2013_63x_New_dist_G16_2DMASK.tif"; Mask3D="JFRC2013_63x_New_dist_G16_3DMASK.nrrd";
-            
           }else if(width==1024 && height==512 && slices==220){//1024x512x220, JFRC2010
             MaskName2D="MAX_JFRC2010_2DMask.tif"; Mask3D="JFRC2010_3DMask.nrrd";
           }
@@ -451,16 +432,14 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
             FilePathArray=newArray(0, MaskName2D,"Open",MaskDir,MIPtitle);
             fileOpen(FilePathArray,filepath);
             print("330");
-            
           }else if (MaskName2D==""){
-            
             setMinAndMax(0, 65535);
             selectWindow(MIPtitle);
             
             makeRectangle(getWidth*0.1, getHeight*0.1, getWidth*0.8, getHeight*0.8);
             setForegroundColor(0, 0, 0);
             run("Fill", "slice");
-          }//if(getWidth==512){
+          }
           
           selectWindow(MIPtitle);
           
@@ -471,12 +450,11 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
               total= total+pxv;
               
               if(pxv==0)
-              if(zeroexi==0)
-              zerovalue=zerovalue+1;
+                if(zeroexi==0)
+                  zerovalue=zerovalue+1;
             }
-          }//for(ix=0; ix<getWidth; ix++){
+          }
           
-          //		zerovalue=counts[0];
           Inimin=round((total/((getHeight*getWidth)-zerovalue))*0.8);//239907 is female VNC size
           print("zerovalue; "+zerovalue+"  total; "+total+"  getHeight; "+getHeight+"  getWidth; "+getWidth);
           print("Initial Bri adjustment; Inimin; "+Inimin+"   max; "+Inimax+"   RealInimax; "+RealInimax+"   DefMaxValue; "+DefMaxValue);
@@ -493,7 +471,7 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
                   setMinAndMax(0, applyV);
                   run("Apply LUT", "stack");
               }
-            
+
               if(AutoBRV==1){
                   setMinAndMax(Inimin, 65535);
                   run("Apply LUT", "stack");
@@ -505,9 +483,9 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
                   print("3D stack brightness adjusted; maxvalue; "+maxvalue);
               }
           }else
-          maxvalue=65535;
+              maxvalue=65535;
           
-        }//	if(bitd==16){
+        }
         
         if(unsharp!="Max" && AutoBRV==1){
           if(lowerweight>0){
@@ -641,7 +619,7 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
           print("DefMaxValue; "+DefMaxValue+"   MaskName2D; "+MaskName2D+"  Inimax; "+Inimax+"  secondjump; "+secondjump);
           
           brightnessapplyArray = newArray(applyV,RealapplyV,sigsize,sigsizethre,GammaON,0);
-          brightnessapply(DefMaxValue,filepath,brightnessapplyArray, bitd,lowerweight,lowthreM,stack,MaskDir,secondjump,Inimax,MaskName2D);
+          brightnessapply(DefMaxValue, filepath, brightnessapplyArray, bitd, lowerweight,lowthreM,stack,MaskDir,secondjump,Inimax,MaskName2D);
           
           applyV=brightnessapplyArray[0];
           RealapplyV=brightnessapplyArray[1];
@@ -650,14 +628,14 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
       }else{
         setMinAndMax(0, 65535);
         run("8-bit");
-      }//if(sigsize<30){
+      }
       if(reverse0==1){
         run("Reverse");
         run("Flip Horizontally", "stack");
       }
       
       if(usingLUT=="royal")
-      stackconcatinate();
+        stackconcatinate();
       
       
       
@@ -687,7 +665,7 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
       }
       
       
-      ColorCoder(slices, applyV, width, AutoBRV, bitd, CLAHE, colorscale, reverse0, colorcoding, usingLUT,DefMaxValue,startMIP,endMIP,expand,GammaON,easyADJ);
+      ColorCoder(slices, applyV, width, AutoBRV, bitd, CLAHE, colorscale, reverse0, colorcoding, usingLUT, DefMaxValue, startMIP, endMIP, expand, GammaON, easyADJ);
       
       if(AutoBRV==1){
         if(sigsize>9)
@@ -1266,7 +1244,7 @@ function stackconcatinate(){
   run("Reverse");
 }
 
-function brightnessapply(DefMaxValue,filepath,brightnessapplyArray, bitd,lowerweight,lowthreM,stack,MaskDir,secondjump,Inimax,MaskName2D){
+function brightnessapply(DefMaxValue,filepath, brightnessapplyArray, bitd,lowerweight,lowthreM,stack,MaskDir,secondjump,Inimax,MaskName2D){
   stacktoApply=getTitle();
   
   applyV = brightnessapplyArray[0];
@@ -1410,7 +1388,7 @@ function brightnessapply(DefMaxValue,filepath,brightnessapplyArray, bitd,lowerwe
     print("getHeight; "+getHeight);
     
     if(MaskName2D!=""){
-      BackgroundMask (BackgroundMaskArray,MaskName2D,MaskDir,MIPapply,bitd,GammaON);
+      BackgroundMask (BackgroundMaskArray, MaskName2D, MaskDir, MIPapply, bitd, GammaON);
       brightnessNeed= BackgroundMaskArray[0];
     }else{//	if(getHeight==512 && getWidth==1024){
       tissue="UNKNOWN";
@@ -1915,13 +1893,14 @@ function basicoperation(BasicMIP){
   BasicMIP[1]=max;
 }
 
-function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd, CLAHE, GFrameColorScaleCheck, reverse0, colorcoding, usingLUT,DefMaxValue,startMIP,endMIP,expand,GammaON,easyADJ) {//"Time-Lapse Color Coder" 
+function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd, CLAHE, GFrameColorScaleCheck, reverse0, colorcoding, usingLUT, DefMaxValue,startMIP,endMIP,expand,GammaON,easyADJ) {//"Time-Lapse Color Coder" 
   
+
   if(usingLUT=="royal")
-  var Glut = "royal";	//default LUT
+    var Glut = "royal";	//default LUT
   
   if(usingLUT=="PsychedelicRainBow2")
-  var Glut = "PsychedelicRainBow2";	//default LUT
+    var Glut = "PsychedelicRainBow2";	// default LUT
   
   var Gstartf = 1;
   
@@ -1948,20 +1927,17 @@ function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd, CLAHE, GFrameColorS
     colv=round(colv);
     setPixel(xxx, 0, colv);
   }
-  //	print("line 2027");
+  print("line 1928");
   run(Glut);
   run("RGB Color");
-  print("line 2030");
   selectWindow("Original_Stack.tif");
-  //print("1992 pre MIP");
   run("Z Code Stack HO", "data=Original_Stack.tif 1px=lut_table.tif");
   
   selectWindow("Depth_color_RGB.tif");
-  //print("1996 post MIP");
   if(endMIP>nSlices)
-  endMIP=nSlices;
+    endMIP=nSlices;
   
-  if(usingLUT=="royal"){
+  if(usingLUT=="royal") {
     addingslices=slicesOri/10;
     addingslices=round(addingslices);
     startMIP=addingslices+startMIP;
@@ -1974,8 +1950,7 @@ function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd, CLAHE, GFrameColorS
   }
   
   if(usingLUT=="PsychedelicRainBow2")
-  run("MIP right color", "start="+startMIP+" end="+endMIP+"");
-  print("line 2054");
+    run("MIP right color", "start="+startMIP+" end="+endMIP+"");
   max=getTitle();
   
   selectWindow("Depth_color_RGB.tif");
@@ -2050,19 +2025,19 @@ function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd, CLAHE, GFrameColorS
   }//if (GFrameColorScaleCheck==1){
   run("Select All");
   
-}//function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd) {//"Time-Lapse Color Coder" 
+}
 
 function CreateScale(lutstr, beginf, endf, reverse0){
   ww = 256;
   hh = 32;
   newImage("color time scale", "8-bit White", ww, hh, 1);
-  if(reverse0==0){
+  if (reverse0==0) {
     for (j = 0; j < hh; j++) {
       for (i = 0; i < ww; i++) {
         setPixel(i, j, i);
       }
     }
-  }//	if(reverse0==0){
+  }
   
   if(reverse0==1){
     valw=ww;

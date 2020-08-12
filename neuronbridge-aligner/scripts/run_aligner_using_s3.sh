@@ -2,11 +2,14 @@
 
 DIR=$(cd "$(dirname "$0")"; pwd)
 
+S3_TEMPLATES_MOUNTPOINT=${S3_TEMPLATES_MOUNTPOINT:-/data/s3/templates}
+
 templates_s3bucket_name=
 inputs_s3bucket_name=
 outputs_s3bucket_name=
 input_filepath=
 output_dir=
+templates_dir_param=
 other_args=()
 use_iam_role=
 
@@ -35,6 +38,10 @@ while [[ $# > 0 ]]; do
             ;;
         --outputs-s3bucket-name)
             outputs_s3bucket_name="$1"
+            shift # past value
+            ;;
+        --templatedir)
+            templates_dir_param="$1"
             shift # past value
             ;;
         -i|--input)
@@ -68,9 +75,6 @@ done
 
 export AWSACCESSKEYID=${AWSACCESSKEYID:-$AWS_ACCESS_KEY_ID}
 export AWSSECRETACCESSKEY=${AWSSECRETACCESSKEY:-$AWS_SECRET_ACCESS_KEY}
-
-template_dirname=${S3_TEMPLATES_MOUNTPOINT}
-
 
 # the script assumes there is a /scratch directory available
 # the working directory is based on the output directory last component name
@@ -107,16 +111,6 @@ echo "Copy s3://${inputs_s3bucket_name}${input_filepath} -> ${inputs_dir}"
 aws s3 cp "s3://${inputs_s3bucket_name}${input_filepath}" ${inputs_dir}
 working_input_filepath="${inputs_dir}/${input_filename}"
 
-if [[ "${neuron_mask}" != "" ]] ; then
-    neuron_mask_filename=`basename ${neuron_mask}`
-    echo "Copy neuron mask from s3://${inputs_s3bucket_name}${neuron_mask} to ${inputs_dir}"
-    aws s3 cp "s3://${inputs_s3bucket_name}${neuron_mask}" ${inputs_dir}
-    working_neuron_mask="${inputs_dir}/${neuron_mask_filename}"
-    nmask_arg="--nmask ${working_neuron_mask}"
-else
-    nmask_arg=
-fi
-
 echo "Mount the S3 buckets using s3fs"
 
 s3fs_opts="-o use_path_request_style,nosscache"
@@ -124,28 +118,30 @@ if [[ "${use_iam_role}" != "" ]] ; then
     s3fs_opts="${s3fs_opts} -o iam_role=${use_iam_role}"
 fi
 
-echo "/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
-/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}
-
-echo "Test ls ${S3_TEMPLATES_MOUNTPOINT}"
-templates_dir_content=$(shopt -s nullglob dotglob; echo ${S3_TEMPLATES_MOUNTPOINT}/*)
-if ((${#templates_dir_content} == 0)); then
-    echo "~ Templates bucket could not be mounted"
-    exit 1
+if [[ "${templates_s3bucket_name}" != ""]] ; then
+    # mount templates directory
+    echo "/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
+    /usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}
+    # create the templates_dir_arg for the alignment
+    if [[ "${templates_dir_param}" != ""]] ; then
+        templates_dir_arg="--templatedir ${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}"
+    else
+        templates_dir_arg="--templatedir ${S3_TEMPLATES_MOUNTPOINT}"
+    fi
 else
-    echo "~ Templates bucket mounted successfully"
+    templates_dir_arg=""
 fi
 
 run_align_cmd_args=(
-    --templatedir ${template_dirname}
+    ${templates_dir_arg}
     -i ${working_input_filepath}
-    ${nmask_arg}
     -o ${results_dir}
-    --mprotocol "\"${mounting_protocol}\""
     "${other_args[@]}"
 )
-echo "Run: /opt/aligner-scripts/run_aligner_and_cdm.sh ${run_align_cmd_args[@]}"
-/opt/aligner-scripts/run_aligner_and_cdm.sh "${run_align_cmd_args[@]}"
+
+export MIPS_OUTPUT="${results_dir}/mips"
+echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
+/opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
 alignment_exit_code=$?
 if (($alignment_exit_code != 0)) ; then
     echo "Alignment exited with $alignment_exit_code";
@@ -153,17 +149,13 @@ if (($alignment_exit_code != 0)) ; then
 fi
 
 # copy the results to the s3 output bucket
-echo "Copy ${results_dir}/color_depth_mips -> s3://${outputs_s3bucket_name}${output_dir}"
-aws s3 cp --recursive "${results_dir}/color_depth_mips" "s3://${outputs_s3bucket_name}${output_dir}"
+echo "Copy ${MIPS_OUTPUT} -> s3://${outputs_s3bucket_name}${output_dir}"
+aws s3 cp --recursive "${MIPS_OUTPUT}" "s3://${outputs_s3bucket_name}${output_dir}"
 
-# delete the input
-echo "Remove s3://${inputs_s3bucket_name}${input_filepath}"
-aws s3 rm "s3://${inputs_s3bucket_name}${input_filepath}"
-rm -f ${working_input_filepath}
-
-if [[ "${neuron_mask}" != "" ]] ; then
-    # delete the mask if there was one
-    echo "Remove neuron mask from s3://${inputs_s3bucket_name}${neuron_mask}"
-    aws s3 rm "s3://${inputs_s3bucket_name}${neuron_mask}"
-    rm -f ${working_neuron_mask}
+if [[ "${debug_flag}" != "true" ]] ; then
+    # delete the input
+    echo "Remove s3://${inputs_s3bucket_name}${input_filepath}"
+    aws s3 rm "s3://${inputs_s3bucket_name}${input_filepath}"
+    echo "Remove working input copy: ${working_input_filepath}"
+    rm -f ${working_input_filepath}
 fi

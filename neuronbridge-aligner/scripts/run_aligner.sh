@@ -108,7 +108,7 @@ source ${COMMON_TOOLS_DIR}/setup_xvfb.sh
 function exitHandler() { exitXvfb; cleanTemp; }
 trap exitHandler EXIT
 
-ALIGNMENT_OUTPUT="${output_dir}/aligned"
+ALIGNMENT_OUTPUT=${ALIGNMENT_OUTPUT:-"${output_dir}/aligned"}
 mkdir -p ${ALIGNMENT_OUTPUT}
 
 export FINALOUTPUT=${ALIGNMENT_OUTPUT}
@@ -120,7 +120,7 @@ cd ${output_dir}
 echo ""
 echo "~ Listing working files:"
 echo ""
-ls -lR $WORKING_DIR
+tree -s $WORKING_DIR
 
 alignment_results=$(shopt -s nullglob dotglob; echo ${ALIGNMENT_OUTPUT}/*.v3dpbd)
 echo "Alignment results: ${alignment_results[@]}"
