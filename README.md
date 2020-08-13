@@ -62,11 +62,11 @@ TEMPLATES_BUCKET=janelia-flylight-color-depth-dev
 INPUT_BUCKET=janelia-neuronbridge-searches-dev
 OUTPUT_BUCKET=janelia-neuronbridge-searches-dev
 
-# alignment location on S3 - this location must start wuth '/'
-TEMPLATES=/alignment_templates
-# input location on S3 - this should be the full "path" but not start with '/'
+# alignment location on S3 (full path but not starting with '/')
+TEMPLATES=alignment_templates
+# input location on S3 - (full path but not starting with '/')
 INPUT=data-folder-on-s3/ch2ch.zip
-# results location on S3 - this should be the full "path" but not start with '/'
+# results location on S3 - (full path but not starting with '/')
 OUTPUT=data-folder-on-s3
 # scratch directory is a local directory mapped in the container as /scratch
 # for holding temporary data generated during alignment
