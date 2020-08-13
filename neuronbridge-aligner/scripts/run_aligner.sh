@@ -126,13 +126,13 @@ echo "~ Listing working files:"
 echo ""
 tree -s $WORKING_DIR
 
-alignment_results=$(shopt -s nullglob dotglob; echo ${ALIGNMENT_OUTPUT}/*.v3dpbd)
+alignment_results=$(shopt -s nullglob dotglob; echo ${ALIGNMENT_OUTPUT}/*.nrrd)
 echo "Alignment results: ${alignment_results[@]}"
 if (( ${#alignment_results} )); then
     echo "~ Finished alignment: ${input_filepath}"
     cleanTemp
     exit 0
 else
-    echo "~ No alignment results were found after alignment of ${YAML_CONFIG_FILE} ${WORKING_DIR} ${shape}"
+    echo "~ No alignment results were found after alignment of ${input_filepath} ${WORKING_DIR} ${shape}"
     exit 1
 fi

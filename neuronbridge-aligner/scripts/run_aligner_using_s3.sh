@@ -171,13 +171,14 @@ if (($alignment_exit_code != 0)) ; then
 fi
 
 # copy the results to the s3 output bucket
-echo "Copy ${MIPS_OUTPUT} -> s3://${outputs_s3bucket_name}${output_dir}"
-aws s3 cp --recursive "${MIPS_OUTPUT}" "s3://${outputs_s3bucket_name}${output_dir}"
+copyMipsCmd="aws s3 cp ${MIPS_OUTPUT}/*.tif s3://${outputs_s3bucket_name}/${output_dir}/"
+echo "Copy MIPS: ${copyMipsCmd}"
+${copyMipsCmd}
 
-if [[ "${debug_flag}" != "true" ]] ; then
+if [[ ${DEBUG_MODE} != "debug" ]] ; then
     # delete the input
-    echo "Remove s3://${inputs_s3bucket_name}${input_filepath}"
-    aws s3 rm "s3://${inputs_s3bucket_name}${input_filepath}"
+    echo "Remove s3://${inputs_s3bucket_name}/${input_filepath}"
+    aws s3 rm "s3://${inputs_s3bucket_name}/${input_filepath}"
     echo "Remove working input copy: ${working_input_filepath}"
     rm -f ${working_input_filepath}
 fi
