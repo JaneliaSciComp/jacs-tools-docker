@@ -2,7 +2,7 @@
 
 DIR=$(cd "$(dirname "$0")"; pwd)
 
-S3_TEMPLATES_MOUNTPOINT=${S3_TEMPLATES_MOUNTPOINT:-/data/s3/templates}
+S3_TEMPLATES_MOUNTPOINT=${S3_TEMPLATES_MOUNTPOINT:-"/s3_alignment_templates"}
 
 templates_s3bucket_name=
 inputs_s3bucket_name=
@@ -12,6 +12,7 @@ output_dir=
 templates_dir_param=
 other_args=()
 use_iam_role=
+skipCopyInputIfExists=false
 
 help_cmd="$0 
     --templates-s3bucket-name <template S3 bucket name>
@@ -55,6 +56,9 @@ while [[ $# > 0 ]]; do
         --use-iam-role)
             use_iam_role="$1"
             shift
+            ;;
+        -skipCopyInputIfExists)
+            skipCopyInputIfExists=true
             ;;
         -debug)
             debug_flag="$1"
@@ -103,32 +107,50 @@ mkdir -p ${inputs_dir}
 echo "Create local results directory ${results_dir}"
 mkdir -p ${results_dir}
 
-echo "Working dir content before copying the inputs from S3"
-tree ${WORKING_DIR}
-
+# copy input file to the input working directory
 input_filename=`basename ${input_filepath}`
-echo "Copy s3://${inputs_s3bucket_name}${input_filepath} -> ${inputs_dir}"
-aws s3 cp "s3://${inputs_s3bucket_name}${input_filepath}" ${inputs_dir}
 working_input_filepath="${inputs_dir}/${input_filename}"
+copyInputsCmd="aws s3 cp s3://${inputs_s3bucket_name}/${input_filepath} ${working_input_filepath}"
 
-echo "Mount the S3 buckets using s3fs"
-
-s3fs_opts="-o use_path_request_style,nosscache"
-if [[ "${use_iam_role}" != "" ]] ; then
-    s3fs_opts="${s3fs_opts} -o iam_role=${use_iam_role}"
-fi
-
-if [[ "${templates_s3bucket_name}" != ""]] ; then
-    # mount templates directory
-    echo "/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
-    /usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}
-    # create the templates_dir_arg for the alignment
-    if [[ "${templates_dir_param}" != ""]] ; then
-        templates_dir_arg="--templatedir ${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}"
-    else
-        templates_dir_arg="--templatedir ${S3_TEMPLATES_MOUNTPOINT}"
+if [[ "${skipCopyInputIfExists}" =~ "true" ]] ; then
+    if [[ ! -e ${working_input_filepath} ]] ;  then
+        echo "Copy inputs: ${copyInputsCmd}"
+        `${copyInputsCmd}`
     fi
 else
+    echo "Copy inputs: ${copyInputsCmd}"
+    `${copyInputsCmd}`
+fi
+
+
+
+if [[ "${templates_s3bucket_name}" != "" ]] ; then
+    echo "Mount S3 templates buckets using s3fs"
+
+    s3fs_opts="-o use_path_request_style,nosscache"
+    if [[ "${use_iam_role}" != "" ]] ; then
+        s3fs_opts="${s3fs_opts} -o iam_role=${use_iam_role}"
+    elif [[ "${AWSACCESSKEYID}" != "" ]] ; then
+        passwd_file=/scratch/.passwd-s3fs
+        echo $AWSACCESSKEYID:$AWSSECRETACCESSKEY > ${passwd_file}
+        chmod 600 ${passwd_file}
+        s3fs_opts="${s3fs_opts} -o passwd_file=${passwd_file}"
+    fi
+    # mount templates directory
+    mountTemplatesCmd="/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
+    echo "Mount templates from S3: ${mountTemplatesCmd}"
+    ${mountTemplatesCmd}
+    if [[ "${templates_dir_param}" != "" ]] ; then
+        templates_dir=${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}
+    else
+        templates_dir=${S3_TEMPLATES_MOUNTPOINT}
+    fi
+    templatesCountCmd="ls ${templates_dir}"
+    templatesCount=`${templatesCountCmd} | wc`
+    echo "Found ${templatesCount} after running ${templatesCountCmd}"
+    templates_dir_arg="--templatedir ${templates_dir}"
+else
+    # will use default templates
     templates_dir_arg=""
 fi
 

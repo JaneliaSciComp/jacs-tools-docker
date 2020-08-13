@@ -13,7 +13,7 @@ RUN pip install yq
 RUN echo "Installing S3 FUSE and AWS CLI"
 RUN yum install -y fuse-devel s3fs-fuse awscli
 
-ENV S3_TEMPLATES_MOUNTPOINT=/data/s3/templates
+ENV S3_TEMPLATES_MOUNTPOINT=/alignment_templates
 
 RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}
 
