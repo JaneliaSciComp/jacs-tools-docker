@@ -146,7 +146,7 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
         templates_dir=${S3_TEMPLATES_MOUNTPOINT}
     fi
     templatesCountCmd="ls ${templates_dir}"
-    templatesCount=`${templatesCountCmd} | wc`
+    templatesCount=`${templatesCountCmd} | wc -l`
     echo "Found ${templatesCount} after running ${templatesCountCmd}"
     templates_dir_arg="--templatedir ${templates_dir}"
 else
