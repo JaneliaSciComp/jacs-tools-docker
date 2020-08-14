@@ -92,13 +92,6 @@ echo "Create working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 cd ${WORKING_DIR}
 
-JAVA_PREFS_DIR="${WORKING_DIR}/.java"
-echo "Set java preferences directory to ${JAVA_PREFS_DIR}"
-mkdir -p "${JAVA_PREFS_DIR}/sprefs"
-mkdir -p "${JAVA_PREFS_DIR}/uprefs"
-
-export JAVA_OPTS="-Djava.util.prefs.systemRoot=${JAVA_PREFS_DIR}/sprefs -Djava.util.prefs.userRoot=${JAVA_PREFS_DIR}/uprefs"
-
 function cleanTemp {
     if [[ ${DEBUG_MODE} =~ "debug" ]]; then
         echo "~ Debugging mode - Leaving temp directory"

@@ -145,9 +145,14 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
     else
         templates_dir=${S3_TEMPLATES_MOUNTPOINT}
     fi
-    templatesCountCmd="ls ${templates_dir}"
-    templatesCount=`${templatesCountCmd} | wc -l`
-    echo "Found ${templatesCount} after running ${templatesCountCmd}"
+    lsTemplatesCmd="ls ${templates_dir}"
+    templatesCount=`${lsTemplatesCmd} | wc -l`
+    echo "Found ${templatesCount} after running ${lsTemplatesCmd}"
+    if [[ ${DEBUG_MODE} =~ "debug" ]] ; then
+        # list templates content  if debug is on
+        echo "${lsTemplatesCmd}"
+        ${lsTemplatesCmd}
+    fi
     templates_dir_arg="--templatedir ${templates_dir}"
 else
     # will use default templates
