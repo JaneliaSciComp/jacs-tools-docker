@@ -19,6 +19,7 @@ help_cmd="$0
     --use-iam-role <iam role to be used by S3FS or auto, if not specified AWS keys must be set>
     --inputs-s3bucket-name <inputs S3 bucket name>
     --outputs-s3bucket-name <outputs S3 bucket name>
+    --search-id <id of the search to be updated using AWS AppSync API>
     -i <input filepath in the inputs bucket>
     -o <output path in the outputs bucket>
     <other aligner args (see run_aligner.sh)>
@@ -44,6 +45,10 @@ while [[ $# > 0 ]]; do
         --templatedir)
             templates_dir_param="$1"
             shift # past value
+            ;;
+        --search-id)
+            searchId="$1"
+            shift
             ;;
         -i|--input)
             input_filepath="$1"
@@ -98,6 +103,33 @@ function cleanWorkingDir {
 }
 trap cleanWorkingDir EXIT
 
+functiom updateSearch() {
+    local searchId=$1
+    local searchStep=$2
+
+    # Update the search if a searchId is passed and 
+    # if the environment variable SEARCH_SYNC_URL is set
+    if [[ "${searchId}" != "" && "${SEARCH_SYNC_URL}" != "" ]] ; then
+        searchData="{
+            \"id\": \"${searchId}\",
+            \"step\": \"${searchStep}\"
+        }"
+        mutation="mutation {
+            updateSearch(input: ${searchData}) {id, step}
+        }"
+        gql="{
+            \"query\": \"${mutation}\"
+        }"
+        updateSearchCmd="curl -XPOST \
+            ${SEARCH_SYNC_URL} \
+            -H 'Content-Type:application/graphql' \
+            -d \"${gql}\"
+            "
+        echo "Update search step: ${updateSearchCmd}"
+        (${updateSearchCmd})
+    fi
+}
+
 # create inputs and outputs directories
 inputs_dir="${WORKING_DIR}/inputs"
 results_dir="${WORKING_DIR}/results"
@@ -121,8 +153,6 @@ else
     echo "Copy inputs: ${copyInputsCmd}"
     `${copyInputsCmd}`
 fi
-
-
 
 if [[ "${templates_s3bucket_name}" != "" ]] ; then
     echo "Mount S3 templates buckets using s3fs"
@@ -159,6 +189,11 @@ else
     templates_dir_arg=""
 fi
 
+export MIPS_OUTPUT="${results_dir}/mips"
+
+echo "Set alignment in progress for ${searchId}"
+updateSearch ${searchId} 1
+
 run_align_cmd_args=(
     ${templates_dir_arg}
     -i ${working_input_filepath}
@@ -166,7 +201,6 @@ run_align_cmd_args=(
     "${other_args[@]}"
 )
 
-export MIPS_OUTPUT="${results_dir}/mips"
 echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
 /opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
 alignment_exit_code=$?
