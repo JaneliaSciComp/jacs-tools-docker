@@ -25,7 +25,6 @@ RUN wget -q http://workstation.int.janelia.org/files/tools/${CMTK_FILE}
 RUN tar xvf $CMTK_FILE && /bin/rm -f $CMTK_FILE
 RUN ln -s cmtk-scm-2017-10-01 CMTK
 
-
 ENV S3_TEMPLATES_MOUNTPOINT=/s3_alignment_templates
 
 RUN mkdir -p ${S3_TEMPLATES_MOUNTPOINT}

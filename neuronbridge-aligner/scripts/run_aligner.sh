@@ -86,6 +86,7 @@ fi
 default_fb_mode="xvfb"
 export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
+echo "Use FB_MODE=${FB_MODE}"
 export WORKING_DIR="${output_dir}/temp"
 echo "Create working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
