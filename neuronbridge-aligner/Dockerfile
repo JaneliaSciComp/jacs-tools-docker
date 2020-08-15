@@ -1,11 +1,17 @@
 FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
 RUN echo "Installing S3 FUSE and AWS CLI"
-RUN yum install -y fuse-devel s3fs-fuse awscli
+RUN yum install -y fuse-devel s3fs-fuse groff wget unzip less
+
+WORKDIR /awsinstall
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN rm -rf aws*
 
 WORKDIR /opt
 
-RUN yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs wget
+RUN yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs
 
 RUN echo "Installing Fiji"
 # Prereqs for Fiji
