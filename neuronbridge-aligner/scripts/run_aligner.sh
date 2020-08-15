@@ -93,7 +93,7 @@ mkdir -p ${WORKING_DIR}
 cd ${WORKING_DIR}
 
 function cleanTemp {
-    if [[ ${DEBUG_MODE} =~ "debug" ]]; then
+    if [[ "${DEBUG_MODE}" =~ "debug" ]]; then
         echo "~ Debugging mode - Leaving temp directory"
     else
         echo "Cleaning ${WORKING_DIR}"

@@ -7,6 +7,7 @@ S3_TEMPLATES_MOUNTPOINT=${S3_TEMPLATES_MOUNTPOINT:-"/s3_alignment_templates"}
 templates_s3bucket_name=
 inputs_s3bucket_name=
 outputs_s3bucket_name=
+searchId=
 input_filepath=
 output_dir=
 templates_dir_param=
@@ -92,8 +93,8 @@ WORKING_DIR="/scratch/${output_basename}"
 echo "Create local working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 
-function cleanWorkingDir {
-    if [[ ${DEBUG_MODE} =~ "debug" ]] ; then
+function cleanWorkingDir() {
+    if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
         echo "~ Debugging mode - Leaving working directory"
     else
         echo "Cleaning ${WORKING_DIR}"
@@ -103,30 +104,20 @@ function cleanWorkingDir {
 }
 trap cleanWorkingDir EXIT
 
-functiom updateSearch() {
+function updateSearch() {
     local searchId=$1
     local searchStep=$2
 
-    # Update the search if a searchId is passed and 
-    # if the environment variable SEARCH_SYNC_URL is set
-    if [[ "${searchId}" != "" && "${SEARCH_SYNC_URL}" != "" ]] ; then
-        searchData="{
-            \"id\": \"${searchId}\",
-            \"step\": \"${searchStep}\"
-        }"
-        mutation="mutation {
-            updateSearch(input: ${searchData}) {id, step}
-        }"
-        gql="{
-            \"query\": \"${mutation}\"
-        }"
-        updateSearchCmd="curl -XPOST \
-            ${SEARCH_SYNC_URL} \
-            -H 'Content-Type:application/graphql' \
-            -d \"${gql}\"
-            "
+    # Update the search if a searchId is passed
+    if [[ "${searchId}" != "" ]] ; then
+        searchData="{ \"searchId\": \"${searchId}\", \"step\": ${searchStep} }"
+        echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
+        printf -v updateSearchCmd "aws lambda invoke --function-name %s --log-type None --payload %s %s" \
+            "${SEARCH_UPDATE_FUNCTION}" \
+            "fileb://${WORKING_DIR}/${searchId}-input.json" \
+            "${WORKING_DIR}/${searchId}.json"
         echo "Update search step: ${updateSearchCmd}"
-        (${updateSearchCmd})
+        ${updateSearchCmd}
     fi
 }
 
@@ -178,7 +169,7 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
     lsTemplatesCmd="ls ${templates_dir}"
     templatesCount=`${lsTemplatesCmd} | wc -l`
     echo "Found ${templatesCount} after running ${lsTemplatesCmd}"
-    if [[ ${DEBUG_MODE} =~ "debug" ]] ; then
+    if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
         # list templates content  if debug is on
         echo "${lsTemplatesCmd}"
         ${lsTemplatesCmd}
@@ -204,7 +195,7 @@ run_align_cmd_args=(
 echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
 /opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
 alignment_exit_code=$?
-if (($alignment_exit_code != 0)) ; then
+if [[ "${alignment_exit_code}" != "0" ]] ; then
     echo "Alignment exited with $alignment_exit_code";
     exit $alignment_exit_code
 fi
@@ -214,7 +205,10 @@ copyMipsCmd="aws s3 cp ${MIPS_OUTPUT}/*.tif s3://${outputs_s3bucket_name}/${outp
 echo "Copy MIPS: ${copyMipsCmd}"
 ${copyMipsCmd}
 
-if [[ ${DEBUG_MODE} != "debug" ]] ; then
+echo "Set alignment to completed for ${searchId}"
+updateSearch ${searchId} 2
+
+if [[ "${DEBUG_MODE}" != "debug" ]] ; then
     # delete the input
     echo "Remove s3://${inputs_s3bucket_name}/${input_filepath}"
     aws s3 rm "s3://${inputs_s3bucket_name}/${input_filepath}"
