@@ -107,11 +107,20 @@ trap cleanWorkingDir EXIT
 function updateSearch() {
     local searchId=$1
     local searchStep=$2
+    local mipsParam=$3
 
     # Update the search if a searchId is passed
     if [[ "${searchId}" != "" ]] ; then
-        searchData="{ \"searchId\": \"${searchId}\", \"step\": ${searchStep} }"
+        mipsList=$(printf ",%s" "${mipsParam[@]}")
+        searchData="{
+            \"searchId\": ${searchId},
+            \"step\": ${searchStep},
+            \"computedMIPs\": [ ${mipsList:1} ]
+        }"
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
+        if [[ "${DEBUG_MODE}" != "debug" ]] ; then
+            echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
+        fi
         printf -v updateSearchCmd "aws lambda invoke --function-name %s --log-type None --payload %s %s" \
             "${SEARCH_UPDATE_FUNCTION}" \
             "fileb://${WORKING_DIR}/${searchId}-input.json" \
@@ -183,7 +192,7 @@ fi
 export MIPS_OUTPUT="${results_dir}/mips"
 
 echo "Set alignment in progress for ${searchId}"
-updateSearch ${searchId} 1
+updateSearch ${searchId} 1 ()
 
 run_align_cmd_args=(
     ${templates_dir_arg}
@@ -205,8 +214,13 @@ copyMipsCmd="aws s3 cp ${MIPS_OUTPUT}/*.tif s3://${outputs_s3bucket_name}/${outp
 echo "Copy MIPS: ${copyMipsCmd}"
 ${copyMipsCmd}
 
-echo "Set alignment to completed for ${searchId}"
-updateSearch ${searchId} 2
+mips=()
+for mip in `ls ${MIPS_OUTPUT}/*.tif` ; do
+    mips=("${mips[@]}" ${mip})
+done
+
+echo "Set alignment to completed for ${searchId}: ${mips[@]}"
+updateSearch ${searchId} 2 ${mips[@]}
 
 if [[ "${DEBUG_MODE}" != "debug" ]] ; then
     # delete the input
