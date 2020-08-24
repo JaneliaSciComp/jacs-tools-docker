@@ -118,7 +118,7 @@ function updateSearch() {
             mipsList=${mipsList:1}
         fi
         searchData="{
-            \"searchId\": ${searchId},
+            \"searchId\": \"${searchId}\",
             \"step\": ${searchStep},
             \"computedMIPs\": [ ${mipsList} ]
         }"
