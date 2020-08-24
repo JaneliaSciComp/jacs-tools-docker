@@ -118,7 +118,7 @@ function updateSearch() {
             \"computedMIPs\": [ ${mipsList:1} ]
         }"
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
-        if [[ "${DEBUG_MODE}" != "debug" ]] ; then
+        if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
             echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
         fi
         printf -v updateSearchCmd "aws lambda invoke --function-name %s --log-type None --payload %s %s" \
