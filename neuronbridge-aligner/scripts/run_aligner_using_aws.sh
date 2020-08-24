@@ -112,7 +112,7 @@ function updateSearch() {
     # Update the search if a searchId is passed
     if [[ "${searchId}" != "" ]] ; then
         if ((${#mipsParam[@]} == 0)) ; then
-            mipsList=""
+            mipsList=
         else
             mipsList=$(printf ",\"%s\"" "${mipsParam[@]}")
             mipsList=${mipsList:1}
