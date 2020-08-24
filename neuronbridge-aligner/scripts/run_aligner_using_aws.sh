@@ -111,11 +111,16 @@ function updateSearch() {
 
     # Update the search if a searchId is passed
     if [[ "${searchId}" != "" ]] ; then
-        mipsList=$(printf ",%s" "${mipsParam[@]}")
+        if ((${#mipsParam[@]} == 0)) ; then
+            mipsList=""
+        else
+            mipsList=$(printf ",\"%s\"" "${mipsParam[@]}")
+            mipsList=${mipsList:1}
+        fi
         searchData="{
             \"searchId\": ${searchId},
             \"step\": ${searchStep},
-            \"computedMIPs\": [ ${mipsList:1} ]
+            \"computedMIPs\": [ ${mipsList} ]
         }"
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
         if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
