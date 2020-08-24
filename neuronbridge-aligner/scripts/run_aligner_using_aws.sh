@@ -191,8 +191,9 @@ fi
 
 export MIPS_OUTPUT="${results_dir}/mips"
 
-echo "Set alignment in progress for ${searchId}"
-updateSearch ${searchId} 1 ()
+mips=()
+echo "Set alignment in progress for ${searchId}: ${mips[@]}"
+updateSearch ${searchId} 1 ${mips[@]}
 
 run_align_cmd_args=(
     ${templates_dir_arg}
@@ -214,7 +215,6 @@ copyMipsCmd="aws s3 cp ${MIPS_OUTPUT}/*.tif s3://${outputs_s3bucket_name}/${outp
 echo "Copy MIPS: ${copyMipsCmd}"
 ${copyMipsCmd}
 
-mips=()
 for mip in `ls ${MIPS_OUTPUT}/*.tif` ; do
     mips=("${mips[@]}" ${mip})
 done
