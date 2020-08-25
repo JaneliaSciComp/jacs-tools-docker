@@ -221,7 +221,7 @@ echo "Copy MIPS: ${copyMipsCmd}"
 ${copyMipsCmd}
 
 for mip in `ls ${MIPS_OUTPUT}/*.tif` ; do
-    mips=("${mips[@]}" ${mip})
+    mips=("${mips[@]}" $(basename ${mip}))
 done
 
 echo "Set alignment to completed for ${searchId}: ${mips[@]}"
