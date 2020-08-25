@@ -21,7 +21,7 @@ argstr=" ";
 DeleteOrMove="DontMove";//"Delete", "Move","DontMove"
 logsave=0;
 FolderNameAdd=false;
-saveFormat="png";//"tif"
+saveFormat="png";
 
 run("Close All");
 pluginDir=getDirectory("plugins");
@@ -589,9 +589,9 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
         selectWindow(neuronCH);
         
         if(unsharp=="Unsharp")
-        run("Unsharp Mask...", "radius=1 mask=0.35 stack");
+          run("Unsharp Mask...", "radius=1 mask=0.35 stack");
         else if(unsharp=="Max")
-        run("Maximum...", "radius=1.5 stack");
+          run("Maximum...", "radius=1.5 stack");
         
         if(bitd==16){
           if(DefMaxValue==4095)
@@ -635,17 +635,15 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
       if(usingLUT=="royal")
         stackconcatinate();
       
-      
-      
       if(AutoBRV==0){
         
         if(isOpen(origi))
-        selectWindow(origi);
+          selectWindow(origi);
         else
-        selectWindow(neuronCH);
+          selectWindow(neuronCH);
         
         if(easyADJ==false)
-        applyV=255;
+          applyV=255;
         if(bitd==16){
           
           if(easyADJ==false)
@@ -655,13 +653,12 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
         }
         
         print("line 1670 nImages; "+nImages);
-      }//if(AutoBRV==0){
+      }//if(AutoBRV==0) {
       
-      if(AutoBRV==1){
+      if(AutoBRV==1) {
         applyV = round(RealapplyV);
         print("Line 1518 RealapplyV; "+round(RealapplyV));
       }
-      
       
       ColorCoder(slices, applyV, width, AutoBRV, bitd, CLAHE, colorscale, reverse0, colorcoding, usingLUT, DefMaxValue, startMIP, endMIP, expand, GammaON, easyADJ);
       
@@ -692,7 +689,7 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
       }//if(AutoBRV==1){
       
       if(CropYN==true)
-      CropOP(MIPtype,applyV,colorscale);
+        CropOP(MIPtype,applyV,colorscale);
       
       
       TrueMaxValue=0;
@@ -702,8 +699,8 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
         if(DefMaxValue<256)
         TrueMaxValue=255;
         
-      }else if(DefMaxValue>4095)
-      TrueMaxValue=65535;
+      } else if(DefMaxValue>4095)
+        TrueMaxValue=65535;
       
       print("dirCOLOR 654; "+dirCOLOR);
       
@@ -711,26 +708,35 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
             
       dotindex = lastIndexOf(DataName,".");
       if(dotindex!=-1)
-      DataName=substring(DataName,0,dotindex);
+        DataName=substring(DataName,0,dotindex);
       
-      if(imageNum==1){
-        if(AutoBRV==1){
-          
+      if(imageNum==1) {
+        if(AutoBRV==1) {
           if(saveFormat=="png")
-          saveAs("PNG", dirCOLOR+DataName+".png");
+            saveAs("PNG", dirCOLOR+DataName+".png");
           else
-          save(dirCOLOR+DataName+vlprscore+".tif");
-          
-          //	File.saveString("applied.brightness="+applyV+" / "+TrueMaxValue+"\n"+"dslt.signal.amount="+sigsize+"\n"+"thresholding.signal.amount="+sigsizethre+"\n"+"S/B ratio="+(sigsize/maxi2)*100, dirCOLOR+DataName+"_CH"+MIPtry+"_MIP.properties");
-        }else{
-          //saveAs("PNG", dirCOLOR+DataName+"_CH"+MIPtry+"_MIP.png");
-          save(dirCOLOR+DataName+".tif");
+            save(dirCOLOR+DataName+vlprscore+".tif");
+        } else {
+          if(saveFormat=="png") {
+            saveAs("PNG", dirCOLOR+DataName+".png");
+          } else {
+            save(dirCOLOR+DataName+".tif");
+          }
         }
-      }else{
-        if(AutoBRV==1){
+      } else {
+        if(AutoBRV==1) {
+          if(saveFormat=="png") {
+            saveAs("PNG", dirCOLOR+DataName+"_CH"+MIPtry+""+vlprscore+".png");
+          } else {
             save(dirCOLOR+DataName+"_CH"+MIPtry+""+vlprscore+".tif");
-        }else
+          }
+        } else {
+          if(saveFormat=="png") {
+            saveAs("PNG", dirCOLOR+DataName+"_CH"+MIPtry+""+vlprscore+".png");
+          } else {
             save(dirCOLOR+DataName+"_CH"+MIPtry+""+vlprscore+".tif");
+          }
+        }
       }
       
       close();
@@ -743,27 +749,26 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
       selectWindow("Original_Stack.tif");
       close();
       
-      if(channels==4){
-        OpenImage=nImages(); OpenTitlelist=getList("image.titles");
-        for(iImage=0; iImage<OpenImage; iImage++){
-          //		print("OpenImage; "+OpenTitlelist[iImage]);
+      if(channels==4) {
+        OpenImage=nImages();
+        OpenTitlelist=getList("image.titles");
+        for(iImage=0; iImage<OpenImage; iImage++) {
           DontClose=0;
-          for(sameornot=0; sameornot<titlelist.length; sameornot++){
-            
+          for(sameornot=0; sameornot<titlelist.length; sameornot++) {
             if(OpenTitlelist[iImage]==titlelist[sameornot])
-            DontClose=1;
+              DontClose=1;
           }
           if(DontClose==0){
             selectWindow(OpenTitlelist[iImage]);
             close();
           }
         }
-      }//if(channels>1){
-    }//if(colorcoding==1){
-    
-  }//	for(MIPtry=1; MIPtry<=imageNum; MIPtry++){
+      }
+    }
+  }
   run("Close All");
-} //function mipfunction(mipbatch) { 
+}
+
 ///////////////////////////////////////////////////////////////
 function autobradjustment(briadj,DSLTver,DefMaxValue){
   DOUBLEdslt=0;
@@ -1527,21 +1532,15 @@ function brightnessapply(DefMaxValue,filepath, brightnessapplyArray, bitd,lowerw
               
               setMinAndMax(min, applyV2+minus2);
               run("Apply LUT");
-              //	save("/Users/otsunah/test/Color_depthMIP_Test/MCFO_unisex20xHR/"+numtry+".tif");
-            }else{
+            } else {
               //Orimaxi
               break;
             }
             
-            //	run("Apply LUT");
-            if(MaskName2D!=""){
-              
+            if(MaskName2D!="") {              
               BackgroundMask (BackgroundMaskArray,MaskName2D,MaskDir,"MIPDUP2.tif",bitd,GammaON);
-              
               brightnessNeed=BackgroundMaskArray[0];
-              
-            }else if (MaskName2D==""){//	if(getHeight==512 && getWidth==1024){
-              
+            } else if (MaskName2D=="") {
               newImage("MaskMIP.tif", "16-bit", getWidth, getHeight, 1);
               setForegroundColor(255, 255, 255);
               makeRectangle(getWidth*0.2, getHeight*0.2, getWidth*0.6, getHeight*0.6);
