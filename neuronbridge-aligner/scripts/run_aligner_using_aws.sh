@@ -216,12 +216,13 @@ if [[ "${alignment_exit_code}" != "0" ]] ; then
 fi
 
 # copy the results to the s3 output bucket
-copyMipsCmd="aws s3 cp ${MIPS_OUTPUT}/*.tif s3://${outputs_s3bucket_name}/${output_dir}/"
+generatedMIPSFolderName="generatedMIPS"
+copyMipsCmd="aws s3 cp ${MIPS_OUTPUT} s3://${outputs_s3bucket_name}/${output_dir}/${generatedMIPSFolderName} --recursive"
 echo "Copy MIPS: ${copyMipsCmd}"
 ${copyMipsCmd}
 
-for mip in `ls ${MIPS_OUTPUT}/*.tif` ; do
-    mips=("${mips[@]}" $(basename ${mip}))
+for mip in `ls ${MIPS_OUTPUT}/*.{tif,png,jpg}` ; do
+    mips=("${mips[@]}" "${generatedMIPSFolderName}/$(basename ${mip})")
 done
 
 echo "Set alignment to completed for ${searchId}: ${mips[@]}"
