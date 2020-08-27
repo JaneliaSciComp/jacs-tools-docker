@@ -108,6 +108,7 @@ function updateSearch() {
     local searchId=$1
     local searchStep=$2
     local mipsParam=$3
+    local errorMessage=$4
 
     # Update the search if a searchId is passed
     if [[ "${searchId}" != "" ]] ; then
@@ -117,11 +118,20 @@ function updateSearch() {
             mipsList=$(printf ",\"%s\"" "${mipsParam[@]}")
             mipsList=${mipsList:1}
         fi
-        searchData="{
-            \"searchId\": \"${searchId}\",
-            \"step\": ${searchStep},
-            \"computedMIPs\": [ ${mipsList} ]
-        }"
+        if [[ "${errorMessage}" == "" ]] ; then
+            searchData="{
+                \"searchId\": \"${searchId}\",
+                \"step\": ${searchStep},
+                \"computedMIPs\": [ ${mipsList} ]
+            }"
+        else
+            searchData="{
+                \"searchId\": \"${searchId}\",
+                \"step\": ${searchStep},
+                \"computedMIPs\": [ ${mipsList} ],
+                \"errorMessage\": \"${errorMessage}\"
+            }"
+        fi
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
         if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
             echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
@@ -211,7 +221,8 @@ echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
 /opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
 alignment_exit_code=$?
 if [[ "${alignment_exit_code}" != "0" ]] ; then
-    echo "Alignment exited with $alignment_exit_code";
+    echo "Alignment exited with ${alignment_exit_code}";
+    updateSearch ${searchId} 1 ${mips[@]} "Alignment failed with exit code ${alignment_exit_code}"
     exit $alignment_exit_code
 fi
 
