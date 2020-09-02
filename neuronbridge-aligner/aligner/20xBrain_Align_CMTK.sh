@@ -141,7 +141,7 @@ function generateAllMIPs() {
     local area="Brain"
     # generate MIPs for all signal channels 2...
     echo "Generate MIPs for all signal channels to ${_mipsOutput}"
-    for ((i=2; i<=$NCHANNELS; i++)); do
+    for ((i=1; i<=$NCHANNELS; i++)); do
         mipCmdArgs="${_sigDir}/,${_sigBaseName}_0${i}.nrrd,${_mipsOutput}/,${TemplatesDir}/,${area}"
         mipsCmd="$FIJI --headless -macro ${MIPGENERATION} ${mipCmdArgs}"
         echo "Generate MIPS for channel ${i}: ${mipsCmd}"
