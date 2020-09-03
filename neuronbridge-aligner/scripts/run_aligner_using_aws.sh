@@ -162,11 +162,11 @@ copyInputsCmd="aws s3 cp s3://${inputs_s3bucket_name}/${input_filepath} ${workin
 if [[ "${skipCopyInputIfExists}" =~ "true" ]] ; then
     if [[ ! -e ${working_input_filepath} ]] ;  then
         echo "Copy inputs: ${copyInputsCmd}"
-        `${copyInputsCmd}`
+        ${copyInputsCmd}
     fi
 else
     echo "Copy inputs: ${copyInputsCmd}"
-    `${copyInputsCmd}`
+    ${copyInputsCmd}
 fi
 
 if [[ "${templates_s3bucket_name}" != "" ]] ; then
@@ -193,11 +193,6 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
     lsTemplatesCmd="ls ${templates_dir}"
     templatesCount=`${lsTemplatesCmd} | wc -l`
     echo "Found ${templatesCount} after running ${lsTemplatesCmd}"
-    if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
-        # list templates content  if debug is on
-        echo "${lsTemplatesCmd}"
-        ${lsTemplatesCmd}
-    fi
     templates_dir_arg="--templatedir ${templates_dir}"
 else
     # will use default templates
