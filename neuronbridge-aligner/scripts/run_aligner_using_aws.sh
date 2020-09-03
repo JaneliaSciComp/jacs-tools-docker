@@ -157,7 +157,7 @@ mkdir -p ${results_dir}
 # copy input file to the input working directory
 input_filename=`basename ${input_filepath}`
 working_input_filepath="${inputs_dir}/${input_filename}"
-copyInputsCmd="aws s3 cp s3://${inputs_s3bucket_name}/${input_filepath} ${working_input_filepath}"
+copyInputsCmd="aws s3 cp s3://${inputs_s3bucket_name}/${input_filepath} ${working_input_filepath} --no-progress"
 
 if [[ "${skipCopyInputIfExists}" =~ "true" ]] ; then
     if [[ ! -e ${working_input_filepath} ]] ;  then
