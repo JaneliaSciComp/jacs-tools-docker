@@ -105,30 +105,41 @@ function cleanWorkingDir() {
 trap cleanWorkingDir EXIT
 
 function updateSearch() {
-    local searchId=$1
-    local searchStep=$2
-    local mipsParam=$3
-    local errorMessage=$4
+    local -a args=("${@}")
+    local searchId=${args[0]}
+    local -i searchStep=${args[1]}
+    local -i nMips=${args[2]}
+    local -a mipsParam
+    if [ $nMips -eq 0 ] ; then
+        mipsParam=()
+    else
+        mipsParam=${args[@]:3:$nMips}
+    fi
+    local errorMessage=${args[3+$nMips]}
 
     # Update the search if a searchId is passed
     if [[ "${searchId}" != "" ]] ; then
-        if ((${#mipsParam} == 0)) ; then
+        if ((${#nMips} == 0)) ; then
             mipsList=
+            displayableMask=
         else
             mipsList=$(printf ",\"%s\"" "${mipsParam[@]}")
             mipsList=${mipsList:1}
+            displayableMask=${mipsParam[0]}
         fi
         if [[ "${errorMessage}" == "" ]] ; then
             searchData="{
                 \"searchId\": \"${searchId}\",
                 \"step\": ${searchStep},
-                \"computedMIPs\": [ ${mipsList} ]
+                \"computedMIPs\": [ ${mipsList} ],
+                \"displayableMask\": \"${displayableMask}\"
             }"
         else
             searchData="{
                 \"searchId\": \"${searchId}\",
                 \"step\": ${searchStep},
                 \"computedMIPs\": [ ${mipsList} ],
+                \"displayableMask\": \"${displayableMask}\",
                 \"errorMessage\": \"${errorMessage}\"
             }"
         fi
@@ -201,9 +212,9 @@ fi
 
 export MIPS_OUTPUT="${results_dir}/mips"
 
-mips=()
+declare -a mips=()
 echo "Set alignment in progress for ${searchId}: ${mips[@]}"
-updateSearch ${searchId} 1 ${mips[@]}
+updateSearch "${searchId}" 1 ${#mips[@]} "${mips[@]}"
 
 run_align_cmd_args=(
     ${templates_dir_arg}
@@ -217,7 +228,7 @@ echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
 alignment_exit_code=$?
 if [[ "${alignment_exit_code}" != "0" ]] ; then
     echo "Alignment exited with ${alignment_exit_code}";
-    updateSearch ${searchId} 1 ${mips[@]} "Alignment failed with exit code ${alignment_exit_code}"
+    updateSearch "${searchId}" 1 ${#mips[@]} "${mips[@]}" "Alignment failed with exit code ${alignment_exit_code}"
     exit $alignment_exit_code
 fi
 
@@ -232,7 +243,8 @@ for mip in `ls ${MIPS_OUTPUT}/*.{tif,png,jpg}` ; do
 done
 
 echo "Set alignment to completed for ${searchId}: ${mips[@]}"
-updateSearch ${searchId} 2 ${mips[@]}
+updateSearch "${searchId}" 2 ${#mips[@]} "${mips[@]}"
+
 
 if [[ "${DEBUG_MODE}" != "debug" ]] ; then
     # delete the input
