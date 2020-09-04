@@ -113,6 +113,11 @@ export FINALOUTPUT=${ALIGNMENT_OUTPUT}
 
 echo "~ Run alignment: ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres} ${forceVxSizeUse}"
 /opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres} ${forceVxSizeUse}
+alignmentExitCode=$?
+if [ $alignmentExitCode -ne 0 ]; then
+    echo "Alignment terminated abnormally: $alignmentExitCode"
+    exit 1
+fi
 
 cd ${output_dir}
 echo ""
