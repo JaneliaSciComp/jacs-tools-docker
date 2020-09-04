@@ -113,7 +113,7 @@ function updateSearch() {
     if [ $nMips -eq 0 ] ; then
         mipsParam=()
     else
-        mipsParam=${args[@]:3:$nMips}
+        mipsParam=("${args[@]:3:$nMips}")
     fi
     local errorMessage=${args[3+$nMips]}
 
@@ -132,7 +132,7 @@ function updateSearch() {
         else
             mipsList=$(printf ",\"%s\"" "${mipsParam[@]}")
             mipsList=${mipsList:1}
-            displayableMask=${mipsParam[0]}
+            displayableMask="${mipsParam[0]}"
         fi
         if [[ "${errorMessage}" == "" ]] ; then
             searchData="{
