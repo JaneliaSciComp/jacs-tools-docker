@@ -117,9 +117,16 @@ function updateSearch() {
     fi
     local errorMessage=${args[3+$nMips]}
 
+    echo "Update Search Params: \
+        searchId: ${searchId} \
+        searchStep: ${searchStep} \
+        nMips: ${nMips} \
+        mips: ${mipsParam[@]} \
+        errors: ${errorMessage}"
+
     # Update the search if a searchId is passed
     if [[ "${searchId}" != "" ]] ; then
-        if ((${#nMips} == 0)) ; then
+        if ((${nMips} == 0)) ; then
             mipsList=
             displayableMask=
         else
