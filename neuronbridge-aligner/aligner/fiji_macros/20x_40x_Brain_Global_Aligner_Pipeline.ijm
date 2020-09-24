@@ -7,12 +7,13 @@ MIPsave=1;
 ShapeAnalysis=1;//perform shape analysis and kick strange sample
 CLAHEwithMASK=1;
 Batch=1;
-BWd=0; // BW decision at 793 line
+BWd=0; //BW decision at 793 line
 PrintSkip=0;
-templateBr="JFRC2014";// JFRC2013, JFRC2014, JRC2018
+templateBr="JFRC2014";//JFRC2013, JFRC2014, JRC2018
 ForceUSE=false;
 nrrdEx=true;
 revstack=false;
+nc82decision="Signal_amount";//"ch1","ch2","ch3"
 
 cropWidth=1400;
 cropHeight=800;
@@ -22,7 +23,6 @@ totalblock=1;
 Frontal50pxPath=0;
 MCFOYN=false;
 TwentyMore=false;
-nc82decision="Color base";
 DecidedColor="Red";
 ShapeMatchingMaskPath=0;
 JFRC2010MedProPath=0;
@@ -46,12 +46,10 @@ testArg=0;
 reverseR=1;
 APcheck=1;
 
-//-Lop
 flipchannel=0;
 PNGsave=0;
 opticlobeMASKcheck=0;
 nc82usecolor=0;
-//-Rop
 
 args = split(getArgument(),",");
 
@@ -66,7 +64,8 @@ objective = args [7];//"40x" or "20x"
 templateBr = args [8];//"JFRC2014", JFRC2013, JFRC2014, JRC2018
 BrainShape = args [9];//"Both_OL_missing (40x)";//"Intact", "Both_OL_missing (40x)", "Unknown"
 PathConsolidatedLabel=args[10];// full file path for ConsolidatedLabel.v3dpbd
-forceVxSize = args[11];
+forceVxSize = args[11];//true, false
+nc82decision = args[12];//"Signal_amount","ch1","ch2","ch3","ch4"
 
 MatchingFilesDir=MatchingFilesDir+"/";
 
@@ -75,6 +74,7 @@ LateralMIPPath = MatchingFilesDir+"Lateral_JFRC2010_5time_smallerMIP.tif";//  fu
 Slice50pxPath = MatchingFilesDir+"JFRC2010_50pxSlice.tif";//  full file path for "JFRC2010_50pxSlice.tif"
 ShapeMatchingMaskPath = MatchingFilesDir+"JFRC2010_ShapeMatchingMask.tif";//"JFRC2010_ShapeMatchingMask.tif";
 
+
 widthVx=parseFloat(widthVx);//Chaneg string to number
 depth=parseFloat(depth);//Chaneg string to number
 heightVx=widthVx;
@@ -82,6 +82,7 @@ NumCPU= parseFloat(NumCPU);//Chaneg string to number
 
 Ori_widthVx = widthVx;
 Ori_heightVx = widthVx;
+
 
 print("savedir; "+savedir);
 print("filename; "+filename);
@@ -94,13 +95,14 @@ print("objective; "+objective);
 print("templateBr; "+templateBr);
 print("BrainShape; "+BrainShape);
 print("PathConsolidatedLabel; "+PathConsolidatedLabel);
+print("forceVxSize; "+forceVxSize);
+print("nc82decision; "+nc82decision);
 print("");
 
 print("Frontal50pxPath; "+Frontal50pxPath);
 print("LateralMIPPath; "+LateralMIPPath);
 print("Slice50pxPath; "+Slice50pxPath);
 print("ShapeMatchingMaskPath; "+ShapeMatchingMaskPath);
-
 
 savedirext=File.exists(savedir);
 if(savedirext!=1)
@@ -110,7 +112,6 @@ noext=filename;
 DotIndex = lastIndexOf(filename, ".");
 if(DotIndex!=-1)
 noext = substring(filename, 0, DotIndex);
-
 
 logsum=getInfo("log");
 
@@ -132,8 +133,6 @@ for (si=0; si<n3; si++) {
 		File.saveString(logsum, filepath);
 		exit();
 	}
-	//	String.append(fromCharCode(c));
-	//	filename = String.buffer;
 }
 String.resetBuffer;
 
@@ -169,18 +168,18 @@ ShapeMatchingMaskPath=FilePathArray[0];
 
 comparisonP="Median";//"Median";//"Max";//"Median"
 
-if(comparisonP=="Average") { // average is not good 13D08
+if(comparisonP=="Average"){// average is not good 13D08
 	JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_AvePro.png"; //"JFRC2010_AvePro.png"
 	FilePathArray=newArray(JFRC2010MedProPath, "JFRC2010_AvePro.png");
 	projectionSt="JFRC2010_AvePro.png";
 }
-if(comparisonP=="Median") {// good for izoom adjustment, but not good for optic lobe detection
+if(comparisonP=="Median"){// good for izoom adjustment, but not good for optic lobe detection
 	JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_MedPro.tif"; //"JFRC2010_AvePro.png"
 	FilePathArray=newArray(JFRC2010MedProPath, "JFRC2010_MedPro.tif");
 	projectionSt="JFRC2010_MedPro.tif";
 }
 
-if(comparisonP=="Max") {
+if(comparisonP=="Max"){
 	JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_MIP.tif"; //"JFRC2010_AvePro.png"
 	FilePathArray=newArray(JFRC2010MedProPath, "JFRC2010_MIP.tif");
 	projectionSt="JFRC2010_MIP.tif";
@@ -217,15 +216,15 @@ getDimensions(width, height, channels, slices, frames);
 getVoxelSize(VxWidth, VxHeight, VxDepth, VxUnit);
 print("File vx size; VxWidth; "+VxWidth+"  VxHeight; "+VxHeight+"   VxDepth; "+VxDepth);
 
-if(forceVxSize==false){
-	if(VxWidth!=1 && VxHeight!=1){
-		Ori_widthVx=VxWidth;
-		widthVx=VxWidth;
-		Ori_heightVx=VxHeight;
-		depth=VxDepth;
-		print("Real voxel size; Ori_widthVx; "+Ori_widthVx+"  depth; "+depth);
-	}
+if(forceVxSize=="false" || forceVxSize==false){
+	Ori_widthVx=VxWidth;
+	widthVx=VxWidth;
+	Ori_heightVx=VxHeight;
+	depth=VxDepth;
+	print("Fixed Real voxel size; Ori_widthVx; "+Ori_widthVx+"  depth; "+depth);
 }
+
+
 
 //if(Ori_widthVx>0.43 && objective=="40x" && Ori_widthVx<0.46){
 //	print("40x vx size changed!! from "+Ori_widthVx+" to 0.4713");
@@ -259,15 +258,6 @@ print("channels; "+channels);
 logsum=getInfo("log");
 File.saveString(logsum, filepath);
 
-titlelist=getList("image.titles");
-signal_count = 0;
-neuron=newArray(titlelist.length);
-UnknownChannel=newArray(titlelist.length);
-posicolor=newArray(titlelist.length);
-Original3D=newArray(titlelist.length);
-
-posicolorNum=0;
-
 //if(channels==1 && nSlices>240){
 //	roundSlices = round(nSlices/4);
 //	actualSlice = nSlices/4;
@@ -291,7 +281,7 @@ if(channels==1 && nSlices<240){
 	run("Quit");
 }
 
-
+posicolorNum=0;
 titlelist=getList("image.titles");
 signal_count = 0; neuron2=0; neuron3=0;
 neuron=newArray(titlelist.length);
@@ -313,83 +303,113 @@ for (iCh=0; iCh<titlelist.length; iCh++) {
 logsum=getInfo("log");
 File.saveString(logsum, filepath);
 
-if(channels==2){
+if(channels>1){
 	
-	if(nc82usecolor==0){
-		selectImage(UnknownChannel[1]);//ch2
-		nc82=getImageID();//White
+	mean10=0; mean20=0; mean30=0; mean40=0; maxmean=-1;
+	if(nc82decision=="Signal_amount"){
 		
-		//	setBatchMode(false);
-		//		updateDisplay();
-		//		"do"
-		//		exit();
+		selectImage(UnknownChannel[0]);
+		run("Z Project...", "projection=[Sum Slices]");
+		avetest0=getImageID();
+		getStatistics(area, mean10, min, max, std, histogram);
+		maxmean=mean10;
+		close();
 		
-		selectImage(UnknownChannel[0]);//ch1
+		selectImage(UnknownChannel[1]);
+		run("Z Project...", "projection=[Sum Slices]");
+		avetest1=getImageID();
+		getStatistics(area, mean20, min, max, std, histogram);
+		if(maxmean<mean20)
+		maxmean=mean20;
+		close();
+		
+		if(channels>=3){
+			selectImage(UnknownChannel[2]);
+			run("Z Project...", "projection=[Sum Slices]");
+			avetest2=getImageID();
+			getStatistics(area, mean30, min, max, std, histogram);
+			if(maxmean<mean30)
+			maxmean=mean30;
+			close();
+		}
+		
+		if(channels==4){
+			selectImage(UnknownChannel[3]);
+			run("Z Project...", "projection=[Sum Slices]");
+			avetest2=getImageID();
+			getStatistics(area, mean40, min, max, std, histogram);
+			if(maxmean<mean40)
+			maxmean=mean40;
+			close();
+		}
+	}//	if(nc82decision=="Signal_amount"){
+	refchannel=0;
+	if(maxmean==mean10 || nc82decision=="ch1"){
+		selectImage(UnknownChannel[0]);
+		nc82=getImageID();
+		
+		selectImage(UnknownChannel[1]);
 		neuron=getImageID();
 		
-		if(flipchannel==1){
-			selectImage(UnknownChannel[0]);//ch2
-			nc82=getImageID();//White
-			
-			selectImage(UnknownChannel[1]);//ch1
-			neuron=getImageID();
+		if(channels>=3){
+			selectImage(UnknownChannel[2]);
+			neuron2=getImageID();
 		}
-	}//	if(nc82usecolor==0){
-	if(nc82usecolor==1){
-		
-		neuron=newArray(channels+1);
-		UnknownChannel=newArray(channels+1);
-		posicolor=newArray(channels+1);
-		
-		posicolorNum=0;
-		
-		for (iCh2=0; iCh2<nImages; iCh2++) {
-			//	print("titlelist[iCh2]; "+titlelist[iCh2]);
-			selectWindow(titlelist[iCh2]);
-			
-			
-			if(nSlices>1){
-				//	cc = substring(chanspec,iCh,iCh+1);
-				print("titlelist[iCh2]; "+titlelist[iCh2]);
-				UnknownChannel[posicolorNum]=getImageID();
-				
-				colorarray=newArray("");
-				colordecision(colorarray);
-				posicolor[posicolorNum]=colorarray[0];
-				posicolorNum=posicolorNum+1;
-			}
-		}//for (i=0; i<lengthOf(chanspec); i++) {
-		
-		print("posicolor0; "+posicolor[0]+"   posicolor1; "+posicolor[1]);
-		neuronassigned=0;
-		
-		if(posicolor[0]=="Red" && posicolor[1]=="Green"){
-			selectImage(UnknownChannel[0]);
-			nc82=getImageID();//White
-			
-			selectImage(UnknownChannel[1]);
-			neuron=getImageID();
-			neuronassigned=1;
+		if(channels==4){
+			selectImage(UnknownChannel[3]);
+			neuron3=getImageID();
 		}
-		if(posicolor[1]=="Red" && posicolor[0]=="Green"){
-			selectImage(UnknownChannel[1]);
-			nc82=getImageID();//White
-			
-			selectImage(UnknownChannel[0]);
-			neuron=getImageID();
-			neuronassigned=1;
-		}
+		refchannel=1;
+		print("ch1 is reference");
+	}else if (maxmean==mean20 || nc82decision=="ch2"){
+		selectImage(UnknownChannel[1]);
+		nc82=getImageID();
 		
-		if(neuronassigned==0){
-			selectWindow("C2-"+oriname);
-			nc82=getImageID();//White
-			
-			selectWindow("C1-"+oriname);
-			neuron=getImageID();
-			
+		selectImage(UnknownChannel[0]);
+		neuron=getImageID();
+		
+		if(channels>=3){
+			selectImage(UnknownChannel[2]);
+			neuron2=getImageID();
 		}
-	}	
-}//if(channels==2){
+		if(channels==4){
+			selectImage(UnknownChannel[3]);
+			neuron3=getImageID();
+		}
+		refchannel=2;
+		print("ch2 is reference");
+	}else if (maxmean==mean30 || nc82decision=="ch3"){
+		selectImage(UnknownChannel[2]);
+		nc82=getImageID();
+		
+		selectImage(UnknownChannel[0]);
+		neuron=getImageID();
+		
+		selectImage(UnknownChannel[1]);
+		neuron2=getImageID();
+		
+		if(channels==4){
+			selectImage(UnknownChannel[3]);
+			neuron3=getImageID();
+		}
+		refchannel=3;
+		print("ch3 is reference");
+	}else if (maxmean==mean40 || nc82decision=="ch4"){
+		selectImage(UnknownChannel[3]);
+		nc82=getImageID();
+		
+		selectImage(UnknownChannel[0]);
+		neuron=getImageID();
+		
+		selectImage(UnknownChannel[1]);
+		neuron2=getImageID();
+		
+		selectImage(UnknownChannel[2]);
+		neuron3=getImageID();
+		print("ch4 is reference");
+		refchannel=4;
+	}
+}//if(channels>1){
 
 //selectImage(nc82);
 //setBatchMode(false);
@@ -398,44 +418,6 @@ if(channels==2){
 //		exit();
 
 
-if(channels==3){
-	
-	selectImage(UnknownChannel[2]);//ch3
-	nc82=getImageID();
-	
-	selectImage(UnknownChannel[0]);//ch1
-	neuron=getImageID();
-	
-	selectImage(UnknownChannel[1]);//ch2
-	neuron2=getImageID();
-}//if(posicolor0=="Red" && posicolor1=="White"){
-
-
-if(channels==4 && endsWith(path,".lsm")){// PTR
-	selectImage(UnknownChannel[0]);
-	nc82=getImageID();
-	
-	selectImage(UnknownChannel[1]);
-	neuron=getImageID();
-	
-	selectImage(UnknownChannel[2]);
-	neuron2=getImageID();	
-	
-	selectImage(UnknownChannel[3]);
-	neuron3=getImageID();	
-}else if(channels==4){// PTR
-	selectImage(UnknownChannel[3]);
-	nc82=getImageID();
-	
-	selectImage(UnknownChannel[0]);
-	neuron=getImageID();
-	
-	selectImage(UnknownChannel[1]);
-	neuron2=getImageID();	
-	
-	selectImage(UnknownChannel[2]);
-	neuron3=getImageID();	
-}//if(channels==4){
 
 
 
@@ -1799,7 +1781,8 @@ if(SizeM!=0){
 				else
 				run("Properties...", "channels=1 slices="+NC82SliceNum+" frames=1 unit=microns pixel_width="+widthVx+" pixel_height="+heightVx+" voxel_depth="+incredepth+"");
 				
-				
+				metadata="voxelSizeXY: "+Ori_widthVx+"\n"+"voxelSizeZ: "+incredepth+"\n"+"numChannels: "+channels+"\n"+"referenceChannel: "+refchannel;
+				File.saveString(metadata, savedir+"metadata.yaml");
 				
 				if(sizediff2>OpticLobeSizeGap || sizediff1>OpticLobeSizeGap || y1_opl==cropHeight*2)
 				run("Nrrd Writer", "compressed nrrd="+myDir0+noext+"_01.nrrd");
@@ -1951,7 +1934,7 @@ if(SizeM!=0){
 						
 						
 						print("");
-						if(MaxinSlice<finslice/2 && MaxOBJ3Dscan>600){
+						if(MaxinSlice<finslice/2 && MaxOBJ3Dscan>600){//means posterior is beginning of slices
 							
 							if(MaxOBJ3Dscan>800){
 								APinv=1;
@@ -1966,42 +1949,58 @@ if(SizeM!=0){
 									setSlice(inSlice);
 									run("Duplicate...", "title=SingleSamp.tif");
 									
-									run("Image Correlation Atomic SD", "samp=JFRC2010_16bit_cropAN.tif temp=SingleSamp.tif +=12 -=12 overlap=90 parallel="+NumCPU+" rotation=1 calculation=OBJPeasonCoeff");
+									//	if(inSlice==7){
+									//	setBatchMode(false);
+									//			updateDisplay();
+									//				"do"
+									//		}
 									
-									resultstringST = call("Image_Correlation_Atomic_SD.getResult");
+									run("Image Correlation Atomic EQ", "samp=JFRC2010_16bit_cropAN.tif temp=SingleSamp.tif +=12 -=12 overlap=90 parallel="+NumCPU+" rotation=1 calculation=OBJPeasonCoeff");
+									
+									resultstringST = call("Image_Correlation_Atomic_EQ.getResult");
 									
 									resultstring=split(resultstringST,"  ");
 									
 									OBJScore=substring(resultstring[4],6,lengthOf(resultstring[4]));
-																		
+									
+									//	totalLog=getInfo("log");
+									//	OBJindex = lastIndexOf(totalLog, "score;");
+									//	xindex = lastIndexOf(totalLog,"shiftx");
+									//	yindex = lastIndexOf(totalLog,"shifty");
+									//	rotindex = lastIndexOf(totalLog,"rotation");
+									
+									//	OBJScore=substring(totalLog,OBJindex+6, lengthOf(totalLog));//getResult("OBJ score", 0);
 									OBJScore=parseFloat(OBJScore);//Chaneg string to number
 									
 									selectWindow("SingleSamp.tif");
 									close();
 									
-									if (OBJScore>MaxOBJ3Dscan) {
+									if(OBJScore>MaxOBJ3Dscan){
 										print("slice; "+inSlice);
 										MaxinSlice=inSlice;
 										MaxOBJ3Dscan=OBJScore;
 										
 										Rot=substring(resultstring[2],9,lengthOf(resultstring[2]));
+										//	Rot= substring(totalLog,rotindex+9, OBJindex-6);//getResult("rotation", 0);
 										Rot=parseFloat(Rot);//Chaneg string to number
 										
 										elipsoidAngle2=parseFloat(Rot);
 										if (elipsoidAngle2>90) 
-											elipsoidAngle2 = -(180 - elipsoidAngle2);
+										elipsoidAngle2 = -(180 - elipsoidAngle2);
 										
 										maxX=substring(resultstring[0],7,lengthOf(resultstring[0]));
+										//	maxX= substring(totalLog,xindex+7, yindex-2);//getResult("shiftx", 0);
 										maxX=parseFloat(maxX);//Chaneg string to number
 										
 										maxY=substring(resultstring[1],7,lengthOf(resultstring[1]));
+										//	maxY=substring(totalLog,yindex+7, rotindex-2);//getResult("shifty", 0);
 										maxY=parseFloat(maxY);//Chaneg string to number
 									}
 								}
 								print("MaxinSliceAN; "+MaxinSlice+"   MaxOBJ3DscanAN; "+MaxOBJ3Dscan+"  elipsoidAngle2; "+elipsoidAngle2);
 								
 								
-								if(MaxinSlice>finslice/2 && MaxOBJ3Dscan>580) {
+								if(MaxinSlice>finslice/2 && MaxOBJ3Dscan>500){
 									APinv=1;
 									print("AP_inverted!!");
 								}
@@ -2699,33 +2698,36 @@ function fileOpen(FilePathArray){
 	FilePath=FilePathArray[0];
 	MIPname=FilePathArray[1];
 	
-	if (isOpen(MIPname)) {
+	//	print(MIPname+"; "+FilePath);
+	if(isOpen(MIPname)){
 		selectWindow(MIPname);
 		tempMask=getDirectory("image");
 		FilePath=tempMask+MIPname;
-	} else {
-		if (FilePath==0) {
+	}else{
+		if(FilePath==0){
+			
 			FilePath=getDirectory("plugins")+MIPname;
+			
 			tempmaskEXI=File.exists(FilePath);
 			if(tempmaskEXI!=1)
-				FilePath=getDirectory("plugins")+"Brain_Aligner_Plugins"+File.separator+MIPname;
+			FilePath=getDirectory("plugins")+"Brain_Aligner_Plugins"+File.separator+MIPname;
 			
 			tempmaskEXI=File.exists(FilePath);
 			
-			if(tempmaskEXI==1) {
+			if(tempmaskEXI==1){
 				open(FilePath);
-			} else {
+			}else{
 				print("no file ; "+FilePath);
 			}
-		} else {
+		}else{
 			tempmaskEXI=File.exists(FilePath);
-			if(tempmaskEXI==1) {
-				open(FilePath);
-			} else {
+			if(tempmaskEXI==1)
+			open(FilePath);
+			else{
 				print("no file ; "+FilePath);
 			}
 		}
-	}
+	}//if(isOpen("JFRC2013_63x_Tanya.nrrd")){
 	
 	FilePathArray[0]=FilePath;
 }

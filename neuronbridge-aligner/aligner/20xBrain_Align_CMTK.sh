@@ -12,6 +12,11 @@ RESZ=$5
 
 # true or false, forcefully use the user input or the size from confocal file
 ForceUseVxSize=$6
+# Reference channel can be one of: {ch1, ch2, ch3, ch4, Signal_amount}
+# If the value is ch<number> it considers that channel as the reference channel
+# If the value is 'Signal_amount' it will compare sum signal between all channels, 
+# and choose the reference channel the one with the highest sum
+referenceChannel=$7
 
 InputFileName=$(basename ${InputFilePath})
 InputName=${InputFileName%.*}
@@ -202,11 +207,11 @@ if [[ -e $OLSHAPE ]]; then
 else
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
-    echo "| $FIJI -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize.\""
+    echo "| $FIJI -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel.\""
     echo "+---------------------------------------------------------------------------------------+"
     START=`date '+%F %T'`
     # Note that this macro does not seem to work in --headless mode
-    $FIJI -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize" > $DEBUG_DIR/preproc.log 2>&1
+    $FIJI -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
