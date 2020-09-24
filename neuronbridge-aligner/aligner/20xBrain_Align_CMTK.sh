@@ -5,18 +5,17 @@
 
 InputFilePath=$1
 NSLOTS=$2
-NCHANNELS=$3
 # Resolutions in microns
-RESX=$4
-RESZ=$5
+RESX=$3
+RESZ=$4
 
 # true or false, forcefully use the user input or the size from confocal file
-ForceUseVxSize=$6
+ForceUseVxSize=$5
 # Reference channel can be one of: {ch1, ch2, ch3, ch4, Signal_amount}
 # If the value is ch<number> it considers that channel as the reference channel
 # If the value is 'Signal_amount' it will compare sum signal between all channels, 
 # and choose the reference channel the one with the highest sum
-referenceChannel=$7
+referenceChannel=$6
 
 InputFileName=$(basename ${InputFilePath})
 InputName=${InputFileName%.*}
@@ -34,7 +33,6 @@ echo "InputFilePath: ${InputFilePath}"
 echo "InputFileName: ${InputFileName}"
 echo "InputName: ${InputName}"
 echo "ForceUseVxSize: ${ForceUseVxSize}"
-echo "Channels: ${NCHANNELS}"
 echo "NSlots: ${NSLOTS}"
 echo "RESX: ${RESX}"
 echo "RESZ: ${RESZ}"
@@ -201,17 +199,18 @@ registered_warp_xform="${OUTPUT}/warp.xform"
 
 # -------------------------------------------------------------------------------------------
 OLSHAPE="${OUTPUT}/OL_shape.txt"
+METADATA="${OUTPUT}/metadata.yaml"
 
-if [[ -e $OLSHAPE ]]; then
-    echo "Already exists: $OLSHAPE"
+if [[ -e ${OLSHAPE} && -e ${METADATA} ]]; then
+    echo "Already exists: ${OLSHAPE} and ${METADATA}"
 else
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
-    echo "| $FIJI -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel.\""
+    echo "| $FIJI --mem 20G -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel.\""
     echo "+---------------------------------------------------------------------------------------+"
     START=`date '+%F %T'`
     # Note that this macro does not seem to work in --headless mode
-    $FIJI -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
+    $FIJI --mem 20G -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
@@ -233,6 +232,16 @@ fi
 
 OL="$(<$OLSHAPE)"
 echo "OLSHAPE; "$OL
+
+if [[ ${DEBUG_MODE} =~ "debug" ]]; then
+    echo "~ Metadata output"
+    cat ${METADATA}
+fi
+
+# get the num channels and reference channel from metadata output
+NCHANNELS=`yq r ${METADATA} numChannels`
+referenceChannel=`yq r ${METADATA} referenceChannel`
+echo "NCHANNELS=${NCHANNELS}, referenceChannel=${referenceChannel}"
 
 iniT=${JRC2018_Unisex_Onemicron1}
 if [[ ! -e ${JRC2018_Unisexgen1CROPPED} ]]; then

@@ -4,9 +4,8 @@ echo "Run aligner with $*"
 
 DIR=$(cd "$(dirname "$0")"; pwd)
 
-xyres=
-zres=
-num_channels=2
+xyres=1
+zres=1
 nslots=2
 input_filepath=
 output_dir=
@@ -34,10 +33,6 @@ while [[ $# > 0 ]]; do
             ;;
         --zres)
             zres="$1"
-            shift # past value
-            ;;
-        --nchannels)
-            num_channels=$1
             shift # past value
             ;;
         --forceVxSize)
@@ -116,8 +111,8 @@ mkdir -p ${ALIGNMENT_OUTPUT}
 
 export FINALOUTPUT=${ALIGNMENT_OUTPUT}
 
-echo "~ Run alignment: ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}"
-/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${num_channels} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}
+echo "~ Run alignment: ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}"
+/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}
 alignmentExitCode=$?
 if [ $alignmentExitCode -ne 0 ]; then
     echo "Alignment terminated abnormally: $alignmentExitCode"
