@@ -1,7 +1,8 @@
 FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
 RUN echo "Installing S3 FUSE and AWS CLI"
-RUN yum install -y fuse-devel s3fs-fuse groff wget unzip less yq
+RUN yum install -y fuse-devel s3fs-fuse groff wget unzip less
+RUN pip install yq
 
 WORKDIR /awsinstall
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"

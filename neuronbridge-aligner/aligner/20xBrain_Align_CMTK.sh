@@ -201,16 +201,17 @@ registered_warp_xform="${OUTPUT}/warp.xform"
 OLSHAPE="${OUTPUT}/OL_shape.txt"
 METADATA="${OUTPUT}/metadata.yaml"
 
+memResource=8G
 if [[ -e ${OLSHAPE} && -e ${METADATA} ]]; then
     echo "Already exists: ${OLSHAPE} and ${METADATA}"
 else
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
-    echo "| $FIJI --mem 20G -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel.\""
+    echo "| $FIJI --mem ${memResource} -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel.\""
     echo "+---------------------------------------------------------------------------------------+"
     START=`date '+%F %T'`
     # Note that this macro does not seem to work in --headless mode
-    $FIJI --mem 20G -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
+    $FIJI --mem ${memResource} -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
@@ -239,8 +240,8 @@ if [[ ${DEBUG_MODE} =~ "debug" ]]; then
 fi
 
 # get the num channels and reference channel from metadata output
-NCHANNELS=`yq r ${METADATA} numChannels`
-referenceChannel=`yq r ${METADATA} referenceChannel`
+NCHANNELS=`yq -r .numChannels ${METADATA}`
+referenceChannel=`yq -r .referenceChannel ${METADATA}`
 echo "NCHANNELS=${NCHANNELS}, referenceChannel=${referenceChannel}"
 
 iniT=${JRC2018_Unisex_Onemicron1}

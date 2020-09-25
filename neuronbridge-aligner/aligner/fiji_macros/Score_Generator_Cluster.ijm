@@ -3,8 +3,6 @@ run("Misc...", "divide=Infinity save");
 List.clear();
 setBatchMode(true);
 
-
-
 TempMaskdir=0;
 Tempdir=0;
 UseMask=false;
@@ -16,25 +14,21 @@ SkipDup=false;
 scorePosi="top";
 movieEx=0;// 0 is no movie export
 
-
 ScoreMethod = "Zero-Normalized cross-correlation";//"OBJ person coeff", "OBJ person coeff with -Ave", "Normalized Cross-correlation", "Zero-Normalized cross-correlation"
 
 testArg=0;
 
 if(testArg!=0)
-args = split(testArg,",");
+	args = split(testArg,",");
 else
-args = split(getArgument(),",");
+	args = split(getArgument(),",");
 
 savedir = args[0];// save dir
 path = args[1];// full file path for inport LSM
 NumCPU = args[2];// slice depth
 temppath = args[3];
 
-
 NumCPU=round(NumCPU);
-
-
 
 tempMaskpath=0; tempMaskFilename=0;
 
@@ -51,10 +45,7 @@ if(TempExt!=1){
 	File.saveString(logsum, filepath);
 	
 	run("Quit");
-	
 }
-
-
 
 if(UseMask==true){
 	tempMaskpathExt=File.exists(TempMaskdir+tempMaskFilename);//"JFRC2010_symmetric_Mask.nrrd";
@@ -72,7 +63,7 @@ truename=tempFilename;
 
 dotIndex= lastIndexOf(tempFilename, ".");
 if(dotIndex!=-1)
-truename=substring(tempFilename,0,dotIndex);
+	truename=substring(tempFilename,0,dotIndex);
 
 print("template open");
 
@@ -95,24 +86,19 @@ if(UseMask==false){// make template brighter
 	run("Apply LUT", "stack");
 }
 
-
 ///2ch & 3ch lsm file detection ///
 
 MaxFileSize=0;
 SecondFileSize=0;MaxNum=0;
 FirstTime=0; resultNum=0; Tempmin=0; Tempmax=0;
 
-
 /// skeletoniztion ///////////////////////////////////////////////////
 
-
 if(Allnrrd==true)
-nc82Nrrd = 1;
+	nc82Nrrd = 1;
 
-
-h5jindex= lastIndexOf(h5jindex, ".h5j");
-v3dpbdindex = lastIndexOf(h5jindex, ".v3dpbd");
-
+h5jindex= lastIndexOf(path, ".h5j");
+v3dpbdindex = lastIndexOf(path, ".v3dpbd");
 
 open(path);
 origi=getTitle();
@@ -121,7 +107,7 @@ truname = substring(origi, 0, dotindex);
 
 VLPRindex = indexOf(tempFilename,"VLPR");
 if(VLPRindex!=-1)
-truname=truname+"_VLPR";
+	truname=truname+"_VLPR";
 
 logsum=getInfo("log");
 //filepath=savedir+truname+"_log.txt";
@@ -130,7 +116,6 @@ File.saveString(logsum, filepath);
 getDimensions(width, height, channels, slices, frames);
 getVoxelSize(VxWidth, VxHeight, VxDepth, VxUnit);
 bitd=bitDepth();
-
 
 print("sample open  "+path);
 logsum=getInfo("log");
@@ -144,13 +129,12 @@ if(FlipZ==true){
 	
 	truname2=substring(listFolder[iF],0,warpIndex);
 	
-	
 	run("Nrrd Writer", "compressed nrrd="+dir+truname2+"_APflip.nrrd");
 	
 	File.delete(dir+listFolder[iF]);
 	
 	if(nc82Nrrd==-1)
-	close();
+		close();
 }
 if(VxWidth==1){
 	if(width==1024)
@@ -184,12 +168,6 @@ if(endsWith(path,".tif") || endsWith(path,".h5j") || endsWith(path,".v3dpbd") ||
 	
 	selectWindow(origi);//nc82 sample
 	
-	//		setBatchMode(false);
-	//			updateDisplay();
-	//			"do"
-	//			exit();
-	
-	
 	originalWidth=getWidth();
 	originalHeight=getHeight();
 	
@@ -220,20 +198,7 @@ if(endsWith(path,".tif") || endsWith(path,".h5j") || endsWith(path,".v3dpbd") ||
 	print("ResultsTable\n\n"+OBJscore); //tab separated
 	
 	print("OBJscore pre; "+OBJscore);
-	
-	//	if(isNaN(OBJscore)){
-	//		OBJscore=substring(logsum,scoreposition+7,scoreposition+12);
-	//		OBJscore=parseFloat(OBJscore);//Chaneg string to number
-	//	}
-	//	if(isNaN(OBJscore)){
-	//		OBJscore=substring(logsum,scoreposition+7,scoreposition+11);
-	//		OBJscore=parseFloat(OBJscore);//Chaneg string to number
-	//	}
-	//	if(isNaN(OBJscore)){
-	//		OBJscore=substring(logsum,scoreposition+7,scoreposition+10);
-	//		OBJscore=parseFloat(OBJscore);//Chaneg string to number
-	//	}
-	
+		
 	OBJscore=d2s(OBJscore,3);
 	print("OBJscore; "+OBJscore);
 	
@@ -270,10 +235,6 @@ if(endsWith(path,".tif") || endsWith(path,".h5j") || endsWith(path,".v3dpbd") ||
 	selectWindow(tempFilename);
 	rename("Temp.tif");
 	
-	//	setSlice(round(nSlices/2));
-	//	setMinAndMax(Tempmin, Tempmax);
-	//	run("Apply LUT", "stack");
-	
 	run("Merge Channels...", "c1=Temp.tif c2="+origi+" c3=Temp.tif");
 	
 	print("line 299");
@@ -282,8 +243,6 @@ if(endsWith(path,".tif") || endsWith(path,".h5j") || endsWith(path,".v3dpbd") ||
 	
 	framer=nSlices/10;
 	framer=round(framer);
-	
-	
 	
 	if(movieEx==0){
 		if(scorePosi=="Bottom"){
@@ -307,14 +266,11 @@ if(endsWith(path,".tif") || endsWith(path,".h5j") || endsWith(path,".v3dpbd") ||
 	selectWindow("RGB");
 	close();
 	
-	
 }//if(endsWith(listFolder[iF],".tif") || endsWith(listFolder[iF],".h5j") || endsWith(listFolder[iF],".v3dpbd"  || nc82Nrrd!=-1)){
-
 
 titlelist=getList("image.titles");
 
 for(iclose=0; iclose<nImages; iclose++){
-	
 	print("titlelist[iclose]; "+titlelist[iclose]);
 	
 	if(titlelist[iclose]!=tempFilename && titlelist[iclose]!=tempMaskFilename){
@@ -326,8 +282,6 @@ for(iclose=0; iclose<nImages; iclose++){
 	}
 }
 
-
-
 function Score3D (NumCPU,stack,temppath,tempMaskpath,tempFilename,tempMaskFilename,UseMask,tempAveBriArray,ScoreMethod){
 	selectImage(stack);
 	stackname=getTitle();
@@ -337,14 +291,12 @@ function Score3D (NumCPU,stack,temppath,tempMaskpath,tempFilename,tempMaskFilena
 		open(temppath);
 		
 	}
-	
 	print("tempFilename; "+tempFilename+"   stackname; "+stackname+"   ScoreMethod; "+ScoreMethod+"  UseMask; "+UseMask);
 	
 	logsum=getInfo("log");
 	File.saveString(logsum, filepath);
 	
 	print("");
-	
 	
 	run("Z Project...", "projection=[Max Intensity]");
 	getStatistics(area, mean, minSample, maxSample, std, histogram);
@@ -362,9 +314,6 @@ function Score3D (NumCPU,stack,temppath,tempMaskpath,tempFilename,tempMaskFilena
 	tempAveBriArray[1]=Tempmin;
 	tempAveBriArray[2]=Tempmax;
 	
-	//	if(max!=255)
-	//	run("Apply LUT", "stack");
-	
 	VLPRindex = indexOf(tempFilename,"VLPR");
 	print("VLPRindex; "+VLPRindex);
 	
@@ -375,18 +324,15 @@ function Score3D (NumCPU,stack,temppath,tempMaskpath,tempFilename,tempMaskFilena
 		File.saveString(logsum, filepath);
 	
 		if(VLPRindex==-1)
-		run("Alignment ScoresSD", "template="+tempFilename+" sample="+stackname+" score=ZeroNormalizedCrossCorrelation parallel="+NumCPU+"");
+			run("Alignment ScoresSD", "template="+tempFilename+" sample="+stackname+" score=ZeroNormalizedCrossCorrelation parallel="+NumCPU+"");
 		else
-		run("Alignment ScoresSD", "template="+stackname+" sample="+tempFilename+" score=ZeroNormalizedCrossCorrelation parallel="+NumCPU+"");
-		
-		//run("Alignment Scores", "template="+tempFilename+" sample="+stackname+" show weight=[Equal weight (temp and sample)] score="+ScoreMethod+" parallel="+NumCPU+"");
+			run("Alignment ScoresSD", "template="+stackname+" sample="+tempFilename+" score=ZeroNormalizedCrossCorrelation parallel="+NumCPU+"");
 		
 	}
 	print("Alignment Scores run");
 	logsum=getInfo("log");
 	File.saveString(logsum, filepath);
 	
-
 	if(UseMask==true){
 		
 		print("Use mask mode");
@@ -406,7 +352,7 @@ function Score3D (NumCPU,stack,temppath,tempMaskpath,tempFilename,tempMaskFilena
 			tempAve=round(tempAve);
 			tempAveBriArray[0] = tempAve;
 		}else//if(tempMaskopen!=1){
-		tempAve = tempAveBriArray[0];
+			tempAve = tempAveBriArray[0];
 		
 		print("template ave bri; "+tempAve);
 		selectWindow(stackname);// sample nc82
@@ -463,11 +409,6 @@ function Score3D (NumCPU,stack,temppath,tempMaskpath,tempFilename,tempMaskFilena
 			Threweight=Threweight+0.1;
 		}
 		
-		//	setBatchMode(false);
-		//	updateDisplay();
-		//	"do"
-		//	exit();
-		
 		run("Alignment ScoresSD", "template="+tempMaskFilename+" sample=ANDresult2.tif score=ZeroNormalizedCrossCorrelation parallel="+NumCPU+"");
 		
 		//run("Alignment Scores", "template="+tempMaskFilename+" sample=ANDresult2.tif show weight=[Equal weight (temp and sample)] score=["+ScoreMethod+"] parallel="+NumCPU+"");
@@ -483,6 +424,3 @@ run("Close All");
 run("Misc...", "divide=Infinity save");
 
 run("Quit");
-
-
-

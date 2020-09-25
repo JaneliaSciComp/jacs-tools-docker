@@ -163,20 +163,17 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
       bitd=8;
       unsharp="Max";//"NA", "Unsharp", "Max"
     }
-    
-    
+
     print("Channel number; "+channels);
     if(bitd==8)
-    print("8bit file");
+      print("8bit file");
     
     if(channels>1 || bitd==24)
-    run("Split Channels");
+      run("Split Channels");
     titlelist=getList("image.titles");
     imageNum=nImages();
     print("imageNum; "+imageNum);
-    
-    
-    
+
     for(MIPtry=1; MIPtry<=imageNum; MIPtry++){
       
       if(logsave==1){
@@ -188,8 +185,6 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
         neuronCH=getTitle();
         NeuronID=getImageID();
         neuronimg="C"+MIPtry+"-";
-        
-        //	neuronCH=neuronimg+origi;
       }
       MedianSub=40;
       if(channels!=0){
@@ -346,7 +341,6 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
                 if(pixn>1){
                   sumval=sumval+pixn;
                   sumnumpx=sumnumpx+1;
-                  //				grayarray[pixn]=grayarray[pixn]+1;
                 }
               }
             }
@@ -356,17 +350,19 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
             
             if(DefMaxValue!=65535){
               if(Inimax>aveval)
-              applyV=aveval;
+                applyV=aveval;
             }						
           }//if(easyADJ==true){
           
           print("applyV 336; "+applyV);
           
           if(width>height)
-          expand=false;
+            expand=false;
           else
-          expand=true;
+            expand=true;
           
+          zerovalue=0;
+
           if(width==1401 && height==2740 && slices==402){//1401x2740x402, JRC2018 63x UNISEX
             MaskName2D="MAX_JRC2018_VNC_UNISEX_63x_2DMASK"; Mask3D="JRC2018_VNC_UNISEX_63x_3DMASK.nrrd";
           }else if(width==1402 && height==2851 && slices==377){//1402x2851x377), JRC2018 63x Female
@@ -387,7 +383,6 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
             MaskName2D="MAX_FemaleVNCSymmetric2017_2DMASK.tif"; Mask3D="FemaleVNCSymmetric2017_3DMASK.nrrd";
             zerovalue=239907;
             zeroexi=1;
-            
           }else if(width==3333 && height==1560 && slices==456){
             MaskName2D="MAX_JRC2018_UNISEX_63xOri_2DMASK.tif"; Mask3D="JRC2018_UNISEX_63xOri_3DMASK.nrrd";
           }else if(width==1652 && height==773 && slices==456){
@@ -441,15 +436,17 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
           
           selectWindow(MIPtitle);
           
-          total=0; // getHistogram is broke;
-          for(ix=0; ix<getWidth; ix++){
-            for(iy=0; iy<getHeight; iy++){
-              pxv = getPixel(ix,iy);
-              total= total+pxv;
-              
-              if(pxv==0)
-                if(zeroexi==0)
-                  zerovalue=zerovalue+1;
+          if(zerovalue == 0) {
+            total=0; // getHistogram is broke;
+            for(ix=0; ix<getWidth; ix++){
+              for(iy=0; iy<getHeight; iy++){
+                pxv = getPixel(ix,iy);
+                total= total+pxv;
+
+                if(pxv==0)
+                  if(zeroexi==0)
+                    zerovalue=zerovalue+1;
+              }
             }
           }
           
