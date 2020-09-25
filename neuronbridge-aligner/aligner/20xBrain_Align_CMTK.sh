@@ -154,6 +154,19 @@ function generateAllMIPs() {
     echo "Finished MIPs generation for all signal channels"
 }
 
+function writeErrorProperties() {
+    local _prefix="$1"
+    local _alignment_space="$2"
+    local _objective="$3"
+    local _error="$4"
+
+    META="${FINALOUTPUT}/${_prefix}.properties"
+    echo "alignment.error="${_error} > $META
+    echo "alignment.image.area=Brain" >> $META
+    echo "alignment.space.name=$_alignment_space" >> $META
+    echo "alignment.objective=$_objective" >> $META
+}
+
 function banner() {
     echo "------------------------------------------------------------------------------------------------------------"
     echo " $1"
@@ -201,7 +214,7 @@ registered_warp_xform="${OUTPUT}/warp.xform"
 OLSHAPE="${OUTPUT}/OL_shape.txt"
 METADATA="${OUTPUT}/metadata.yaml"
 
-memResource=8G
+memResource=${ALIGNMENT_MEMORY:-"8G"}
 if [[ -e ${OLSHAPE} && -e ${METADATA} ]]; then
     echo "Already exists: ${OLSHAPE} and ${METADATA}"
 else
@@ -212,6 +225,7 @@ else
     START=`date '+%F %T'`
     # Note that this macro does not seem to work in --headless mode
     $FIJI --mem ${memResource} -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
+    preprocessExitCode=$?
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
@@ -224,10 +238,12 @@ else
     # check for prealigner errors
     LOGFILE="${OUTPUT}/20x_brain_pre_aligner_log.txt"
     cp $LOGFILE $DEBUG_DIR
-    PreAlignerError=`grep "PreAlignerError: " $LOGFILE | head -n1 | sed "s/PreAlignerError: //"`
-    if [[ ! -z "$PreAlignerError" ]]; then
-        writeErrorProperties "PreAlignerError" "JRC2018_" "$objective" "Pre-aligner rejection: $PreAlignerError"
-        exit 0
+    preAlignerError=`grep "PreAlignerError: " $LOGFILE | head -n1 | sed "s/PreAlignerError: //"`
+    memoryError=`grep "Cannot allocate memory" $LOGFILE | head -n1`
+    if [[ ! -z "${preAlignerError}" || ! -z "${memoryError}" || ${preprocessExitCode} -ne 0 ]]; then
+        writeErrorProperties "PreAlignerError" "JRC2018_" "${objective}" "Pre-aligner rejection: ${preAlignerError}"
+        cat ${LOGFILE}
+        exit 1
     fi
 fi
 
@@ -237,6 +253,7 @@ echo "OLSHAPE; "$OL
 if [[ ${DEBUG_MODE} =~ "debug" ]]; then
     echo "~ Metadata output"
     cat ${METADATA}
+    echo ""
 fi
 
 # get the num channels and reference channel from metadata output

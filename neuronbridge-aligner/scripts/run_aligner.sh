@@ -83,6 +83,8 @@ if [ ! -e "${input_filepath}" ]; then
     exit 1
 fi
 
+umask 0002
+
 default_fb_mode="xvfb"
 export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
