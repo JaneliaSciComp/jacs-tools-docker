@@ -214,22 +214,25 @@ registered_warp_xform="${OUTPUT}/warp.xform"
 OLSHAPE="${OUTPUT}/OL_shape.txt"
 METADATA="${OUTPUT}/metadata.yaml"
 
-memResource=${ALIGNMENT_MEMORY:-"8G"}
+memResource=${ALIGNMENT_MEMORY:-"2G"}
 if [[ -e ${OLSHAPE} && -e ${METADATA} ]]; then
     echo "Already exists: ${OLSHAPE} and ${METADATA}"
 else
+    preprocessingParams="${OUTPUT}/,${InputName}.,${InputFilePath},${TemplatesDir},${RESX},${RESZ},${NSLOTS},${objective},${templateBr},${BrainShape},${Unaligned_Neuron_Separator_Result_V3DPBD},${ForceUseVxSize},${referenceChannel}"
+    fijiOpts="--dont-patch-ij1 --mem ${memResource}"
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
-    echo "| $FIJI --mem ${memResource} -macro $PREPROCIMG \"$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel.\""
+    echo "| ${FIJI} ${fijiOpts} -macro ${PREPROCIMG} \"${preprocessingParams}\""
     echo "+---------------------------------------------------------------------------------------+"
     START=`date '+%F %T'`
     # Note that this macro does not seem to work in --headless mode
-    $FIJI --mem ${memResource} -macro $PREPROCIMG "$OUTPUT/,$InputName.,$InputFilePath,$TemplatesDir,$RESX,$RESZ,$NSLOTS,$objective,$templateBr,$BrainShape,$Unaligned_Neuron_Separator_Result_V3DPBD,$ForceUseVxSize,$referenceChannel" > $DEBUG_DIR/preproc.log 2>&1
+    ${FIJI} ${fijiOpts} -macro ${PREPROCIMG} "${preprocessingParams}" > ${DEBUG_DIR}/preproc.log 2>&1
     preprocessExitCode=$?
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
     echo "Otsuna_Brain preprocessing stop: $STOP"
+
     if [[ ${DEBUG_MODE} =~ "debug" ]]; then
         echo "~ Preprocessing output"
         cat $DEBUG_DIR/preproc.log
@@ -242,8 +245,12 @@ else
     memoryError=`grep "Cannot allocate memory" $LOGFILE | head -n1`
     if [[ ! -z "${preAlignerError}" || ! -z "${memoryError}" || ${preprocessExitCode} -ne 0 ]]; then
         writeErrorProperties "PreAlignerError" "JRC2018_" "${objective}" "Pre-aligner rejection: ${preAlignerError}"
+        echo "~ Preprocessing log"
         cat ${LOGFILE}
         exit 1
+    elif [[ ${DEBUG_MODE} =~ "debug" ]]; then
+        echo "~ Preprocessing log"
+        cat ${LOGFILE}
     fi
 fi
 

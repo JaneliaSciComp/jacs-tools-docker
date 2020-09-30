@@ -51,7 +51,9 @@ while [[ $# > 0 ]]; do
             shift # past value
             ;;
         --reference-channel)
-            reference_channel=$1
+            if [[ "$1" != "" ]] ; then
+                reference_channel=$1
+            fi
             shift
             ;;
         -i|--input)
@@ -89,10 +91,18 @@ default_fb_mode="xvfb"
 export NSLOTS=${NSLOTS:-$nslots}
 export FB_MODE=${FB_MODE:-$default_fb_mode}
 echo "Use FB_MODE=${FB_MODE}"
+
 export WORKING_DIR="${output_dir}/temp"
 echo "Create working directory ${WORKING_DIR}"
 mkdir -p ${WORKING_DIR}
 cd ${WORKING_DIR}
+
+JAVA_PREFS_DIR="${WORKING_DIR}/.java"
+echo "Set java preferences directory to ${JAVA_PREFS_DIR}"
+mkdir -p "${JAVA_PREFS_DIR}/sprefs"
+mkdir -p "${JAVA_PREFS_DIR}/uprefs"
+
+export JAVA_OPTS="-Djava.util.prefs.systemRoot=${JAVA_PREFS_DIR}/sprefs -Djava.util.prefs.userRoot=${JAVA_PREFS_DIR}/uprefs"
 
 function cleanTemp {
     if [[ "${DEBUG_MODE}" =~ "debug" ]]; then
