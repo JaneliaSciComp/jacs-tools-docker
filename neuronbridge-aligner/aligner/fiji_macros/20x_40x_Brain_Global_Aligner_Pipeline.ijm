@@ -309,7 +309,7 @@ function main() {
 				avetest2=getImageID();
 				getStatistics(area, mean30, min, max, std, histogram);
 				if(maxmean<mean30)
-				maxmean=mean30;
+					maxmean=mean30;
 				close();
 			}
 			
@@ -319,7 +319,7 @@ function main() {
 				avetest2=getImageID();
 				getStatistics(area, mean40, min, max, std, histogram);
 				if(maxmean<mean40)
-				maxmean=mean40;
+					maxmean=mean40;
 				close();
 			}
 		}//	if(nc82decision=="Signal_amount"){
@@ -1022,7 +1022,7 @@ function main() {
 							}
 							
 							if(meanHole==255)
-							run("Paste");
+								run("Paste");
 							
 							
 							run("Analyze Particles...", "size="+(100000*MaxZoom)*Zoomratio+"-Infinity show=Masks display clear");//run("Analyze Particles...", "size=200000-Infinity show=Masks display exclude clear");
@@ -1098,7 +1098,7 @@ function main() {
 							run("Canvas Size...", "width="+resliceLongLength+" height="+resliceLongLength+" position=Center zero");
 							getVoxelSize(LVxWidth, LVxHeight, LVxDepth, LVxUnit);//reslice
 							if(bitDepth==8)
-							run("16-bit");
+								run("16-bit");
 							run("Rotation Hideo", "rotate="+elipsoidAngle+" in=InMacro");
 							
 							run("Translate...", "x="+finalshiftX+" y="+finalshiftY+" interpolation=None");
@@ -1241,7 +1241,7 @@ function main() {
 									print("max; "+max);
 									
 									if(max!=maxvalue0 && max!=255)
-									run("Apply LUT");
+										run("Apply LUT");
 									
 									run("8-bit");
 									run("Grays");
@@ -1278,7 +1278,7 @@ function main() {
 						selectImage(ID20xMIP);
 						selectWindow(ID20xMIPtitle);
 						if(y1_opl!=cropHeight*2)// if no shape problem
-						print("Opticlobe1 size gap; "+sizediff1+"  Opticlobe1 center X,Y; ("+x1_opl+" , "+y1_opl+") / "+ycenterCrop+"  Opticlobe2 size gap; "+sizediff2+"  Opticlobe2 center X,Y; ("+x2_opl+" , "+y2_opl+")");
+							print("Opticlobe1 size gap; "+sizediff1+"  Opticlobe1 center X,Y; ("+x1_opl+" , "+y1_opl+") / "+ycenterCrop+"  Opticlobe2 size gap; "+sizediff2+"  Opticlobe2 center X,Y; ("+x2_opl+" , "+y2_opl+")");
 						
 						logsum=getInfo("log");
 						File.saveString(logsum, filepath);
@@ -1296,11 +1296,9 @@ function main() {
 							
 							rotationYN="Yes";
 							
-							//	run("Translate...", "x="+round(maxX*20/Zoomratio)+" y="+round(maxY*20/Zoomratio)+" interpolation=None");
-							
 							orizoomratio=Zoomratio;
 							if(shrinkTo2010==false)
-							Zoomratio=1;
+								Zoomratio=1;
 							
 							run("Canvas Size...", "width="+round(cropWidth*Zoomratio*MaxZoom)+" height="+round(cropHeight*Zoomratio*MaxZoom)+" position=Center zero");
 							
@@ -1387,7 +1385,7 @@ function main() {
 						incredepth=218/NC82SliceNum;//ADJUSTING sample depth size to template , z=1 micron template
 						
 						if(TwentyMore!=0)
-						incredepth=incredepth*(1+TwentyMore/100);
+							incredepth=incredepth*(1+TwentyMore/100);
 						print("TwentyMore; "+TwentyMore+"   1+TwentyMore/100; "+1+TwentyMore/100);
 						
 					}else if(templateBr=="JFRC2014" || templateBr=="JRC2018"){
@@ -1398,7 +1396,7 @@ function main() {
 							
 							incredepth=tempthinkness/sampthickness;//ADJUSTING sample depth size to template 
 						}else
-						incredepth=(218/NC82SliceNum)*0.69;
+							incredepth=(218/NC82SliceNum)*0.69;
 						
 					}//	if(templateBr=="JFRC2010"){
 				}else{//if(OBJL>500){
@@ -1419,7 +1417,7 @@ function main() {
 						c=95;
 					}
 					if (c>=32 && c<=127)
-					String.append(fromCharCode(c));
+						String.append(fromCharCode(c));
 					
 					noext3 = String.buffer;
 				}//	for (si=0; si<n3; si++) {
@@ -1525,7 +1523,7 @@ function main() {
 						run("Nrrd Writer", "compressed nrrd="+myDir0+noext+"_01.nrrd");
 					else{
 						if(BrainShape!="Both_OL_missing (40x)")
-						run("Nrrd Writer", "compressed nrrd="+savedir+noext+"_01.nrrd");
+							run("Nrrd Writer", "compressed nrrd="+savedir+noext+"_01.nrrd");
 					}
 									
 					run("Z Project...", "start=15 stop="+nSlices-10+" projection=[Max Intensity]");
@@ -1585,14 +1583,14 @@ function main() {
 						
 						JFRC2010Ext=File.exists(MatchingFilesDir+"JFRC2010_16bit_crop5.tif");
 						if(JFRC2010Ext!=1)
-						print("Not exist; "+MatchingFilesDir+"JFRC2010_16bit_crop5.tif");
+							print("Not exist; "+MatchingFilesDir+"JFRC2010_16bit_crop5.tif");
 						
 						if(JFRC2010Ext==1)
-						open(MatchingFilesDir+"JFRC2010_16bit_crop5.tif");
+							open(MatchingFilesDir+"JFRC2010_16bit_crop5.tif");
 						
 						JFRC2010Ext=File.exists(MatchingFilesDir+"JFRC2010_16bit_cropAN.tif");
 						if(JFRC2010Ext!=1)
-						print("Not exist; "+MatchingFilesDir+"JFRC2010_16bit_cropAN.tif");
+							print("Not exist; "+MatchingFilesDir+"JFRC2010_16bit_cropAN.tif");
 						
 						if(JFRC2010Ext==1){
 							open(MatchingFilesDir+"JFRC2010_16bit_cropAN.tif");

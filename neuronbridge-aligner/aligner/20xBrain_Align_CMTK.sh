@@ -192,7 +192,6 @@ mkdir -p $OUTPUT
 mkdir -p $DEBUG_DIR
 mkdir -p $FINALOUTPUT
 
-
 if [[ ! -e $PREPROCIMG ]]; then
     echo "Preprocess macro could not be found at $PREPROCIMG"
     exit 1
