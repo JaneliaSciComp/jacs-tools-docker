@@ -167,6 +167,31 @@ function writeErrorProperties() {
     echo "alignment.objective=$_objective" >> $META
 }
 
+function checkTimeout() {
+    local cpid=$1;
+    local timeoutVal=$2;
+    local inc=$3
+    local errMsg=$4
+    local  __exitStatusVar=$5
+
+    # check for timeout
+    runningTime=0
+    psflags="-p ${cpid} --no-headers -o %cpu,%mem,cmd"
+    while ps ${psflags} ; do
+        if [ ${runningTime} -ge ${timeoutVal} ]; then
+            echo ${errMsg}
+            screenSnapshot
+            kill -9 $cpid
+            break
+        else
+            sleep $inc
+            runningTime=$((runningTime+inc))
+        fi
+    done
+    wait $cpid
+    eval $__exitStatusVar=$?
+}
+
 function banner() {
     echo "------------------------------------------------------------------------------------------------------------"
     echo " $1"
@@ -227,24 +252,16 @@ else
     START=`date '+%F %T'`
     # Start the preprocessing in background and then wait until it finishes or times out.
     # Note that this macro does not seem to work in --headless mode
+    PREALIGN_TIMEOUT=$((${PREALIGN_TIMEOUT:-5400}))
     (${FIJI} ${fijiOpts} -macro ${PREPROCIMG} "${preprocessingParams}" > ${DEBUG_DIR}/preproc.log 2>&1) &
     fpid=$!
     # check for timeout
-    fijiRunningTime=0
-    inc=60
-    # default prealign timeout -> 1.5h
-    PREALIGN_TIMEOUT=$((${PREALIGN_TIMEOUT:-5400}))
-    while ps -p ${fpid} ; do
-        if [ ${fijiRunningTime} -gt ${PREALIGN_TIMEOUT} ]; then
-            echo "Fiji preprocessing timed out -  killing the process"
-            kill -9 $fpid
-        else
-            sleep $inc
-            fijiRunningTime=$((fijiRunningTime+inc))
-        fi
-    done
-    wait $fpid
-    preprocessExitCode=$?
+    checkTimeout \
+        $fpid \
+        ${PREALIGN_TIMEOUT} \
+        60 \
+        "Fiji preprocessing timed out -  killing the process" \
+        preprocessExitCode
 
     STOP=`date '+%F %T'`
     echo "Otsuna_Brain preprocessing start: $START"
