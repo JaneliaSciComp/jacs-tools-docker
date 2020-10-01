@@ -225,8 +225,25 @@ else
     echo "| ${FIJI} ${fijiOpts} -macro ${PREPROCIMG} \"${preprocessingParams}\""
     echo "+---------------------------------------------------------------------------------------+"
     START=`date '+%F %T'`
+    # Start the preprocessing in background and then wait until it finishes or times out.
     # Note that this macro does not seem to work in --headless mode
-    ${FIJI} ${fijiOpts} -macro ${PREPROCIMG} "${preprocessingParams}" > ${DEBUG_DIR}/preproc.log 2>&1
+    (${FIJI} ${fijiOpts} -macro ${PREPROCIMG} "${preprocessingParams}" > ${DEBUG_DIR}/preproc.log 2>&1) &
+    fpid=$!
+    # check for timeout
+    fijiRunningTime=0
+    inc=60
+    # default prealign timeout -> 1.5h
+    PREALIGN_TIMEOUT=$((${PREALIGN_TIMEOUT:-5400}))
+    while ps -p ${fpid} ; do
+        if [ ${fijiRunningTime} -gt ${PREALIGN_TIMEOUT} ]; then
+            echo "Fiji preprocessing timed out -  killing the process"
+            kill -9 $fpid
+        else
+            sleep $inc
+            fijiRunningTime=$((fijiRunningTime+inc))
+        fi
+    done
+    wait $fpid
     preprocessExitCode=$?
 
     STOP=`date '+%F %T'`
