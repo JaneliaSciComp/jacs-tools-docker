@@ -28,19 +28,7 @@ PORT=$DISPLAY_PORT
 COUNTER=0
 RETRIES=10
 
-# Clean up Xvfb on any exit
-function cleanXvfb {
-    kill $MYPID
-    rm -f ${X_WORK_DIR}/.X${PORT}-lock
-    rm -f ${X_WORK_DIR}/.X11-unix/X${PORT}
-    echo "Cleaned up Xvfb"
-}
-
-function screenSnapshot {
-    # take a screenshot
-    echo "Taking a screen snapshot -> ${X_WORK_DIR}/screenshot_${PORT}.png"
-    DISPLAY=:$PORT import -window root ${X_WORK_DIR}/screenshot_${PORT}.png
-}
+source ${COMMON_TOOLS_DIR}/xvfb_functions.sh
 trap screenSnapshot SIGINT SIGQUIT SIGKILL SIGTERM SIGHUP
 
 while [ "$COUNTER" -lt "$RETRIES" ]; do
@@ -72,6 +60,6 @@ while [ "$COUNTER" -lt "$RETRIES" ]; do
 
 done
 
-export XVFB_PORT=$PORT
-export XVFB_PID=$MYPID
-
+export X_WORK_DIR=${X_WORK_DIR}
+export XVFB_PORT=${PORT}
+export XVFB_PID=${MYPID}

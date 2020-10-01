@@ -11,8 +11,9 @@ if [[ $FB_MODE =~ "xvfb" ]]; then
 else
     # dummy screenSnapshot function
     function screenSnapshot {
-        # dummy  function
+        echo "No op screenSnapshot"
     }
+    
     # dummy exitXvfb function
     function exitXvfb {
         echo "Nothing to do for exiting Xvfb"

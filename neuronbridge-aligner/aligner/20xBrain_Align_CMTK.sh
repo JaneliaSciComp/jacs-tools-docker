@@ -16,6 +16,7 @@ ForceUseVxSize=$5
 # If the value is 'Signal_amount' it will compare sum signal between all channels, 
 # and choose the reference channel the one with the highest sum
 referenceChannel=$6
+returnedErrorFilename=$7
 
 InputFileName=$(basename ${InputFilePath})
 InputName=${InputFileName%.*}
@@ -154,24 +155,11 @@ function generateAllMIPs() {
     echo "Finished MIPs generation for all signal channels"
 }
 
-function writeErrorProperties() {
-    local _prefix="$1"
-    local _alignment_space="$2"
-    local _objective="$3"
-    local _error="$4"
-
-    META="${FINALOUTPUT}/${_prefix}.properties"
-    echo "alignment.error="${_error} > $META
-    echo "alignment.image.area=Brain" >> $META
-    echo "alignment.space.name=$_alignment_space" >> $META
-    echo "alignment.objective=$_objective" >> $META
-}
-
 function checkTimeout() {
     local cpid=$1;
     local timeoutVal=$2;
     local inc=$3
-    local errMsg=$4
+    local errHandler=$4
     local  __exitStatusVar=$5
 
     # check for timeout
@@ -179,8 +167,7 @@ function checkTimeout() {
     psflags="-p ${cpid} --no-headers -o %cpu,%mem,cmd"
     while ps ${psflags} ; do
         if [ ${runningTime} -ge ${timeoutVal} ]; then
-            echo ${errMsg}
-            screenSnapshot
+            ${errHandler}
             kill -9 $cpid
             break
         else
@@ -253,14 +240,23 @@ else
     # Start the preprocessing in background and then wait until it finishes or times out.
     # Note that this macro does not seem to work in --headless mode
     PREALIGN_TIMEOUT=$((${PREALIGN_TIMEOUT:-5400}))
+    PREALIGN_CHECKINTERVAL=$((${PREALIGN_CHECKINTERVAL:-60}))
     (${FIJI} ${fijiOpts} -macro ${PREPROCIMG} "${preprocessingParams}" > ${DEBUG_DIR}/preproc.log 2>&1) &
     fpid=$!
+
+    function prealignTimeoutHandler {
+        echo "Fiji preprocessing timed out -  killing the process"
+        source ${COMMON_TOOLS_DIR}/xvfb_functions.sh
+        screenSnapshot
+        eval "ALIGNMENT_ERROR=\"Preprocessing timed out\""
+    }
+
     # check for timeout
     checkTimeout \
         $fpid \
         ${PREALIGN_TIMEOUT} \
-        60 \
-        "Fiji preprocessing timed out -  killing the process" \
+        ${PREALIGN_CHECKINTERVAL} \
+        prealignTimeoutHandler \
         preprocessExitCode
 
     STOP=`date '+%F %T'`
@@ -275,12 +271,23 @@ else
     # check for prealigner errors
     LOGFILE="${OUTPUT}/20x_brain_pre_aligner_log.txt"
     cp $LOGFILE $DEBUG_DIR
-    preAlignerError=`grep "PreAlignerError: " $LOGFILE | head -n1 | sed "s/PreAlignerError: //"`
-    memoryError=`grep "Cannot allocate memory" $LOGFILE | head -n1`
-    if [[ ! -z "${preAlignerError}" || ! -z "${memoryError}" || ${preprocessExitCode} -ne 0 ]]; then
-        writeErrorProperties "PreAlignerError" "JRC2018_" "${objective}" "Pre-aligner rejection: ${preAlignerError}"
-        echo "~ Preprocessing log"
+
+    # check if there were errors
+    if [[ ${preprocessExitCode} -eq 0 ]] ; then
+        preAlignerError=`grep "PreAlignerError: " $LOGFILE | head -n1 | sed "s/PreAlignerError: //"`
+        memoryError=`grep -i "Cannot allocate memory" $LOGFILE | head -n1`
+        outOfMemoryError=`grep -i "out of memory" $LOGFILE | head -n1`
+        if [[ ! -z "${preAlignerError}" ]] ; then
+            ALIGNMENT_ERROR=${preAlignerError}
+        elif [[ ! -z "${memoryError}" || ! -z "${outOfMemoryError}" ]] ; then
+            ALIGNMENT_ERROR="Out of memory error";
+        fi
+    fi
+
+    if [[ ! -z "${ALIGNMENT_ERROR}" ]]; then
         cat ${LOGFILE}
+        echo "~ Preprocessing error: ${ALIGNMENT_ERROR}"
+        echo ${ALIGNMENT_ERROR} > ${returnedErrorFilename} 
         exit 1
     elif [[ ${DEBUG_MODE} =~ "debug" ]]; then
         echo "~ Preprocessing log"

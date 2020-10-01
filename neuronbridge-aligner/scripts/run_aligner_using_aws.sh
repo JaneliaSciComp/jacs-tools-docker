@@ -231,11 +231,18 @@ run_align_cmd_args=(
 )
 
 echo "Run: /opt/aligner-scripts/run_aligner.sh ${run_align_cmd_args[@]}"
+export alignmentErrFile="${results_dir}/alignErr.txt"
 /opt/aligner-scripts/run_aligner.sh "${run_align_cmd_args[@]}"
 alignment_exit_code=$?
 if [[ "${alignment_exit_code}" != "0" ]] ; then
-    echo "Alignment exited with ${alignment_exit_code}";
-    updateSearch "${searchId}" 1 ${#mips[@]} "${mips[@]}" "Alignment failed with exit code ${alignment_exit_code}"
+    alignmentErr=$(cat "${alignmentErrFile}" || "")
+    echo "Alignment exited with ${alignment_exit_code}: ${alignmentErr}";
+    if [[ ! -z "${alignmentErr}" ]]; then
+        errorMessage=${alignmentErr}
+    else
+        errorMessage="Alignment failed with exit code ${alignment_exit_code}"
+    fi
+    updateSearch "${searchId}" 1 ${#mips[@]} "${mips[@]}" "${errorMessage}"
     exit $alignment_exit_code
 fi
 

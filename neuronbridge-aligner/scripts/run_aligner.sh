@@ -121,13 +121,15 @@ trap exitHandler EXIT
 ALIGNMENT_OUTPUT=${ALIGNMENT_OUTPUT:-"${output_dir}/aligned"}
 mkdir -p ${ALIGNMENT_OUTPUT}
 
+alignmentErrFile=${alignmentErrFile:-"${output_dir}/alignErr.txt"}
 export FINALOUTPUT=${ALIGNMENT_OUTPUT}
 
 echo "~ Run alignment: ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}"
-/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}
+/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${alignmentErrFile}
 alignmentExitCode=$?
 if [ $alignmentExitCode -ne 0 ]; then
-    echo "Alignment terminated abnormally: $alignmentExitCode"
+    alignmentErr=$(cat "${alignmentErrFile}" || "")
+    echo "Alignment terminated abnormally ${alignmentErr}"
     exit 1
 fi
 
