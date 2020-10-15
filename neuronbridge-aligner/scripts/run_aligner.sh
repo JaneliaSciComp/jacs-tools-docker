@@ -15,8 +15,8 @@ reference_channel=Signal_amount
 help_cmd="$0 
     --xyres <xy resolution in um>
     --zres <z resolution in um>
+    --reference-channel <reference channel>
     --nslots <nslots (default = 2)>
-    --nchannels <number of channels (default = 2)>
     --templatedir <template config directory>
     --forceVxSize <true|false>
     -i <input file stack>
