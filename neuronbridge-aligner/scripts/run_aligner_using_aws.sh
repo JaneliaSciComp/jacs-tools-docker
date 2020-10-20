@@ -128,25 +128,25 @@ function updateSearch() {
     if [[ "${searchId}" != "" ]] ; then
         if ((${nMips} == 0)) ; then
             mipsList=
-            displayableMask=
+            thumbnail=
         else
             mipsList=$(printf ",\"%s\"" "${mipsParam[@]}")
             mipsList=${mipsList:1}
-            displayableMask="${mipsParam[0]}"
+            thumbnail="${mipsParam[0]}"
         fi
         if [[ "${errorMessage}" == "" ]] ; then
             searchData="{
                 \"searchId\": \"${searchId}\",
                 \"step\": ${searchStep},
                 \"computedMIPs\": [ ${mipsList} ],
-                \"displayableMask\": \"${displayableMask}\"
+                \"uploadThumbnail\": \"${thumbnail}\"
             }"
         else
             searchData="{
                 \"searchId\": \"${searchId}\",
                 \"step\": ${searchStep},
                 \"computedMIPs\": [ ${mipsList} ],
-                \"displayableMask\": \"${displayableMask}\",
+                \"uploadThumbnail\": \"${thumbnail}\",
                 \"errorMessage\": \"${errorMessage}\"
             }"
         fi
