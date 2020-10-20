@@ -151,9 +151,7 @@ function updateSearch() {
             }"
         fi
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
-        if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
-            echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
-        fi
+        echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
         printf -v updateSearchCmd "aws lambda invoke --function-name %s --log-type None --payload %s %s" \
             "${SEARCH_UPDATE_FUNCTION}" \
             "fileb://${WORKING_DIR}/${searchId}-input.json" \
