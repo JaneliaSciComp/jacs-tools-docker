@@ -27,6 +27,7 @@ help_cmd="$0
     -debug <{true|false}>
     -h"
 
+echo "Invoked neuronbridge aligner with $@"
 while [[ $# > 0 ]]; do
     key="$1"
     shift # past the key
@@ -165,25 +166,27 @@ function updateSearch() {
 inputs_dir="${WORKING_DIR}/inputs"
 results_dir="${WORKING_DIR}/results"
 
-echo "Create local inputs directory ${inputs_dir}"
+echo "Create local inputs directory ${inputs_dir} for searchId: ${searchId}"
 mkdir -p ${inputs_dir}
-echo "Create local results directory ${results_dir}"
+echo "Create local results directory ${results_dir} for searchId: ${searchId}"
 mkdir -p ${results_dir}
 
 # copy input file to the input working directory
-input_filename=`basename ${input_filepath}`
-working_input_filepath=`echo "${inputs_dir}/${input_filename}" | sed "s/ /_/g"`
-echo "Working input: ${working_input_filepath}"
-copyInputsCmd="aws s3 cp \"s3://${inputs_s3bucket_name}/${input_filepath}\" ${working_input_filepath} --no-progress"
+echo "Input filepath: ${input_filepath}"
+input_filename=$(basename "${input_filepath}")
+echo "Input filename: ${input_filename}"
+working_input_filepath=${inputs_dir}/${input_filename/ /_}
+echo "Working input file path: ${working_input_filepath}"
+copyInputsCmd="aws s3 cp s3://${inputs_s3bucket_name}/${input_filepath} ${working_input_filepath} --no-progress"
 
 if [[ "${skipCopyInputIfExists}" =~ "true" ]] ; then
     if [[ ! -e ${working_input_filepath} ]] ;  then
         echo "Copy inputs: ${copyInputsCmd}"
-        ${copyInputsCmd}
+        $(aws s3 cp s3://${inputs_s3bucket_name}/"${input_filepath}" "${working_input_filepath}" --no-progress)
     fi
 else
     echo "Copy inputs: ${copyInputsCmd}"
-    ${copyInputsCmd}
+    $(aws s3 cp s3://${inputs_s3bucket_name}/"${input_filepath}" "${working_input_filepath}" --no-progress)
 fi
 
 if [[ "${templates_s3bucket_name}" != "" ]] ; then
