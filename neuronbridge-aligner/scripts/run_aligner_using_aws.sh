@@ -177,16 +177,18 @@ input_filename=$(basename "${input_filepath}")
 echo "Input filename: ${input_filename}"
 working_input_filepath=${inputs_dir}/${input_filename/ /_}
 echo "Working input file path: ${working_input_filepath}"
-copyInputsCmd="aws s3 cp s3://${inputs_s3bucket_name}/${input_filepath} ${working_input_filepath} --no-progress"
+copyInputsCmd="aws s3 cp \"s3://${inputs_s3bucket_name}/${input_filepath}\" \"${working_input_filepath}\" --no-progress"
 
 if [[ "${skipCopyInputIfExists}" =~ "true" ]] ; then
     if [[ ! -e ${working_input_filepath} ]] ;  then
         echo "Copy inputs: ${copyInputsCmd}"
-        $(aws s3 cp s3://${inputs_s3bucket_name}/"${input_filepath}" "${working_input_filepath}" --no-progress)
+        cpInputRes=$(eval ${copyInputsCmd})
+        echo "Copy input result: ${cpInputRes}"
     fi
 else
     echo "Copy inputs: ${copyInputsCmd}"
-    $(aws s3 cp s3://${inputs_s3bucket_name}/"${input_filepath}" "${working_input_filepath}" --no-progress)
+    cpInputRes=$(eval ${copyInputsCmd})
+    echo "Copy input result: ${cpInputRes}"
 fi
 
 if [[ "${templates_s3bucket_name}" != "" ]] ; then
