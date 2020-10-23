@@ -261,7 +261,6 @@ done
 echo "Set alignment to completed for ${searchId}: ${mips[@]}"
 updateSearch "${searchId}" 2 ${#mips[@]} "${mips[@]}"
 
-
 if [[ "${DEBUG_MODE}" != "debug" ]] ; then
     # delete the input
     echo "Remove s3://${inputs_s3bucket_name}/${input_filepath}"
