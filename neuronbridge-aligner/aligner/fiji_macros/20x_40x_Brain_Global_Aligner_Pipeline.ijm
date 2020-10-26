@@ -75,6 +75,7 @@ function main() {
 	PathConsolidatedLabel=args[10];// full file path for ConsolidatedLabel.v3dpbd
 	forceVxSize = args[11];//true, false
 	nc82decision = args[12];//"Signal_amount","ch1","ch2","ch3","ch4"
+	comparisonP = args[13]; // { "Median", "Max"}
 
 	MatchingFilesDir=MatchingFilesDir+"/";
 
@@ -173,8 +174,6 @@ function main() {
 	FilePathArray=newArray(ShapeMatchingMaskPath, "JFRC2010_ShapeMatchingMask.tif");
 	fileOpen(FilePathArray);
 	ShapeMatchingMaskPath=FilePathArray[0];
-
-	comparisonP="Median";//"Median";//"Max";//"Median"
 
 	if(comparisonP=="Average"){// average is not good 13D08
 		JFRC2010MedProPath = MatchingFilesDir+"JFRC2010_AvePro.png"; //"JFRC2010_AvePro.png"
@@ -2425,7 +2424,7 @@ function ImageCorrelation(ImageCorrelationArray,widthVx,NumCPU,projectionSt,PNGs
 	STring="EQ";
 	tempSD=1;
 	
-	mirot=180;//180;
+	mirot=90;//180;
 	mirot2=55;//55
 	porot=180;//179
 	

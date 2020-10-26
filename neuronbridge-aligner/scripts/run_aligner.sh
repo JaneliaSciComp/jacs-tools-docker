@@ -11,11 +11,13 @@ input_filepath=
 output_dir=
 use_voxel_resolution_args=false
 reference_channel=Signal_amount
+comparison_alg=Max
 
 help_cmd="$0 
     --xyres <xy resolution in um>
     --zres <z resolution in um>
     --reference-channel <reference channel>
+    --comparison_alg <comparison alg: {Max, Median}>
     --nslots <nslots (default = 2)>
     --templatedir <template config directory>
     --forceVxSize <true|false>
@@ -52,8 +54,12 @@ while [[ $# > 0 ]]; do
             ;;
         --reference-channel)
             if [[ "$1" != "" ]] ; then
-                reference_channel=$1
+                reference_channel="$1"
             fi
+            shift
+            ;;
+        --comparison_alg)
+            comparison_alg="$1"
             shift
             ;;
         -i|--input)
@@ -124,7 +130,7 @@ mkdir -p ${ALIGNMENT_OUTPUT}
 alignmentErrFile=${alignmentErrFile:-"${output_dir}/alignErr.txt"}
 export FINALOUTPUT=${ALIGNMENT_OUTPUT}
 
-echo "~ Run alignment: ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel}"
+echo "~ Run alignment: ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${comparison_alg}"
 /opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${alignmentErrFile}
 alignmentExitCode=$?
 if [ $alignmentExitCode -ne 0 ]; then

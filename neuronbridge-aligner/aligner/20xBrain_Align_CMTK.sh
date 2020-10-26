@@ -16,7 +16,8 @@ ForceUseVxSize=$5
 # If the value is 'Signal_amount' it will compare sum signal between all channels, 
 # and choose the reference channel the one with the highest sum
 referenceChannel=$6
-returnedErrorFilename=$7
+comparisonAlg=$7
+returnedErrorFilename=$8
 
 InputFileName=$(basename ${InputFilePath})
 InputName=${InputFileName%.*}
@@ -229,7 +230,7 @@ memResource=${ALIGNMENT_MEMORY:-"2G"}
 if [[ -e ${OLSHAPE} && -e ${METADATA} ]]; then
     echo "Already exists: ${OLSHAPE} and ${METADATA}"
 else
-    preprocessingParams="${OUTPUT}/,${InputName}.,${InputFilePath},${TemplatesDir},${RESX},${RESZ},${NSLOTS},${objective},${templateBr},${BrainShape},${Unaligned_Neuron_Separator_Result_V3DPBD},${ForceUseVxSize},${referenceChannel}"
+    preprocessingParams="${OUTPUT}/,${InputName}.,${InputFilePath},${TemplatesDir},${RESX},${RESZ},${NSLOTS},${objective},${templateBr},${BrainShape},${Unaligned_Neuron_Separator_Result_V3DPBD},${ForceUseVxSize},${referenceChannel},${comparisonAlg}"
     fijiOpts="--dont-patch-ij1 --mem ${memResource} --debug"
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
