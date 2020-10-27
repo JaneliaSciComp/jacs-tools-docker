@@ -2,7 +2,6 @@
 //Wrote by Hideo Otsuna, Jan 16, 2018
 
 main();
-print("!!!!!!!!!!!!!!");
 run("Quit");
 
 function main() {
@@ -106,6 +105,7 @@ function main() {
 	print("PathConsolidatedLabel; "+PathConsolidatedLabel);
 	print("forceVxSize; "+forceVxSize);
 	print("nc82decision; "+nc82decision);
+	print("comparisonP: "+comparisonP);
 	print("");
 
 	print("Frontal50pxPath; "+Frontal50pxPath);

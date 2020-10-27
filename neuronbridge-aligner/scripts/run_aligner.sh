@@ -130,8 +130,8 @@ mkdir -p ${ALIGNMENT_OUTPUT}
 alignmentErrFile=${alignmentErrFile:-"${output_dir}/alignErr.txt"}
 export FINALOUTPUT=${ALIGNMENT_OUTPUT}
 
-echo "~ Run alignment: ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${comparison_alg}"
-/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${alignmentErrFile}
+echo "~ Run alignment: ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${comparison_alg} ${alignmentErrFile}"
+/opt/aligner/20xBrain_Align_CMTK.sh ${input_filepath} ${nslots} ${xyres} ${zres} ${use_voxel_resolution_args} ${reference_channel} ${comparison_alg} ${alignmentErrFile}
 alignmentExitCode=$?
 if [ $alignmentExitCode -ne 0 ]; then
     alignmentErr=$(cat "${alignmentErrFile}" || "")
