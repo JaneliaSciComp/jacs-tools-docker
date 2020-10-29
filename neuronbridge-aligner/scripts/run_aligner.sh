@@ -17,10 +17,10 @@ help_cmd="$0
     --xyres <xy resolution in um>
     --zres <z resolution in um>
     --reference-channel <reference channel>
-    --comparison_alg <comparison alg: {Max, Median}>
+    --comparison-alg <comparison alg: {Max, Median}>
     --nslots <nslots (default = 2)>
     --templatedir <template config directory>
-    --forceVxSize <true|false>
+    --force-res <true|false>
     -i <input file stack>
     -o <output directory>
     -debug
@@ -37,7 +37,7 @@ while [[ $# > 0 ]]; do
             zres="$1"
             shift # past value
             ;;
-        --forceVxSize)
+        --force-res|--forceVxSize)
             if [[ "$1" =~ "true" ]] ; then
                 # if arg is true use_voxel_resolution_args otherwise leave it false
                 use_voxel_resolution_args=true
@@ -52,13 +52,13 @@ while [[ $# > 0 ]]; do
             export TEMPLATE_DIR="$1"
             shift # past value
             ;;
-        --reference-channel)
+        --reference-channel|--reference_channel)
             if [[ "$1" != "" ]] ; then
                 reference_channel="$1"
             fi
             shift
             ;;
-        --comparison_alg)
+        --comparison-alg|--comparison_alg)
             comparison_alg="$1"
             shift
             ;;
