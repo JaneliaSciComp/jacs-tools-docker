@@ -18,8 +18,8 @@ RUN echo "Installing Fiji"
 # Prereqs for Fiji
 RUN yum install -y libXtst-devel libXrender
 # Install Fiji
-ENV FIJI_FILE=fiji-1.52c.tgz
-RUN wget -q http://workstation.int.janelia.org/files/fiji/${FIJI_FILE}
+ENV FIJI_FILE=fiji-linux64.tar.gz
+RUN wget -q https://downloads.imagej.net/fiji/latest/${FIJI_FILE}
 RUN tar xvf $FIJI_FILE && /bin/rm -rf ${FIJI_FILE}
 RUN rm -rf Fiji && mv Fiji.app Fiji
 

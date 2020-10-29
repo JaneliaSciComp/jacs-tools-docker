@@ -2811,7 +2811,7 @@ function ImageCorrelation(ImageCorrelationArray,widthVx,NumCPU,projectionSt,PNGs
 	
 	mirot=90;//180;
 	mirot2=55;//55
-	porot=180;//179
+	porot=90;//179
 	
 	if(isOpen("SampMIP.tif")){
 		selectWindow("SampMIP.tif");
