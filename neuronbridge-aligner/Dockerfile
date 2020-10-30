@@ -1,7 +1,5 @@
 FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
-ENV HOME=/tmp
-
 RUN echo "Installing S3 FUSE and AWS CLI"
 RUN yum install -y fuse-devel s3fs-fuse groff wget unzip less
 RUN pip install yq
@@ -59,7 +57,16 @@ RUN cp -R $LUTS_SOURCE/* $LUTS_TARGET && /bin/rm -rf $LUTS_SOURCE
 
 WORKDIR /testdata
 COPY /testdata/test.h5j /testdata
-RUN /opt/Fiji/ImageJ-linux64 --headless -macro /opt/aligner/fiji_macros/h5jinstall.ijm || true
+ENV FFMPEG_VERSION="4.1-1.4.4"
+RUN wget https://repo1.maven.org/maven2/org/bytedeco/javacpp-presets/ffmpeg/${FFMPEG_VERSION}/ffmpeg-${FFMPEG_VERSION}-linux-x86.jar \
+    -O ffmpeg-${FFMPEG_VERSION}-linux-x86.jar -q
+RUN unzip ffmpeg-${FFMPEG_VERSION}-linux-x86.jar
+RUN cp -v org/bytedeco/javacpp/linux-x86/* /lib64
+
+# ENV LD_LIBRARY_PATH=/lib64
+
+RUN /opt/Fiji/ImageJ-linux64 --headless -macro /opt/aligner/fiji_macros/h5jinstall.ijm
+RUN /opt/Fiji/ImageJ-linux64 --headless -macro /opt/aligner/fiji_macros/h5jtest.ijm || true
 RUN rm -rf /testdata
 
 RUN echo "Fixing permissions"
