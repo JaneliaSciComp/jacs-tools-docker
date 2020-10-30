@@ -12,25 +12,36 @@ RUN rm -rf aws*
 
 WORKDIR /opt
 
-RUN yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs
+# Prereqs for Fiji
+RUN yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm && \
+    yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs ffmpeg ffmpeg-devel && \
+    yum install -y libXtst-devel libXrender
 
 RUN echo "Installing Fiji"
-# Prereqs for Fiji
-RUN yum install -y libXtst-devel libXrender
 # Install Fiji
 ENV FIJI_FILE=fiji-linux64.tar.gz
-RUN wget -q https://downloads.imagej.net/fiji/latest/${FIJI_FILE}
-RUN tar xvf $FIJI_FILE && /bin/rm -rf ${FIJI_FILE}
-RUN rm -rf Fiji && mv Fiji.app Fiji
+RUN wget -q https://downloads.imagej.net/fiji/latest/${FIJI_FILE} && \
+    tar xvf $FIJI_FILE && /bin/rm -rf ${FIJI_FILE} && \
+    rm -rf Fiji && \
+    mv Fiji.app Fiji
+
+RUN rm /opt/Fiji/jars/ffmpeg-platform*.jar
+
+ENV FFMPEG_VERSION="4.1-1.4.4"
+RUN wget https://repo1.maven.org/maven2/org/bytedeco/ffmpeg/${FFMPEG_VERSION}/ffmpeg-${FFMPEG_VERSION}-linux-x86_64.jar \
+    -O /opt/Fiji/jars/ffmpeg-${FFMPEG_VERSION}-linux-x86_64.jar
+
+RUN wget https://repo1.maven.org/maven2/org/bytedeco/ffmpeg-platform/${FFMPEG_VERSION}/ffmpeg-platform-${FFMPEG_VERSION}.jar \
+    -O /opt/Fiji/jars/ffmpeg-platform-${FFMPEG_VERSION}.jar
 
 RUN echo "Installing CMTK"
 # Prereqs for CMTK
 RUN yum install -y fftw-libs-double
 # Install CMTK
 ENV CMTK_FILE=cmtk-20171001-sl7avx.tgz
-RUN wget -q http://workstation.int.janelia.org/files/tools/${CMTK_FILE}
-RUN tar xvf $CMTK_FILE && /bin/rm -f $CMTK_FILE
-RUN ln -s cmtk-scm-2017-10-01 CMTK
+RUN wget -q http://workstation.int.janelia.org/files/tools/${CMTK_FILE} && \
+    tar xvf $CMTK_FILE && /bin/rm -f $CMTK_FILE && \
+    ln -s cmtk-scm-2017-10-01 CMTK
 
 ENV S3_TEMPLATES_MOUNTPOINT=/s3_alignment_templates
 
