@@ -265,7 +265,7 @@ else
 
     if [[ ${DEBUG_MODE} =~ "debug" ]]; then
         echo "~ Preprocessing output"
-        cat $DEBUG_DIR/preproc.log
+        tail -1000 $DEBUG_DIR/preproc.log
     fi
 
     # check for prealigner errors
