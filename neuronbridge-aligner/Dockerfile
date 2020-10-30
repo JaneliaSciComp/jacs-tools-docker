@@ -1,5 +1,7 @@
 FROM registry.int.janelia.org/jacs-scripts/common-tools:1.0
 
+ENV HOME=/tmp
+
 RUN echo "Installing S3 FUSE and AWS CLI"
 RUN yum install -y fuse-devel s3fs-fuse groff wget unzip less
 RUN pip install yq
@@ -13,9 +15,8 @@ RUN rm -rf aws*
 WORKDIR /opt
 
 # Prereqs for Fiji
-RUN yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm && \
-    yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs ffmpeg ffmpeg-devel && \
-    yum install -y libXtst-devel libXrender
+RUN yum install -y \
+        mesa-libGLU qt qt-x11 libXv numactl-libs libXtst-devel libXrender
 
 RUN echo "Installing Fiji"
 # Install Fiji
@@ -24,15 +25,6 @@ RUN wget -q https://downloads.imagej.net/fiji/latest/${FIJI_FILE} && \
     tar xvf $FIJI_FILE && /bin/rm -rf ${FIJI_FILE} && \
     rm -rf Fiji && \
     mv Fiji.app Fiji
-
-RUN rm /opt/Fiji/jars/ffmpeg-platform*.jar
-
-ENV FFMPEG_VERSION="4.1-1.4.4"
-RUN wget https://repo1.maven.org/maven2/org/bytedeco/ffmpeg/${FFMPEG_VERSION}/ffmpeg-${FFMPEG_VERSION}-linux-x86_64.jar \
-    -O /opt/Fiji/jars/ffmpeg-${FFMPEG_VERSION}-linux-x86_64.jar
-
-RUN wget https://repo1.maven.org/maven2/org/bytedeco/ffmpeg-platform/${FFMPEG_VERSION}/ffmpeg-platform-${FFMPEG_VERSION}.jar \
-    -O /opt/Fiji/jars/ffmpeg-platform-${FFMPEG_VERSION}.jar
 
 RUN echo "Installing CMTK"
 # Prereqs for CMTK
@@ -64,6 +56,11 @@ RUN echo "Installing Fiji LUTs for color depth"
 ENV LUTS_SOURCE=/opt/aligner/fiji_luts
 ENV LUTS_TARGET=/opt/Fiji/luts
 RUN cp -R $LUTS_SOURCE/* $LUTS_TARGET && /bin/rm -rf $LUTS_SOURCE
+
+WORKDIR /testdata
+COPY /testdata/test.h5j /testdata
+RUN /opt/Fiji/ImageJ-linux64 --headless -macro /opt/aligner/fiji_macros/h5jinstall.ijm || true
+RUN rm -rf /testdata
 
 RUN echo "Fixing permissions"
 RUN chown -R root:root /opt/*
