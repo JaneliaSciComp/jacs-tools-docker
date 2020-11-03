@@ -55,12 +55,6 @@ ENV LUTS_SOURCE=/opt/aligner/fiji_luts
 ENV LUTS_TARGET=/opt/Fiji/luts
 RUN cp -R $LUTS_SOURCE/* $LUTS_TARGET && /bin/rm -rf $LUTS_SOURCE
 
-WORKDIR /testdata
-COPY /testdata/test.h5j /testdata
-
-RUN /opt/Fiji/ImageJ-linux64 --ij2 --headless -macro /opt/aligner/fiji_macros/h5jtest.ijm || true
-RUN rm -rf /testdata
-
 RUN echo "Fixing permissions"
 RUN chown -R root:root /opt/*
 RUN chmod -R g+r /opt/*
