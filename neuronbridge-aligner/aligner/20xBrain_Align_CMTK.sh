@@ -231,7 +231,7 @@ if [[ -e ${OLSHAPE} && -e ${METADATA} ]]; then
     echo "Already exists: ${OLSHAPE} and ${METADATA}"
 else
     preprocessingParams="${OUTPUT}/,${InputName}.,${InputFilePath},${TemplatesDir},${RESX},${RESZ},${NSLOTS},${objective},${templateBr},${BrainShape},${Unaligned_Neuron_Separator_Result_V3DPBD},${ForceUseVxSize},${referenceChannel},${comparisonAlg}"
-    fijiOpts="--mem ${memResource} --debug"
+    fijiOpts="--ij2 --mem ${memResource} --debug"
     echo "+---------------------------------------------------------------------------------------+"
     echo "| Running OtsunaBrain preprocessing step"
     echo "| ${FIJI} ${fijiOpts} -macro ${PREPROCIMG} \"${preprocessingParams}\""
