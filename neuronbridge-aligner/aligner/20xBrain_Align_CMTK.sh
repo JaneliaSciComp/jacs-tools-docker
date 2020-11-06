@@ -263,21 +263,19 @@ else
     echo "Otsuna_Brain preprocessing start: $START"
     echo "Otsuna_Brain preprocessing stop: $STOP"
 
-    if [[ ${DEBUG_MODE} =~ "debug" ]]; then
-        echo "~ Preprocessing output"
-        tail -1000 $DEBUG_DIR/preproc.log
-    fi
-
     # check for prealigner errors
     LOGFILE="${OUTPUT}/20x_brain_pre_aligner_log.txt"
     cp $LOGFILE $DEBUG_DIR
 
     # check if there were errors
     if [[ ${preprocessExitCode} -eq 0 ]] ; then
+        coreDumpError=`grep SIGSEGV $DEBUG_DIR/preproc.log`
         preAlignerError=`grep "PreAlignerError: " $LOGFILE | head -n1 | sed "s/PreAlignerError: //"`
         memoryError=`grep -i "Cannot allocate memory" $LOGFILE | head -n1`
         outOfMemoryError=`grep -i "out of memory" $LOGFILE | head -n1`
-        if [[ ! -z "${preAlignerError}" ]] ; then
+        if [[ ! -z "${coreDumpError}" ]] ; then
+            ALIGNMENT_ERROR="Preprocessing failed with a fatal error"
+        elif [[ ! -z "${preAlignerError}" ]] ; then
             ALIGNMENT_ERROR=${preAlignerError}
         elif [[ ! -z "${memoryError}" || ! -z "${outOfMemoryError}" ]] ; then
             ALIGNMENT_ERROR="Out of memory error";
@@ -285,11 +283,16 @@ else
     fi
 
     if [[ ! -z "${ALIGNMENT_ERROR}" ]]; then
+        echo "~ Preprocessing output"
+        tail -1000 $DEBUG_DIR/preproc.log
+        echo "~ Preprocessing log"
         cat ${LOGFILE}
         echo "~ Preprocessing error: ${ALIGNMENT_ERROR}"
         echo ${ALIGNMENT_ERROR} > ${returnedErrorFilename} 
         exit 1
     elif [[ ${DEBUG_MODE} =~ "debug" ]]; then
+        echo "~ Preprocessing output"
+        tail -1000 $DEBUG_DIR/preproc.log
         echo "~ Preprocessing log"
         cat ${LOGFILE}
     fi
