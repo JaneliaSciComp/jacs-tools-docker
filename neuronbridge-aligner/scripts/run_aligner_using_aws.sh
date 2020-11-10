@@ -109,18 +109,25 @@ function updateSearch() {
     local -a args=("${@}")
     local searchId=${args[0]}
     local -i searchStep=${args[1]}
-    local -i nMips=${args[2]}
+    local -i with_ts=${args[2]}
+    local -i nMips=${args[3]}
     local -a mipsParam
     if [ $nMips -eq 0 ] ; then
         mipsParam=()
     else
-        mipsParam=("${args[@]:3:$nMips}")
+        mipsParam=("${args[@]:4:$nMips}")
     fi
-    local errorMessage=${args[3+$nMips]}
+    local errorMessage=${args[4+$nMips]}
+
+    local alignedTimestamp=
+    if [[ ${with_ts} == 1 ]] ; then
+        alignedTimestamp=`date --utc +%FT%TZ`
+    fi
 
     echo "Update Search Params: \
         searchId: ${searchId} \
         searchStep: ${searchStep} \
+        alignFinished: ${alignedTimestamp} \
         nMips: ${nMips} \
         mips: ${mipsParam[@]} \
         errors: ${errorMessage}"
@@ -139,6 +146,7 @@ function updateSearch() {
             searchData="{
                 \"searchId\": \"${searchId}\",
                 \"step\": ${searchStep},
+                \"alignFinished\": \"${alignedTimestamp}\",
                 \"computedMIPs\": [ ${mipsList} ],
                 \"uploadThumbnail\": \"${thumbnail}\"
             }"
@@ -225,7 +233,7 @@ export MIPS_OUTPUT="${results_dir}/mips"
 
 declare -a mips=()
 echo "Set alignment in progress for ${searchId}: ${mips[@]}"
-updateSearch "${searchId}" 1 ${#mips[@]} "${mips[@]}"
+updateSearch "${searchId}" 1 0 ${#mips[@]} "${mips[@]}"
 
 run_align_cmd_args=(
     ${templates_dir_arg}
@@ -246,7 +254,7 @@ if [[ "${alignment_exit_code}" != "0" ]] ; then
     else
         errorMessage="Alignment failed with exit code ${alignment_exit_code}"
     fi
-    updateSearch "${searchId}" 1 ${#mips[@]} "${mips[@]}" "${errorMessage}"
+    updateSearch "${searchId}" 1 0 ${#mips[@]} "${mips[@]}" "${errorMessage}"
     exit $alignment_exit_code
 fi
 
@@ -261,7 +269,7 @@ for mip in `ls ${MIPS_OUTPUT}/*.{tif,png,jpg}` ; do
 done
 
 echo "Set alignment to completed for ${searchId}: ${mips[@]}"
-updateSearch "${searchId}" 2 ${#mips[@]} "${mips[@]}"
+updateSearch "${searchId}" 2 1 ${#mips[@]} "${mips[@]}"
 
 if [[ "${DEBUG_MODE}" != "debug" ]] ; then
     # delete the input
