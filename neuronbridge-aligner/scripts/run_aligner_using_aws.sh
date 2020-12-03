@@ -14,6 +14,7 @@ templates_dir_param=
 other_args=()
 use_iam_role=
 skipCopyInputIfExists=false
+remove_input=false
 
 help_cmd="$0 
     --templates-s3bucket-name <template S3 bucket name>
@@ -66,6 +67,10 @@ while [[ $# > 0 ]]; do
             ;;
         -skipCopyInputIfExists)
             skipCopyInputIfExists=true
+            ;;
+        --rm)
+            remove_input="$1"
+            shift
             ;;
         -debug)
             debug_flag="$1"
@@ -272,9 +277,12 @@ echo "Set alignment to completed for ${searchId}: ${mips[@]}"
 updateSearch "${searchId}" 2 1 ${#mips[@]} "${mips[@]}"
 
 if [[ "${DEBUG_MODE}" != "debug" ]] ; then
+    echo "Remove working input copy: ${working_input_filepath}"
+    rm -f ${working_input_filepath}
+fi
+
+if [[ "${remove_input}" =~ "true" ]] ; then
     # delete the input
     echo "Remove s3://${inputs_s3bucket_name}/${input_filepath}"
     aws s3 rm "s3://${inputs_s3bucket_name}/${input_filepath}"
-    echo "Remove working input copy: ${working_input_filepath}"
-    rm -f ${working_input_filepath}
 fi
