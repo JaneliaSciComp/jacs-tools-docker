@@ -3,13 +3,16 @@ FROM continuumio/miniconda3
 RUN apt-get update && \
     apt-get install -y \
         build-essential procps wget \
-        unzip libxext-dev libxt-dev libxmu-dev
+        unzip libxext-dev libxt-dev libxmu-dev \
+        libxcomposite-dev
 
 # install Matlab-2017a
 WORKDIR /mcr-install
 
-RUN wget https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/5/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2019a_Update_5_glnxa64.zip
-RUN unzip MATLAB_Runtime_R2019a_Update_5_glnxa64.zip
+ENV DOWNLOAD_FILENAME=MATLAB_Runtime_R2019a_Update_5_glnxa64.zip
+RUN wget https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/5/deployment_files/installer/complete/glnxa64/${DOWNLOAD_FILENAME}
+RUN unzip ${DOWNLOAD_FILENAME} && \
+    rm -f ${DOWNLOAD_FILENAME}
 RUN ./install -mode silent -agreeToLicense yes
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\
