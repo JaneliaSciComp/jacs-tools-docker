@@ -10,7 +10,7 @@ RUN apt-get update && \
 WORKDIR /mcr-install
 
 ENV DOWNLOAD_FILENAME=MATLAB_Runtime_R2019a_Update_5_glnxa64.zip
-RUN wget https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/5/deployment_files/installer/complete/glnxa64/${DOWNLOAD_FILENAME}
+RUN wget --quiet https://ssd.mathworks.com/supportfiles/downloads/R2019a/Release/5/deployment_files/installer/complete/glnxa64/${DOWNLOAD_FILENAME}
 RUN unzip ${DOWNLOAD_FILENAME} && \
     rm -f ${DOWNLOAD_FILENAME}
 RUN ./install -mode silent -agreeToLicense yes
