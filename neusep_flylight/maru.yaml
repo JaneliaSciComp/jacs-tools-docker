@@ -1,0 +1,11 @@
+maru_version: 0.1.0
+name: neusep_flylight
+version: 1.0.0
+build_args:
+  TOOLS_ARCHIVE_RELEASE: 1.0.0
+  VAA3D_VERSION: redhat-mark13
+  NEUSEP_VERSION: neusep_4.11-sl72-bin
+remotes:
+- janeliascicomp
+- registry.int.janelia.org/jacs-scripts
+

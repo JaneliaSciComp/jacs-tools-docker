@@ -1,0 +1,9 @@
+maru_version: 0.1.0
+name: vaa3d
+version: redhat-mark13
+build_args:
+  TOOLS_ARCHIVE_RELEASE: 1.0.0
+  GIT_TAG: vaa3d-$version
+remotes:
+- janeliascicomp
+- registry.int.janelia.org/jacs-scripts
