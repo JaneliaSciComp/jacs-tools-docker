@@ -1,0 +1,7 @@
+maru_version: 0.1.0
+name: common-tools
+version: 1.0.2
+remotes:
+- janeliascicomp
+- registry.int.janelia.org/jacs-scripts
+
