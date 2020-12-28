@@ -23,8 +23,8 @@ RUN curl -sL https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.
     echo "conda activate base" >> ~/.bashrc
 
 RUN /opt/conda/bin/conda update conda -y \
-	&& /opt/conda/bin/conda create -n py3 python=3 h5py=2.8.0 PyYAML=3.13 -y \
-	&& /opt/conda/bin/conda clean --all -f -y
+    && /opt/conda/bin/conda create -n py3 python=3 h5py=2.8.0 PyYAML=3.13 -y \
+    && /opt/conda/bin/conda clean --all -f -y
 
 # start with Fiji
 FROM janeliascicomp/fiji-zulu-8:$FIJI_VERSION
