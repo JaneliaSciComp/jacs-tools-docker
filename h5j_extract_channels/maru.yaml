@@ -1,0 +1,13 @@
+maru_version: 0.1.0
+name: h5j_extract_channels
+version: 1.0.0
+build_args:
+  GIT_TAG: master
+template_args:
+  flavor: python_conda
+  build:
+    repo_url: https://github.com/JaneliaSciComp/jacs-tools-docker.git
+  python_conda:
+    python_version: "3.6"
+    dependencies: h5py=2.8.0
+    script_path: h5j_extract_channels/src/extract_channels.py
