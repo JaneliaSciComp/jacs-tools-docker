@@ -1,12 +1,10 @@
 maru_version: 0.1.0
 name: flylight_tools
-version: 1.0.0
+version: 1.0.1
 build_args:
   TOOLS_ARCHIVE_RELEASE: 1.0.0
   ANTS_VERSION: ants-redhat-yuy2013
   VAA3D_VERSION: vaa3d-redhat-mark13
-  FIJI_VERSION: 20201104-1356
+  FIJI_VERSION: 20201021-2016
 remotes:
 - janeliascicomp
-- registry.int.janelia.org/jacs-scripts
-
