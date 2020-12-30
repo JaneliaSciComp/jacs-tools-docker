@@ -5,9 +5,7 @@
 # Usage:
 # sh separatePipeline.sh <output dir> <name> <input file> 
 
-. /opt/common-tools/legacy_init_xvfb.sh
-
-DIR=$(cd "$(dirname "$0")"; pwd)
+. /app/scripts/utils/initXvfb.sh
 
 NETPBM_PATH="/usr"
 NETPBM_BIN="$NETPBM_PATH/bin"
@@ -44,7 +42,6 @@ cd $WORKING_DIR
 
 echo "Neuron Separator Dir: $NSDIR"
 echo "Vaa3d Dir: $Vaa3D"
-echo "Run Dir: $DIR"
 echo "Working Dir: $WORKING_DIR"
 echo "Input file: $INPUT_FILE"
 echo "Output dir: $OUTDIR"
@@ -180,7 +177,7 @@ if [ -s SeparationResultUnmapped.nsp ]; then
         mv Reference.v3draw $OUTDIR
 
         echo "~ Launching artifact pipeline..."
-        $DIR/artifactPipeline.sh $OUTDIR $NAME $INPUT_FILE "$SIGNAL_CHAN" "$REF_CHAN"
+        /app/scripts/utils/artifactPipeline.sh $OUTDIR $NAME $INPUT_FILE "$SIGNAL_CHAN" "$REF_CHAN"
 
         echo "~ Compressing final outputs in: $OUTDIR"
         cd $OUTDIR

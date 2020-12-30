@@ -7,7 +7,7 @@
 
 DIR=$(cd "$(dirname "$0")"; pwd)
 
-. $DIR/common.sh
+. /app/scripts/utils/common.sh
 
 NETPBM_PATH="/usr"
 NETPBM_BIN="$NETPBM_PATH/bin"

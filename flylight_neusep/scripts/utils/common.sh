@@ -31,7 +31,7 @@ ensureLocalFile()
         local _FILE_STUB=`basename $_FILE_PATH`
         _FILE="$_WORKING_DIR/$_FILE_STUB"
         echo "Copying to local file"
-        $_SYNC_SCRIPT -command read -path "$_FILE_PATH" -file "$_FILE"
+        $_SYNC_SCRIPT "$_FILE_PATH" "$_FILE"
     fi
     eval $_RESULTVAR="'$_FILE'"
 }
@@ -49,6 +49,7 @@ ensureUncompressedFile()
         gunzip -c $_INFILE > $_FILE
         ;;
     *.bz2 )
+        echo "Using $NSLOTS cores for pbzip2"
         _FILE="$_WORKING_DIR/$_FILE_STUB"
         pbzip2 -dc -p$NSLOTS $_INFILE > $_FILE
         ;;
