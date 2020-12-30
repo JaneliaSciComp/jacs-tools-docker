@@ -1,4 +1,4 @@
-ARG FIJI_VERSION=20201104-1356
+ARG FIJI_VERSION
 
 FROM janeliascicomp/common-tools:1.0.2 as ants-builder
 ARG TOOLS_ARCHIVE_RELEASE=1.0.0
@@ -26,14 +26,14 @@ RUN /opt/conda/bin/conda update conda -y \
     && /opt/conda/bin/conda create -n py3 python=3 h5py=2.8.0 PyYAML=3.13 -y \
     && /opt/conda/bin/conda clean --all -f -y
 
-# start with Fiji
+# Start with Fiji
 FROM janeliascicomp/fiji-zulu-8:$FIJI_VERSION
 ARG VAA3D_VERSION
 
-# install dependencies for scripts and Vaa3d
-#RUN yum install -y pbzip2 netpbm netpbm-progs mesa-libGLU qt qt-x11 libXv numactl-libs 
-RUN apt-get update \
-    && apt-get install -y netpbm libglu1-mesa qt4-default libxv-dev numactl rsync pbzip2
+# Install dependencies
+RUN apt-get update && apt-get install --no-install-recommends -y \
+        libxext6 libxrender1 libxtst6 libxi6 libglu1-mesa qt4-default libqt4-opengl libxv-dev \
+        numactl rsync pbzip2 net-tools xvfb netpbm ffmpeg imagemagick
 
 COPY --from=ants-builder --chown=root:root /tmp/ANTS /app/ants
 COPY --from=vaa3d-builder --chown=root:root /tmp/$VAA3D_VERSION /app/vaa3d
