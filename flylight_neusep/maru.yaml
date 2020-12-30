@@ -1,5 +1,5 @@
 maru_version: 0.1.0
-name: neusep_flylight
+name: flylight_neusep
 version: 1.0.0
 build_args:
   TOOLS_ARCHIVE_RELEASE: 1.0.0
