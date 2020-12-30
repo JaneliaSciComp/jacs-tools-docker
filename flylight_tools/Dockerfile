@@ -40,6 +40,8 @@ COPY --from=vaa3d-builder --chown=root:root /tmp/$VAA3D_VERSION /app/vaa3d
 COPY --from=conda-builder --chown=root:root /opt/conda /opt/conda
 COPY scripts /app/scripts
 COPY fiji_macros /app/fiji_macros
+COPY fiji_plugins /app/fiji/Fiji.app/plugins
+COPY fiji_luts /app/fiji/Fiji.app/luts
 
 WORKDIR /app
 
