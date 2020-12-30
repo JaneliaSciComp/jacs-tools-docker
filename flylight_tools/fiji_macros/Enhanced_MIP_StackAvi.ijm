@@ -422,7 +422,7 @@ function performHistogramStretching() {
     getDimensions(width, height, channels, slices, frames);
     W = round(width/5);
     run("Z Project...", "projection=[Max Intensity]");
-    run("Size...", "width=W height=W depth=1 constrain average interpolation=Bilinear");
+    run("Size...", "width="+W+" height="+W+" depth=1 constrain average interpolation=Bilinear");
     run("Select All");
     getStatistics(area, mean, min, max, std, histogram);
     close();

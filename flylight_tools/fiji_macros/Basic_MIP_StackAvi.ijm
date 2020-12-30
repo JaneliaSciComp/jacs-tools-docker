@@ -758,14 +758,14 @@ function performHistogramAdjustment(window_name, minMax) {
     } 
     else {
         scalar = 255/max;
-        run("Multiply...", "value=scalar stack");
+        run("Multiply...", "value="+scalar+" stack");
     }
 }
 
 function performGammaCorrection(block_size, max_slope) {
     if (gammaCorrection) {
         print("Performing gamma correction with blocksize="+block_size+" and max_slope="+max_slope);
-        run("Enhance Local Contrast (CLAHE)", "blocksize=block_size histogram=256 maximum=max_slope");
+        run("Enhance Local Contrast (CLAHE)", "blocksize="+block_size+" histogram=256 maximum="+max_slope);
     }
 }
 
