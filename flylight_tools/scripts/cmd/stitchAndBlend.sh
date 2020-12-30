@@ -4,7 +4,7 @@ referenceChannelIndex=$1
 inputDirectoryPath=$2
 outputFilePath=$3
 
-. /app/scripts/utils/legacy_init_xvfb.sh
+. /app/scripts/utils/initXvfb.sh
 
 # Stitch
 /app/vaa3d/vaa3d -x imageStitch.so -f v3dstitch -p "#c $referenceChannelIndex #si 0" -i "$inputDirectoryPath"

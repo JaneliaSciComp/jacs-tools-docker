@@ -3,7 +3,7 @@
 # two scanned images merging pipeline
 #
 
-. /app/scripts/utils/legacy_init_xvfb.sh
+. /app/scripts/utils/initXvfb.sh
 
 ####
 # TOOLKITS

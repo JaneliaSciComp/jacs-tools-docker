@@ -6,7 +6,7 @@ commaSeparatedFragmentList=$3
 finalOutputMIPPath=$4
 newOutputStackPath=$5
 
-. /app/scripts/utils/legacy_init_xvfb.sh
+. /app/scripts/utils/initXvfb.sh
 
 WORKING_DIR=`mktemp -d`
 tempOutputMIPPath=$WORKING_DIR/temp.tif
