@@ -30,8 +30,8 @@ trap exitHandler EXIT
 
 # Run Fiji macro
 echo "Executing:"
-echo "/app/fiji/fiji -macro /app/fiji_macros/Enhanced_MIP_StackAvi.ijm $TEMP_DIR,$OUTPUT_PREFIX,$MODE,$INPUT_FILE,$CHAN_SPEC,$COLOR_SPEC,$OPTIONS"
-/app/fiji/fiji -macro /app/fiji_macros/Enhanced_MIP_StackAvi.ijm $TEMP_DIR,$OUTPUT_PREFIX,$MODE,$INPUT_FILE,$CHAN_SPEC,$COLOR_SPEC,$OPTIONS &
+echo "/app/fiji/fiji -macro /app/fiji_macros/Enhanced_MIP_StackAvi.ijm $TEMP_DIR,$OUTPUT_PREFIX,$MODE,$INPUT_FILE,$CHAN_SPEC,$COLOR_SPEC,$OPTIONS > $OUTPUT_DIR/enhancedMIP.log 2>&1"
+/app/fiji/fiji -macro /app/fiji_macros/Enhanced_MIP_StackAvi.ijm $TEMP_DIR,$OUTPUT_PREFIX,$MODE,$INPUT_FILE,$CHAN_SPEC,$COLOR_SPEC,$OPTIONS > $OUTPUT_DIR/enhancedMIP.log 2>&1 &
 
 # Monitor Fiji and take periodic screenshots, killing it eventually
 fpid=$!

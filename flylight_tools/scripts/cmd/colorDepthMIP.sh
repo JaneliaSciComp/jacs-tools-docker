@@ -30,8 +30,8 @@ INPUT_FILENAME=`basename $INPUT_FILE`
 
 # Run Fiji macro
 echo "Executing:"
-echo "/app/fiji/fiji -macro /app/fiji_macros/Color_Depth_MIP_batch_0724_2017_For_Pipeline.ijm $INPUT_DIR,$INPUT_FILENAME,$TEMP_DIR,$MASK_DIR,$ANATOMICAL_AREA"
-/app/fiji/fiji -macro /app/fiji_macros/Color_Depth_MIP_batch_0724_2017_For_Pipeline.ijm $INPUT_DIR,$INPUT_FILENAME,$TEMP_DIR,$MASK_DIR,$ANATOMICAL_AREA &
+echo "/app/fiji/fiji -macro /app/fiji_macros/Color_Depth_MIP_batch_0724_2017_For_Pipeline.ijm $INPUT_DIR,$INPUT_FILENAME,$TEMP_DIR,$MASK_DIR,$ANATOMICAL_AREA > $OUTPUT_DIR/colorDepthMIP.log 2>&1"
+/app/fiji/fiji -macro /app/fiji_macros/Color_Depth_MIP_batch_0724_2017_For_Pipeline.ijm $INPUT_DIR,$INPUT_FILENAME,$TEMP_DIR,$MASK_DIR,$ANATOMICAL_AREA > $OUTPUT_DIR/colorDepthMIP.log 2>&1 &
 
 # Monitor Fiji and take periodic screenshots, killing it eventually
 fpid=$!
