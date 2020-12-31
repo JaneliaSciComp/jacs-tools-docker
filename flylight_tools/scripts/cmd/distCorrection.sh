@@ -21,8 +21,8 @@ IN_FNAME=`basename $LSM_FILENAME`
 
 # Run Fiji macro
 echo "Executing:"
-echo "/app/fiji/fiji -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm \"$IN_DIR/,$IN_FNAME,$OUT_DIR/,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR\" > $OUT_DIR/distCorrection.log 2>&1"
-/app/fiji/fiji -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm "$IN_DIR/,$IN_FNAME,$OUT_DIR/,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR" > $OUT_DIR/distCorrection.log 2>&1 &
+echo "/app/fiji/fiji --headless -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm \"$IN_DIR/,$IN_FNAME,$OUT_DIR/,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR\""
+/app/fiji/fiji --headless -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm "$IN_DIR/,$IN_FNAME,$OUT_DIR/,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR" &
 
 # Monitor Fiji and take periodic screenshots, killing it eventually
 fpid=$!
