@@ -22,19 +22,21 @@ trap exitHandler EXIT
 # Go to the working directory
 cd $WORKING_DIR
 
-if [ "$FLIP" != "" ]; then
+echo "Flip: $FLIP"
+if [ "$FLIP" == "true" ]; then
 
     if [ "$CHANNEL_MAPPING" != "" ]; then
         TEMP_FILE="$WORKING_DIR/flipped.v3draw"
-        /app/scripts/utils/flipZ.sh "$INPUT_FILENAME" "$TEMP_FILE" 
+        /app/scripts/utils/flipZ.sh "$INPUT_FILENAME" "$TEMP_FILE"
         INPUT_FILENAME="$TEMP_FILE"
     else
         /app/scripts/utils/flipZ.sh "$INPUT_FILENAME" "$OUTPUT_FILENAME"
     fi
 fi
 
+echo "Channel mapping: $CHANNEL_MAPPING"
 if [ "$CHANNEL_MAPPING" != "" ]; then
-    /app/scripts/channelMap.sh -i "$INPUT_FILENAME" -o "$OUTPUT_FILENAME" -m "$CHANNEL_MAPPING"
+    /app/scripts/cmd/channelMap.sh -i "$INPUT_FILENAME" -o "$OUTPUT_FILENAME" -m "$CHANNEL_MAPPING"
 fi
 
 echo 'Done'
