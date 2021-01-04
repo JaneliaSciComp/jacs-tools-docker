@@ -142,7 +142,7 @@ else
         # Special case for splitting an H5J file
 
         echo "~ Splitting H5J channels in $INPUT_FILE"
-        /app/scripts/extractChannels.sh -i $INPUT_FILE -o $WORKING_DIR
+        /app/scripts/cmd/extractChannels.sh -i $INPUT_FILE -o $WORKING_DIR
         ls $WORKING_DIR
         # Compress all temporary output files by recursively calling this script
         shopt -s nullglob
@@ -150,7 +150,7 @@ else
             inbase=`basename $fin`
             inbase=${inbase%.h5j}
             fout=$OUTPUT_DIR/${inbase}"."${OUTPUT_FILE_EXT}
-            /app/scripts/convert.sh $fin $fout 0 $REF_CHAN $SIGNAL_CHAN
+            /app/scripts/cmd/convert.sh $fin $fout 0 $REF_CHAN $SIGNAL_CHAN
         done
         shopt -u nullglob
 
