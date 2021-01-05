@@ -28,20 +28,20 @@ NUMPARAMS=$#
 if [ $NUMPARAMS -lt 2 ]
 then
     echo " "
-    echo " USAGE: sh $0 [input path] [output path] [split] <ref channels> <signal channels>"
+    echo " USAGE: sh $0 [input path] [output path] [metadata path] [split] <ref channels> <signal channels>"
     echo "   split: 1 if splitting, 0 if not splitting (default)"
     echo "   The channel parameters are 1-indexed and comma-delimited, with no spaces. They are only necessary when converting to H5J format."
     exit
 fi
 
-
 SIGNAL_COMPRESSION=7
 REF_COMPRESSION=21
 INPUT_FILE=$1
 OUTPUT_FILE=$2
-SPLIT_CHANNELS=${3:=0}
-REF_CHAN=$4
-SIGNAL_CHAN=$5
+METADATA_FILE=$3
+SPLIT_CHANNELS=${4:=0}
+REF_CHAN=$5
+SIGNAL_CHAN=$6
 WORKING_DIR=`mktemp -d -p /dev/shm`
 cd $WORKING_DIR
 
@@ -150,7 +150,7 @@ else
             inbase=`basename $fin`
             inbase=${inbase%.h5j}
             fout=$OUTPUT_DIR/${inbase}"."${OUTPUT_FILE_EXT}
-            /app/scripts/cmd/convert.sh $fin $fout 0 $REF_CHAN $SIGNAL_CHAN
+            /app/scripts/cmd/convert.sh $fin $fout "" 0 $REF_CHAN $SIGNAL_CHAN
         done
         shopt -u nullglob
 
@@ -158,7 +158,18 @@ else
 
         # When encoding a new H5J file, use vaa3d.
         # Unlike the Fiji plugin, we can specify differential compression for the signal and reference channels.
-        encodeH5J $INPUT_FILE $OUTPUT_FILE
+        TEMP_FILE=$WORKING_DIR/temp.h5j
+        encodeH5J $INPUT_FILE $TEMP_FILE
+
+        if [ ! -z $METADATA_FILE ]; then
+            # Add metadata
+            echo "~ Adding H5J metadata"
+            /app/scripts/cmd/h5jMetadata.sh $TEMP_FILE $METADATA_FILE
+        fi
+
+        # Rsync it into its final position
+        echo "~ Rsyncing $TEMP_FILE to $OUTPUT_FILE"
+        $SYNC_CMD $TEMP_FILE $OUTPUT_FILE
 
     else
         # To create PBD or MP4 files, we must use Vaa3d, since Fiji does not support these as output formats.
