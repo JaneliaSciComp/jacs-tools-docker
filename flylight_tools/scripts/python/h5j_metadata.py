@@ -26,21 +26,23 @@ GROUPS = "groups"
 def parse_cmd_args():
     parser = argparse.ArgumentParser(description='Read or write HDF5 attributes')
     parser.add_argument('input', help='Target HDF5 file')
+    parser.add_argument('-m', '--metadata', help='Input metadata in YAML format')
     parser.add_argument('-d', '--debug', dest="debug", action="store_true", 
             help='Print debug output instead of writing to the file')
     args = parser.parse_args()
     return args
 
 
-def process(filename, debug=False):
+def process(filename, metadata, debug=False):
 
     global DEBUG
     DEBUG = args.debug
 
-    if not sys.stdin.isatty():
-        data = yaml.load(sys.stdin)
-        write_metadata(filename, data)
-        if DEBUG: print()
+    if metadata:
+        with open(metadata) as yamlfile:
+            data = yaml.load(yamlfile)
+            write_metadata(filename, data)
+            if DEBUG: print()
 
     if DEBUG: print("Reading attributes from %s"%filename)
     read_metadata(filename)
@@ -49,7 +51,7 @@ def process(filename, debug=False):
 def write_metadata(filename, data):
     """ Take attributes in the dictionary provided and add them to the HDF5 file.
     """
-    if DEBUG: print("Read input from YAML:\n%s"%yaml.dump(data, indent=2))
+    if DEBUG: print("Reading input metadata from YAML:\n%s"%yaml.dump(data, indent=2))
     h5_file = File(filename, mode='r+')
     root = h5_file['/']
     if DEBUG: print("Would write attributes to %s as follows:" % filename)
@@ -162,5 +164,5 @@ def read_attrs(g):
 
 if __name__ == "__main__":
     args = parse_cmd_args()
-    process(args.input, args.debug)
+    process(args.input, args.metadata, args.debug)
 
