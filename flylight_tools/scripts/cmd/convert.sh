@@ -22,7 +22,6 @@
 Vaa3D="/app/vaa3d/vaa3d"
 Fiji="/app/fiji/fiji"
 FijiMacros="/app/fiji_macros"
-export TMPDIR=""
 
 NUMPARAMS=$#
 if [ $NUMPARAMS -lt 2 ]
@@ -42,7 +41,7 @@ METADATA_FILE=$3
 SPLIT_CHANNELS=${4:=0}
 REF_CHAN=$5
 SIGNAL_CHAN=$6
-WORKING_DIR=`mktemp -d -p /dev/shm`
+WORKING_DIR=`mktemp -d`
 cd $WORKING_DIR
 
 function cleanWorkingDir {
