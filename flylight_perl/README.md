@@ -22,3 +22,6 @@ singularity run docker://registry.int.janelia.org/jacs-scripts/flylight_perl:1.0
 1. When run inside a Docker container, SAGE loader is currently only able to process image indexing requests (base CV = light_imagery)
 2. When run inside a Docker container, SAGE loader does not support the -kafka flag
 3. The use of senndmail from inside a Docker container is currently not set up (this is of minimal concern for image indexing requests) 
+
+## Notes
+1. The Dockerfile calls for usage of Python - despite the name ("flylight_perl"), while Perl is used for most image indexing requests, some Python is used for FFC and PTR.
