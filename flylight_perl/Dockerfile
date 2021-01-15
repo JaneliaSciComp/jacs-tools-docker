@@ -30,6 +30,9 @@ RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 WORKDIR /app
 RUN git clone git@github.com:JaneliaSciComp/SAGE.git
 
+# Install Perl modules
+COPY modules /usr/share/perl5
+
 # Create final image
 FROM ubuntu:18.04
 
@@ -49,13 +52,12 @@ RUN apt-get install -y python3-pip python3-dev libmysqlclient-dev \
     && ln -s /usr/bin/python3 /usr/bin/python
 
 WORKDIR /app
-COPY --from=builder /usr/local/lib/x86_64-linux-gnu/perl /usr/local/lib/x86_64-linux-gnu/perl
-COPY --from=builder /usr/local/share/perl /usr/local/share/perl
 COPY --from=builder /usr/share/perl /usr/share/perl
 COPY --from=builder /usr/share/perl5 /usr/share/perl5
+COPY --from=builder /usr/local/share/perl /usr/local/share/perl
+COPY --from=builder /usr/local/lib/x86_64-linux-gnu/perl /usr/local/lib/x86_64-linux-gnu/perl
 COPY --from=builder /usr/lib/x86_64-linux-gnu/perl /usr/lib/x86_64-linux-gnu/perl
 COPY --from=builder /app/SAGE /app/SAGE
-COPY modules /usr/share/perl5
 COPY scripts /app/scripts
 RUN mkdir -p /groups
 RUN mkdir -p /misc/sc/pipeline
