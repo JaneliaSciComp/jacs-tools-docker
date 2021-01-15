@@ -1,5 +1,11 @@
 ## Building
 
+With [Maru](https://github.com/JaneliaSciComp/maru) installed:
+```
+maru build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
+```
+
+Otherwise:
 ```
 docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.0 -t registry.int.janelia.org/jacs-scripts/flylight_perl --label "sage_loader_version=1.46" .
 docker push registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.1
