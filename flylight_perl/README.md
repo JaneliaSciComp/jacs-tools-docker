@@ -16,3 +16,9 @@ You can now use singularity to execute your command:
 ```
 singularity run docker://registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.1 perl /app/SAGE/bin/sage_loader.pl -config /groups/scicomp/informatics/data/flylightflip_light_imagery-config.xml -grammar /misc/sc/pipeline/grammar/projtechres.gra -lab flylight -debug -item "2021/01/06/JPTR_20210108132345995_7223.lsm"
 ```
+
+## Issues
+
+1. When run inside a Docker container, SAGE loader is currently only able to process image indexing requests (base CV = light_imagery)
+2. When run inside a Docker container, SAGE loader does not support the -kafka flag
+3. The use of senndmail from inside a Docker container is currently not set up (this is of minimal concern for image indexing requests) 
