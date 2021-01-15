@@ -1,5 +1,8 @@
 FROM ubuntu:18.04 as builder
 
+LABEL maintainer="Rob Svirskas <svirskasr@hhmi.org>"
+LABEL description="Image for execution of sage_loader.pl"
+
 RUN apt-get update
 RUN apt-get install -y perl
 RUN apt-get install --no-install-recommends -y openssh-client git
