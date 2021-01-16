@@ -5,8 +5,9 @@ LABEL description="SAGE Loader and other Perl scripts"
 
 # Install dependencies
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y perl openssh-client git \
-        make libyaml-appconfig-perl build-essential \
+    && apt-get install -y perl \
+    && apt-get install -y --no-install-recommends openssh-client git \
+    && apt-get install -y make libyaml-appconfig-perl build-essential \
         libexpat-dev libxml-sax-expat-incremental-perl \
         libpq5 libpq-dev libdbd-pg-perl libmysqlclient-dev libdbd-mysql-perl
 
@@ -17,7 +18,8 @@ RUN cpan App::cpanminus \
          Parse::RecDescent Pod::Text Pod::Usage POSIX Scalar::Util \
          Switch Sys::Hostname Time Try::Tiny URI::Escape XML::Simple \
          CGI Class::Accessor::Fast Date::Calc Date::Manip \
-         Rose::DB::Object::Manager DBD::Pg DBD::mysql
+         Rose::DB::Object::Manager DBD::Pg DBD::mysql \
+         Pegex::Base YAML JSYNC
 
 # Add SSH credentials
 ARG SSH_PRIVATE_KEY
@@ -39,11 +41,17 @@ FROM ubuntu:18.04
 # Eliminate input warnings from debconf
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
 RUN apt-get update \
+    # Set UTF-8 by default, this is needed to run with Singularity
+    && apt-get install --no-install-recommends -y locales \
+    && echo "LC_ALL=en_US.UTF-8" >> /etc/environment \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && echo "LANG=en_US.UTF-8" > /etc/locale.conf \
+    && locale-gen en_US.UTF-8 \
+    # Install dependencies
     && apt-get install -y libexpat-dev libxml-sax-expat-incremental-perl \
-    libpq5 libpq-dev libdbd-pg-perl libmysqlclient-dev libdbd-mysql-perl \
-    sendmail
+        libpq5 libpq-dev libdbd-pg-perl libmysqlclient-dev libdbd-mysql-perl \
+        sendmail
 
 # Python (needed for PTR and FFC)
 RUN apt-get install -y python3-pip python3-dev libmysqlclient-dev \
@@ -59,6 +67,3 @@ COPY --from=builder /usr/local/lib/x86_64-linux-gnu/perl /usr/local/lib/x86_64-l
 COPY --from=builder /usr/lib/x86_64-linux-gnu/perl /usr/lib/x86_64-linux-gnu/perl
 COPY --from=builder /app/SAGE /app/SAGE
 COPY scripts /app/scripts
-RUN mkdir -p /groups
-RUN mkdir -p /misc/sc/pipeline
-
