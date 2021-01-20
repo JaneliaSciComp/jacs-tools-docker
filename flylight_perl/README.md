@@ -16,7 +16,7 @@ docker push registry.int.janelia.org/jacs-scripts/flylight_perl
 
 First, some environment variables must be set:
 ```
-export SINGULARITY_BINDPATH='/groups:/groups,/misc/sc/pipeline:/misc/sc/pipeline'
+export SINGULARITY_BINDPATH='/groups:/groups'
 ```
 You can now use singularity to execute your command:
 ```
@@ -31,4 +31,5 @@ All issues refer to the execution of sageLoader.sh within a Docker container - t
 4. There is sometimes a warning "Redundant argument in printf..." when run inside a Docker container - this is no cause for concern, and will be fixed in a future version.
 
 ## Notes
-1. The Dockerfile calls for usage of Python - despite the name ("flylight_perl"), while Perl is used for most image indexing requests, some Python is used for FFC and PTR.
+1. Pipeline grammars and related programs are copied into pipeline/.
+2. The Dockerfile calls for usage of Python - despite the name ("flylight_perl"), while Perl is used for most image indexing requests, some Python is used for FFC and PTR.

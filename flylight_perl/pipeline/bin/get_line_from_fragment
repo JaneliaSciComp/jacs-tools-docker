@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use DBI;
+use JFRC::Utils::DB qw(:all);
+
+&dbConnect(\my $dbh,'sage');
+my @line = $dbh->selectrow_array("SELECT DISTINCT line FROM image_data_mv WHERE published='Y' AND family='rubin_chacrm' AND driver!='LexA' AND REPLACE(SUBSTRING_INDEX(line,'_',2),'GMR_','')=UPPER('$ARGV[0]')");
+print $line[0]||'' . "\n";
+exit(0);

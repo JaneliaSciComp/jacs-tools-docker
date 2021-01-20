@@ -67,3 +67,4 @@ COPY --from=builder /usr/local/lib/x86_64-linux-gnu/perl /usr/local/lib/x86_64-l
 COPY --from=builder /usr/lib/x86_64-linux-gnu/perl /usr/lib/x86_64-linux-gnu/perl
 COPY --from=builder /app/SAGE /app/SAGE
 COPY scripts /app/scripts
+COPY pipeline /misc/sc/pipeline
