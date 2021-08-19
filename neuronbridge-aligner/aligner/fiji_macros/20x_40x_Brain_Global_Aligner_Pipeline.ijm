@@ -228,12 +228,15 @@ print("JFRC2010MedProPath; "+JFRC2010MedProPath);
 filepathcolor=0; 
 NRRD_02_ext=0; 
 
-
-
 List.clear();
 
 beforeopen=getTime();
-open(path);// for tif, comp nrrd, lsm", am, v3dpbd, mha
+
+if(endsWith(path,".lif") !=1 )
+	open(path);// for tif, comp nrrd, lsm", am, v3dpbd, mha
+else
+	run("Bio-Formats Importer", "open="+path+" autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
+
 afteropen=getTime();
 
 oriname=getTitle();
