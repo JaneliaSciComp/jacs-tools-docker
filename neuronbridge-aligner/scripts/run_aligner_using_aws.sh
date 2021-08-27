@@ -161,7 +161,7 @@ function updateSearch() {
                 \"step\": ${searchStep},
                 \"computedMIPs\": [ ${mipsList} ],
                 \"uploadThumbnail\": \"${thumbnail}\",
-                \"errorMessage\": \"${errorMessage}\"
+                \"alignmentErrorMessage\": \"${errorMessage}\"
             }"
         fi
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
