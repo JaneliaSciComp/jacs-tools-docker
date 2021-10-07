@@ -21,7 +21,7 @@ export SINGULARITY_BINDPATH='/groups:/groups'
 ```
 You can now use singularity to execute your command:
 ```
-singularity run docker://registry.int.janelia.org/jacs-scripts/flylight_perl /app/scripts/cmd/sageLoader.sh -config /groups/scicomp/informatics/data/flylightflip_light_imagery-config.xml -grammar /misc/sc/pipeline/grammar/projtechres.gra -lab flylight -debug -item "2021/01/06/JPTR_20210108132345995_7223.lsm"
+singularity run docker://registry.int.janelia.org/jacs-scripts/flylight_perl /app/scripts/cmd/sageLoader.sh -config /groups/scicompsoft/informatics/data/flylightflip_light_imagery-config.xml -grammar /misc/sc/pipeline/grammar/projtechres.gra -lab flylight -debug --test -item "2021/01/06/JPTR_20210108132345995_7223.lsm"
 ```
 
 ## Issues
