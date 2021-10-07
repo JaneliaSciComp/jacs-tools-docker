@@ -7,9 +7,10 @@ maru build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
 
 Otherwise:
 ```
-docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.0 -t registry.int.janelia.org/jacs-scripts/flylight_perl --label "sage_loader_version=1.46" .
-docker push registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.1
+docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_ed25519)" -t registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.3 -t registry.int.janelia.org/jacs-scripts/flylight_perl -t registry.int.janelia.org/jacs-scripts/flylight_perl:latest --label "sage_loader_version=1.48" .
+docker push registry.int.janelia.org/jacs-scripts/flylight_perl:1.0.3
 docker push registry.int.janelia.org/jacs-scripts/flylight_perl
+docker push registry.int.janelia.org/jacs-scripts/flylight_perl:latest
 ```
 
 ## Using on the cluster

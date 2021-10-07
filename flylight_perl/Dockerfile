@@ -16,7 +16,7 @@ RUN cpan App::cpanminus \
     && cpanm DBI Digest::MD5 Fcntl File::Basename \
          Getopt::Long Image::Size IO::File JSON LWP::UserAgent LWP::Simple \
          Parse::RecDescent Pod::Text Pod::Usage POSIX Scalar::Util \
-         Switch Sys::Hostname Time Try::Tiny URI::Escape XML::Simple \
+         Switch Sys::Hostname Time::HiRes Try::Tiny URI::Escape XML::Simple \
          CGI Class::Accessor::Fast Date::Calc Date::Manip \
          Rose::DB::Object::Manager DBD::Pg DBD::mysql \
          Pegex::Base YAML JSYNC
@@ -24,7 +24,7 @@ RUN cpan App::cpanminus \
 # Add SSH credentials
 ARG SSH_PRIVATE_KEY
 RUN mkdir /root/.ssh/
-RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_ed25519 && chmod 600 /root/.ssh/id_ed25519
 RUN touch /root/.ssh/known_hosts
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 

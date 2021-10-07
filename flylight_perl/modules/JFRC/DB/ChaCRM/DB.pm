@@ -10,14 +10,14 @@ __PACKAGE__->default_domain('production');
 __PACKAGE__->register_db(domain   => 'production',
                          driver   => 'Pg',
                          database => 'chacrm',
-                         host     => 'chacrm',
+                         host     => 'chacrm.int.janelia.org',
                          username => 'apollo',
                          password => 'apollo');
                          
 __PACKAGE__->register_db(domain   => 'development',
                          driver   => 'Pg',
                          database => 'chacrm',
-                         host     => 'dev-db',
+                         host     => 'dev-db.int.janelia.org',
                          username => 'apollo',
                          password => 'apollo');
                          
