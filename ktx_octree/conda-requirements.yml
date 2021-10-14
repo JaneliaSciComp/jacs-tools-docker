@@ -1,0 +1,10 @@
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+
+dependencies:
+  - libtiff=4.0.10
+  - numpy
+  - pip
+  - pyopengl
