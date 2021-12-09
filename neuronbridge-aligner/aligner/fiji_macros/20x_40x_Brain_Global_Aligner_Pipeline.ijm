@@ -65,6 +65,7 @@ APcheck=1;
 
 //0.46
 //testArg= "/Users/otsunah/test/20x_brain_alignment/,"+nameFile+",/Users/otsunah/test/20x_brain_alignment/"+nameFile+",/Users/otsunah/Registration/JRC2018_align_test/Template,0.46,1,11,40x,JRC2018,Both_OL_missing (40x),??,false,Signal_amount";
+//testArg= "/Users/otsunah/test/NeuronBridge_test/,SPARC_84144_52_2channels_final_2.lif,/Users/otsunah/test/NeuronBridge_test/SPARC_84144_52_2channels_final_2.lif,/Users/otsunah/Registration/JRC2018_align_test/Template,0.46,1,11,40x,JRC2018,Both_OL_missing (40x),??,false,Signal_amount,Median";
 
 //testArg= "A:\\22\\,"+nameFile+",A:\\22\\"+nameFile+",E:\\template,0.18,0.38,14,20x,JRC2018,Both_OL_missing (40x),??,false,Signal_amount";
 
@@ -232,7 +233,7 @@ List.clear();
 
 beforeopen=getTime();
 
-if(endsWith(path,".lif") !=1 )
+if(endsWith(path,".lif") !=1)
 	open(path);// for tif, comp nrrd, lsm", am, v3dpbd, mha
 else
 	run("Bio-Formats Importer", "open="+path+" autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");

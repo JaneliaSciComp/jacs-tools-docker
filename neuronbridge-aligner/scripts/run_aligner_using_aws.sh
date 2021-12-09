@@ -84,7 +84,7 @@ while [[ $# > 0 ]]; do
             exit 0
             ;;
         *)
-            other_args=("${other_args[@]}" ${key})
+            other_args=("${other_args[@]}" "${key}")
             ;;
     esac
 done
@@ -94,17 +94,17 @@ export AWSSECRETACCESSKEY=${AWSSECRETACCESSKEY:-$AWS_SECRET_ACCESS_KEY}
 
 # the script assumes there is a /scratch directory available
 # the working directory is based on the output directory last component name
-output_basename=`basename ${output_dir}`
+output_basename=`basename "${output_dir}"`
 WORKING_DIR="/scratch/${output_basename}"
-echo "Create local working directory ${WORKING_DIR}"
-mkdir -p ${WORKING_DIR}
+echo "Create local working directory '${WORKING_DIR}'"
+mkdir -p "${WORKING_DIR}"
 
 function cleanWorkingDir() {
     if [[ "${DEBUG_MODE}" =~ "debug" ]] ; then
         echo "~ Debugging mode - Leaving working directory"
     else
         echo "Cleaning ${WORKING_DIR}"
-        rm -rf ${WORKING_DIR}
+        rm -rf "${WORKING_DIR}"
         echo "Cleaned up ${WORKING_DIR}"
     fi
 }
@@ -166,7 +166,7 @@ function updateSearch() {
         fi
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
         echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
-        printf -v updateSearchCmd "aws lambda invoke --function-name %s --log-type None --payload %s %s" \
+        printf -v updateSearchCmd "aws lambda invoke --function-name '%s' --log-type None --payload '%s' '%s'" \
             "${SEARCH_UPDATE_FUNCTION}" \
             "fileb://${WORKING_DIR}/${searchId}-input.json" \
             "${WORKING_DIR}/${searchId}.json"
@@ -180,9 +180,9 @@ inputs_dir="${WORKING_DIR}/inputs"
 results_dir="${WORKING_DIR}/results"
 
 echo "Create local inputs directory ${inputs_dir} for searchId: ${searchId}"
-mkdir -p ${inputs_dir}
+mkdir -p "${inputs_dir}"
 echo "Create local results directory ${results_dir} for searchId: ${searchId}"
-mkdir -p ${results_dir}
+mkdir -p "${results_dir}"
 
 # copy input file to the input working directory
 echo "Input filepath: ${input_filepath}"
@@ -217,15 +217,15 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
         s3fs_opts="${s3fs_opts} -o passwd_file=${passwd_file}"
     fi
     # mount templates directory
-    mountTemplatesCmd="/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
+    mountTemplatesCmd="/usr/bin/s3fs \"${templates_s3bucket_name}\" \"${S3_TEMPLATES_MOUNTPOINT}\" ${s3fs_opts}"
     echo "Mount templates from S3: ${mountTemplatesCmd}"
     ${mountTemplatesCmd}
     if [[ "${templates_dir_param}" != "" ]] ; then
-        templates_dir=${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}
+        templates_dir="${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}"
     else
-        templates_dir=${S3_TEMPLATES_MOUNTPOINT}
+        templates_dir="${S3_TEMPLATES_MOUNTPOINT}"
     fi
-    lsTemplatesCmd="ls ${templates_dir}"
+    lsTemplatesCmd="ls \"${templates_dir}\""
     templatesCount=`${lsTemplatesCmd} | wc -l`
     echo "Found ${templatesCount} after running ${lsTemplatesCmd}"
     templates_dir_arg="--templatedir ${templates_dir}"
@@ -241,9 +241,9 @@ echo "Set alignment in progress for ${searchId}: ${mips[@]}"
 updateSearch "${searchId}" 1 0 ${#mips[@]} "${mips[@]}"
 
 run_align_cmd_args=(
-    ${templates_dir_arg}
-    -i ${working_input_filepath}
-    -o ${results_dir}
+    "${templates_dir_arg}"
+    -i "${working_input_filepath}"
+    -o "${results_dir}"
     "${other_args[@]}"
 )
 

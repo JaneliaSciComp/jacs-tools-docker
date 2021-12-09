@@ -41,6 +41,8 @@ echo "RESZ: ${RESZ}"
 echo "TEMPLATE_DIR: ${TEMPLATE_DIR}"
 echo "WORKING_DIR: ${WORKING_DIR}"
 echo "OUTPUT: ${OUTPUT}"
+echo "ReferenceChannel: ${referenceChannel}"
+echo "ComparisonAlg: ${comparisonAlg}"
 
 # Tools
 CMTK=/opt/CMTK/bin
@@ -100,9 +102,11 @@ function reformatAll() {
     local _sig="$4"
     local _result_var="$5"
     local _opts="$6"
+    declare -i numCh=$7
 
     # Reformat each channel
-    for ((i=1; i<=$NCHANNELS; i++)); do
+    for ((i=1; i<=$numCh; i++)); do
+        echo "Reformat channel ${i}"
         GLOBAL_NRRD="${_gsig}_0${i}.nrrd"
         OUTPUT_NRRD="${_sig}_0${i}.nrrd"
         reformat "${GLOBAL_NRRD}" "${_TEMPLATE}" "${_DEFFIELD}" "${OUTPUT_NRRD}" "${i}" "ignore" "${opts}"
@@ -143,10 +147,11 @@ function generateAllMIPs() {
     local _sigDir=$1
     local _sigBaseName=$2
     local _mipsOutput=$3
+    declare -i numCh=$4
     local area="Brain"
     # generate MIPs for all signal channels 2...
     echo "Generate MIPs for all signal channels to ${_mipsOutput}"
-    for ((i=1; i<=$NCHANNELS; i++)); do
+    for ((i=1; i<=$numCh; i++)); do
         mipCmdArgs="${_sigDir}/,${_sigBaseName}_0${i}.nrrd,${_mipsOutput}/,${TemplatesDir}/,${area}"
         mipsCmd="$FIJI --headless -macro ${MIPGENERATION} ${mipCmdArgs}"
         echo "Generate MIPS for channel ${i}: ${mipsCmd}"
@@ -391,12 +396,12 @@ TEMPLATE="${TemplatesDir}/JRC2018_UNISEX_20x_HR.nrrd"
 
 gsig="${OUTPUT}/${InputName}"
 
-reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT
+reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT $NCHANNELS
 scoreGen "${sig}_01.nrrd" ${TEMPLATE} "score2018"
 
 # Generate MIPs
 MIPS_OUTPUT=${MIPS_OUTPUT:-"${OUTPUT}/MIP"}
-generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT}
+generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT} ${NCHANNELS}
 
 cp $OUTPUT/*.{png,jpg,txt,nrrd} $DEBUG_DIR
 cp -R $OUTPUT/*.xform $DEBUG_DIR

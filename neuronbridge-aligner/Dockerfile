@@ -19,7 +19,7 @@ RUN yum install -y \
 RUN echo "Installing Fiji"
 # Install Fiji
 ENV FIJI_FILE=fiji-linux64.tar.gz
-RUN wget -q https://downloads.imagej.net/fiji/latest/${FIJI_FILE}
+RUN wget -q --no-check-certificate https://downloads.imagej.net/fiji/latest/${FIJI_FILE}
 RUN tar xvf $FIJI_FILE && /bin/rm -rf ${FIJI_FILE} && \
     rm -rf Fiji && \
     mv Fiji.app Fiji
