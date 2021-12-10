@@ -8,6 +8,7 @@ ENV JULIA_PROJECT /app
 
 COPY Project.toml .
 COPY src src
+COPY octree.sh /
 
 RUN julia -e ' \
     import Pkg; \
@@ -18,6 +19,7 @@ RUN julia -e ' \
 
 RUN julia -e 'using Images; using ImageMagick; using OctreeBuilder;'
 
-RUN find /applib -type d -exec chmod 777 {} \;
+RUN find /applib -type d -exec chmod 2777 {} \;
 RUN find /applib -type f -exec chmod 666 {} \;
-ENTRYPOINT ["julia", "/app/src/main.jl"]
+RUN chmod 2777 /octree.sh
+ENTRYPOINT ["/octree.sh"]
