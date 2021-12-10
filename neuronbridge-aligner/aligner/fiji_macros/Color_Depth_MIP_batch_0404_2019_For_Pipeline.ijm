@@ -2,7 +2,7 @@
 
 setBatchMode(true);
 
-AutoBRV=false;
+AutoBRV=true;
 desiredmean=190;
 usingLUT="PsychedelicRainBow2";
 
@@ -112,7 +112,7 @@ function mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, Cro
   reverse0=false;
   multiDSLT=1; // 1 is multi step DSLT for better thresholding sensitivity
   DSLTver="Line"; // "normal";
-  GammaON=false; // no gamma
+  GammaON=true; // no gamma
   easyADJ=false;
   if(AutoBRV==false) {
     easyADJ=true;
@@ -1411,10 +1411,10 @@ function brightnessapply(DefMaxValue,filepath, brightnessapplyArray, bitd,lowerw
       imageCalculator("Min", MIPthresholding,"MaskMIP.tif");
       
       if(GammaON==true){
-        run("Gamma samewindow noswing", "gamma=1.40 cpu=2");
+        run("Gamma samewindow noswing", "gamma=1.20 cpu=2");
         rename(MIPthresholding);
         MIPDUPid=getImageID();
-        print("GAMMA 1.4 applied to 2D");
+        print("GAMMA 1.2 applied to 2D");
       }
       
       run("Three D Ave");      
@@ -1744,11 +1744,11 @@ function brightnessapply(DefMaxValue,filepath, brightnessapplyArray, bitd,lowerw
     
     if(GammaON==true){
       
-      run("Gamma samewindow noswing", "gamma=1.40 3d cpu=2");
+      run("Gamma samewindow noswing", "gamma=1.20 3d cpu=2");
       
       rename(stacktoApply);
       stack = getImageID();
-      print("GAMMA 1.4 applied to 3D stack");
+      print("GAMMA 1.2 applied to 3D stack");
     }
     
     if(sigsize>=MinSigSize){
@@ -1904,10 +1904,10 @@ function ColorCoder(slicesOri, applyV, width, AutoBRV, bitd, CLAHE, GFrameColorS
   if(GammaON==true){
     print("GammaON; "+GammaON);
     
-    run("Gamma samewindow noswing", "gamma=1.40 3d cpu=2");
+    run("Gamma samewindow noswing", "gamma=1.20 3d cpu=2");
     
     rename("Original_Stack.tif");
-    print("GAMMA 1.4 applied");
+    print("GAMMA 1.2 applied");
   }
   
   
@@ -2223,11 +2223,11 @@ function BackgroundMask (BackgroundMaskArray,MaskName2D,MaskDir,MIPapply,bitd,Ga
     
     if(GammaON==true){
       
-      run("Gamma samewindow noswing", "gamma=1.40 cpu=2");
+      run("Gamma samewindow noswing", "gamma=1.20 cpu=2");
       rename(MIPapply);
       
       MIPid = getImageID();
-      print("GAMMA 1.4 applied to 2D");
+      print("GAMMA 1.2 applied to 2D");
     }//	if(GammaON==true
     
     if(MaskName!=""){
