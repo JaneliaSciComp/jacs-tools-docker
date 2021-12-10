@@ -25,6 +25,9 @@ ENV PYTHONPATH=/app/src:${PYTHONPATH}
 
 # clone pyktx repo
 WORKDIR /app
+
+COPY ktx.sh /
+
 RUN git clone https://github.com/JaneliaSciComp/pyktx.git .
 RUN pip install -e .
 
@@ -33,4 +36,5 @@ WORKDIR /tmplibtiff
 RUN git clone https://github.com/pearu/pylibtiff.git .
 RUN pip install -e .
 
-ENTRYPOINT ["/miniconda/bin/python", "/app/src/tools/convert_subtree.py"]
+RUN chmod 2775 /ktx.sh
+ENTRYPOINT ["/ktx.sh"]

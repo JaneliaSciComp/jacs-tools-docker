@@ -21,5 +21,6 @@ RUN julia -e 'using Images; using ImageMagick; using OctreeBuilder;'
 
 RUN find /applib -type d -exec chmod 2777 {} \;
 RUN find /applib -type f -exec chmod 666 {} \;
-RUN chmod 2777 /octree.sh
+RUN chmod 2775 /octree.sh
+
 ENTRYPOINT ["/octree.sh"]
