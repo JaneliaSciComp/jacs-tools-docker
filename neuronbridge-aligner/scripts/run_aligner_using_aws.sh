@@ -228,7 +228,7 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
     lsTemplatesCmd="ls \"${templates_dir}\""
     templatesCount=`${lsTemplatesCmd} | wc -l`
     echo "Found ${templatesCount} after running ${lsTemplatesCmd}"
-    templates_dir_arg="--templatedir ${templates_dir}"
+    templates_dir_arg="--templatedir \"${templates_dir}\""
 else
     # will use default templates
     templates_dir_arg=""
@@ -241,7 +241,7 @@ echo "Set alignment in progress for ${searchId}: ${mips[@]}"
 updateSearch "${searchId}" 1 0 ${#mips[@]} "${mips[@]}"
 
 run_align_cmd_args=(
-    "${templates_dir_arg}"
+    ${templates_dir_arg}
     -i "${working_input_filepath}"
     -o "${results_dir}"
     "${other_args[@]}"
