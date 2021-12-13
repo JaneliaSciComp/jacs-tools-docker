@@ -166,7 +166,7 @@ function updateSearch() {
         fi
         echo ${searchData} > "${WORKING_DIR}/${searchId}-input.json"
         echo "SearchData: $(cat "${WORKING_DIR}/${searchId}-input.json")"
-        printf -v updateSearchCmd "aws lambda invoke --function-name '%s' --log-type None --payload '%s' '%s'" \
+        printf -v updateSearchCmd "aws lambda invoke --function-name %s --log-type None --payload %s %s" \
             "${SEARCH_UPDATE_FUNCTION}" \
             "fileb://${WORKING_DIR}/${searchId}-input.json" \
             "${WORKING_DIR}/${searchId}.json"
@@ -217,18 +217,18 @@ if [[ "${templates_s3bucket_name}" != "" ]] ; then
         s3fs_opts="${s3fs_opts} -o passwd_file=${passwd_file}"
     fi
     # mount templates directory
-    mountTemplatesCmd="/usr/bin/s3fs \"${templates_s3bucket_name}\" \"${S3_TEMPLATES_MOUNTPOINT}\" ${s3fs_opts}"
+    mountTemplatesCmd="/usr/bin/s3fs ${templates_s3bucket_name} ${S3_TEMPLATES_MOUNTPOINT} ${s3fs_opts}"
     echo "Mount templates from S3: ${mountTemplatesCmd}"
     ${mountTemplatesCmd}
     if [[ "${templates_dir_param}" != "" ]] ; then
-        templates_dir="${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}"
+        templates_dir=${S3_TEMPLATES_MOUNTPOINT}/${templates_dir_param}
     else
-        templates_dir="${S3_TEMPLATES_MOUNTPOINT}"
+        templates_dir=${S3_TEMPLATES_MOUNTPOINT}
     fi
-    lsTemplatesCmd="ls \"${templates_dir}\""
+    lsTemplatesCmd="ls ${templates_dir}"
     templatesCount=`${lsTemplatesCmd} | wc -l`
     echo "Found ${templatesCount} after running ${lsTemplatesCmd}"
-    templates_dir_arg="--templatedir \"${templates_dir}\""
+    templates_dir_arg="--templatedir ${templates_dir}"
 else
     # will use default templates
     templates_dir_arg=""

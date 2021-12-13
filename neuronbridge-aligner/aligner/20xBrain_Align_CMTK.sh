@@ -102,10 +102,10 @@ function reformatAll() {
     local _sig="$4"
     local _result_var="$5"
     local _opts="$6"
-    declare -i numCh=$7
 
+    echo "Reformat all channels ${[@]}"
     # Reformat each channel
-    for ((i=1; i<=$numCh; i++)); do
+    for ((i=1; i<=$NCHANNELS; i++)); do
         echo "Reformat channel ${i}"
         GLOBAL_NRRD="${_gsig}_0${i}.nrrd"
         OUTPUT_NRRD="${_sig}_0${i}.nrrd"
@@ -147,11 +147,10 @@ function generateAllMIPs() {
     local _sigDir=$1
     local _sigBaseName=$2
     local _mipsOutput=$3
-    declare -i numCh=$4
     local area="Brain"
-    # generate MIPs for all signal channels 2...
+    # generate MIPs for all signal channels ...
     echo "Generate MIPs for all signal channels to ${_mipsOutput}"
-    for ((i=1; i<=$numCh; i++)); do
+    for ((i=1; i<=$NCHANNELS; i++)); do
         mipCmdArgs="${_sigDir}/,${_sigBaseName}_0${i}.nrrd,${_mipsOutput}/,${TemplatesDir}/,${area}"
         mipsCmd="$FIJI --headless -macro ${MIPGENERATION} ${mipCmdArgs}"
         echo "Generate MIPS for channel ${i}: ${mipsCmd}"
@@ -396,12 +395,12 @@ TEMPLATE="${TemplatesDir}/JRC2018_UNISEX_20x_HR.nrrd"
 
 gsig="${OUTPUT}/${InputName}"
 
-reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT $NCHANNELS
+reformatAll $gsig $TEMPLATE $DEFFIELD $sig RAWOUT
 scoreGen "${sig}_01.nrrd" ${TEMPLATE} "score2018"
 
 # Generate MIPs
 MIPS_OUTPUT=${MIPS_OUTPUT:-"${OUTPUT}/MIP"}
-generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT} ${NCHANNELS}
+generateAllMIPs ${OUTPUT} ${sig} ${MIPS_OUTPUT}
 
 cp $OUTPUT/*.{png,jpg,txt,nrrd} $DEBUG_DIR
 cp -R $OUTPUT/*.xform $DEBUG_DIR
