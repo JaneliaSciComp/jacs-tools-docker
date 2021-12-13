@@ -103,7 +103,7 @@ function reformatAll() {
     local _result_var="$5"
     local _opts="$6"
 
-    echo "Reformat all channels ${[@]}"
+    echo "Reformat all channels -> [1..$NCHANNELS]"
     # Reformat each channel
     for ((i=1; i<=$NCHANNELS; i++)); do
         echo "Reformat channel ${i}"
