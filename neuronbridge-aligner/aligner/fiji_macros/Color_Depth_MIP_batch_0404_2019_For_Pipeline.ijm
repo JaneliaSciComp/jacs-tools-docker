@@ -1,5 +1,6 @@
 //Wrote by Hideo Otsuna (HHMI Janelia Research Campus), Aug 4, 2017
 
+
 setBatchMode(true);
 
 AutoBRV=true;//true;false
@@ -25,11 +26,12 @@ saveFormat="png";//"tif"
 
 run("Close All");
 pluginDir=getDirectory("plugins");
+//argstr="/Volumes/otsuna/TZ_VND/reformatted/,ALv1_P06(DM1,4)_1_2018U.nrrd,/Volumes/otsuna/TZ_VND/reformatted/newCDM/,/Users/otsunah/test/Color_depthMIP_Test/Template_MIP/";
+//argstr="/Users/otsunah/test/Color_depthMIP_Test/sample/,_16F12_AE_01_20181127_64_D1_f_ch1.h5j,/Users/otsunah/test/Color_depthMIP_Test/sample/,/Users/otsunah/test/Color_depthMIP_Test/Template_MIP/,Brain";
 
-if(argstr==" ") {
-	argstr = getArgument();//Argument
-	print(argstr);
-}
+
+if(argstr==" ")
+argstr = getArgument();//Argument
 
 args = split(argstr,",");
 
@@ -38,6 +40,7 @@ if (lengthOf(args)>1) {
 	DataName = args[1];//input file Name
 	dirCOLOR = args[2];//save directory
 	MaskDir = args[3];//Directory of masks.tif
+	//chanspec = toLowerCase(args[5]);// channel spec
 }
 
 filesep=lastIndexOf(DataName,"/");
@@ -55,41 +58,52 @@ if (FolderNameAdd==true){
 	
 	dirsub=substring(dir,0, lengthOf(dir)-1);
 	filesepindex=lastIndexOf(dirsub,"/");
+	
 	addingname=substring(dirsub,filesepindex+1, lengthOf(dirsub));
+	
 	DataName=addingname+"_"+DataName;
 }
+
+//print("Desired mean; "+desiredmean);
 
 savedirext=File.exists(dirCOLOR);
 
 if(savedirext!=1){
 	File.makeDirectory(dirCOLOR);
-	print("Created output directory!");
+	print("made save directory!");
 }
+
 
 run("Close All");
 
+
 JFRCexist=File.exists(MaskDir);
-if (JFRCexist==0) {
-	print("MaskDir does not exist: " + MaskDir);
+if(JFRCexist==0){
+	print("MaskDir is not exist; "+MaskDir);
+	
 	logsum=getInfo("log");
 	filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
 	File.saveString(logsum, filepath);
+	
 	run("Quit");
 }
 
-mipfunction(dir, DataName, dirCOLOR, AutoBRV, MIPtype, desiredmean, CropYN, usingLUT, lowerweight, lowthreM, startMIP, endMIP, unsharp, secondjump, MaskDir, logsave);
 
-if(DeleteOrMove=="Move") {
+mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,usingLUT,lowerweight,lowthreM,startMIP,endMIP,unsharp,secondjump,MaskDir,logsave);
+
+
+
+if(DeleteOrMove=="Move"){
 	doneExt=File.exists(dir+"Done/");
 	
 	if(doneExt!=1)
-		File.makeDirectory(dir+"Done/");
+	File.makeDirectory(dir+"Done/");
 	
 	File.rename(dir+DataName, dir+"Done/"+DataName); // - Renames, or moves, a file or directory. Returns "1" (true) if successful. 
-} else if(DeleteOrMove=="Delete")
-   	File.delete(dir+DataName);
+}else if(DeleteOrMove=="Delete")
+File.delete(dir+DataName);
 
-if(logsave==1) {
+if(logsave==1){
 	logsum=getInfo("log");
 	filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
 	File.saveString(logsum, filepath);
@@ -99,6 +113,8 @@ end=getTime();
 print((end-startT)/1000+" sec");
 
 run("Quit");
+
+
 
 /////////Function//////////////////////////////////////////////////////////////////
 function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,usingLUT,lowerweight,lowthreM,startMIP,endMIP,unsharp,secondjump,MaskDir,logsave){ 
@@ -126,7 +142,8 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
 	PathExt=File.exists(path);
 	filepath=dirCOLOR+DataName+"Color_depthMIP_log.txt";
 	
-	if (PathExt==1) {
+	if(PathExt==1){
+		
 		titlelistOri=getList("image.titles");
 		IJ.redirectErrorMessages();
 		
@@ -397,7 +414,8 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
 					}else if(width==512 && height==1024 && slices==220){//512x1024x220, JRC2018 20x UNISEX
 						MaskName2D="MAX_FemaleVNCSymmetric2017_2DMASK.tif"; Mask3D="FemaleVNCSymmetric2017_3DMASK.nrrd";
 						zerovalue=239907;
-						zeroexi=1;	
+						zeroexi=1;
+						
 					}else if(width==3333 && height==1560 && slices==456){
 						MaskName2D="MAX_JRC2018_UNISEX_63xOri_2DMASK.tif"; Mask3D="JRC2018_UNISEX_63xOri_3DMASK.nrrd";
 					}else if(width==1652 && height==773 && slices==456){
@@ -408,6 +426,7 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
 						MaskName2D="MAX_JRC2018_UNISEX_20x_HR_2DMASK.tif"; Mask3D="JRC2018_UNISEX_20x_HR_3DMASK.nrrd";
 					}else if(width==1010 && height==473 && slices==174){
 						MaskName2D="MAX_JRC2018_UNISEX_20x_gen1_2DMASK.tif"; Mask3D="JRC2018_UNISEX_20x_gen1_3DMASK.nrrd";
+						
 					}else if(width==3333 && height==1550 && slices==478){
 						MaskName2D="MAX_JRC2018_FEMALE_63x_2DMASK.tif"; Mask3D="JRC2018_FEMALE_63x_3DMASK.nrrd";
 					}else if(width==1652 && height==768 && slices==478){
@@ -418,6 +437,7 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
 						MaskName2D="MAX_JRC2018_FEMALE_20x_HR_2DMASK.tif"; Mask3D="JRC2018_FEMALE_20x_HR_3DMASK.nrrd";
 					}else if(width==1010 && height==470 && slices==182){
 						MaskName2D="MAX_JRC2018_FEMALE_20x_gen1_2DMASK.tif"; Mask3D="JRC2018_FEMALE_20x_gen1_3DMASK.nrrd";
+						
 					}else if(width==3150 && height==1500 && slices==476){//3150x1500x476, JRC2018 BRAIN 63x MALE
 						MaskName2D="MAX_JRC2018_MALE_63x_2DMASK.tif"; Mask3D="JRC2018_MALE_63x_3DMASK.nrrd";
 					}else if(width==1561 && height==744 && slices==476){//1561x744x476, JRC2018 BRAIN 63xDW MALE
@@ -428,10 +448,12 @@ function mipfunction(dir,DataName, dirCOLOR, AutoBRV,MIPtype,desiredmean,CropYN,
 						MaskName2D="MAX_JRC2018_MALE_20xHR_2DMASK.tif"; Mask3D="JRC2018_MALE_20xHR_3DMASK.nrrd";
 					}else if(width==955 && height==455 && slices==181){
 						MaskName2D="MAX_JRC2018_MALE_20x_gen1_2DMASK.tif"; Mask3D="JRC2018_MALE_20x_gen1_3DMASK.nrrd";
+						
 					}else if(width==1184 && height==592 && slices==218){
 						MaskName2D="MAX_JFRC2013_20x_New_dist_G16_2DMASK.tif"; Mask3D="JFRC2013_20x_New_dist_G16_3DMASK.nrrd";
 					}else if(width==1450 && height==725 && slices==436){
 						MaskName2D="MAX_JFRC2013_63x_New_dist_G16_2DMASK.tif"; Mask3D="JFRC2013_63x_New_dist_G16_3DMASK.nrrd";
+						
 					}else if(width==1024 && height==512 && slices==220){//1024x512x220, JFRC2010
 						MaskName2D="MAX_JFRC2010_2DMask.tif"; Mask3D="JFRC2010_3DMask.nrrd";
 					}
