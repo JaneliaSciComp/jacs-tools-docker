@@ -243,7 +243,7 @@ else
     START=`date '+%F %T'`
     # Start the preprocessing in background and then wait until it finishes or times out.
     # Note that this macro does not seem to work in --headless mode
-    PREALIGN_TIMEOUT=$((${PREALIGN_TIMEOUT:-5400}))
+    PREALIGN_TIMEOUT=$((${PREALIGN_TIMEOUT:-9000}))
     PREALIGN_CHECKINTERVAL=$((${PREALIGN_CHECKINTERVAL:-60}))
     (${FIJI} ${fijiOpts} -macro ${PREPROCIMG} "${preprocessingParams}" > ${DEBUG_DIR}/preproc.log 2>&1) &
     fpid=$!
