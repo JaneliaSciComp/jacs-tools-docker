@@ -28,7 +28,7 @@ pluginDir=getDirectory("plugins");
 
 if(argstr==" ") {
 	argstr = getArgument();//Argument
-	print(argstr)
+	print(argstr);
 }
 
 args = split(argstr,",");
