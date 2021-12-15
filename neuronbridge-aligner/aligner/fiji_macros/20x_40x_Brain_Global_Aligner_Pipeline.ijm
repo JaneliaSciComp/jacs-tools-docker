@@ -88,7 +88,7 @@ path = args[2];// full file path for inport LSM
 MatchingFilesDir = args[3];
 widthVx = args[4];// X voxel size
 depth = args[5];// slice depth
-NumCPU = args[6];
+NumCPU=args[6];
 objective = args [7];//"40x" or "20x"
 templateBr = args [8];//"JFRC2014", JFRC2013, JFRC2014, JRC2018
 BrainShape = args [9];//"Both_OL_missing (40x)";//"Intact", "Both_OL_missing (40x)", "Unknown"
@@ -229,14 +229,16 @@ print("JFRC2010MedProPath; "+JFRC2010MedProPath);
 filepathcolor=0; 
 NRRD_02_ext=0; 
 
+
+
 List.clear();
 
 beforeopen=getTime();
 
-if(endsWith(path,".lif") !=1)
-	open(path);// for tif, comp nrrd, lsm", am, v3dpbd, mha
+if(endsWith(path,"lif")!=1)
+open(path);// for tif, comp nrrd, lsm", am, v3dpbd, mha
 else
-	run("Bio-Formats Importer", "open="+path+" autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
+run("Bio-Formats Importer", "open="+path+" autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT");
 
 afteropen=getTime();
 
@@ -252,12 +254,24 @@ getDimensions(width, height, channels, slices, frames);
 getVoxelSize(VxWidth, VxHeight, VxDepth, VxUnit);
 print("File vx size; VxWidth; "+VxWidth+"  VxHeight; "+VxHeight+"   VxDepth; "+VxDepth);
 
+stackthickness=slices*VxDepth;
+if(stackthickness<90 || stackthickness>200){
+	fiedZ=140/slices;
+	print("The stack is too thin, fixed z vx size from "+VxDepth+" to "+fiedZ);
+	
+	run("Properties...", "channels="+channels+" slices="+slices+" frames=1 unit=microns pixel_width="+VxWidth+" pixel_height="+VxHeight+" voxel_depth="+fiedZ+"");
+	getVoxelSize(VxWidth, VxHeight, VxDepth, VxUnit);
+
+	
+}
+
+
 if(forceVxSize=="false" || forceVxSize==false){
 	Ori_widthVx=VxWidth;
 	widthVx=VxWidth;
 	Ori_heightVx=VxHeight;
 	depth=VxDepth;
-	print("Fixed Real voxel size; Ori_widthVx; "+Ori_widthVx+"  depth; "+depth);
+	print("forceVxSize=false, then Real voxel size is file vx size; Ori_widthVx; "+Ori_widthVx+"  depth; "+depth);
 }
 
 
