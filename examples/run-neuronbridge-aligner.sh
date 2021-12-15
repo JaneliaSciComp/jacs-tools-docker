@@ -24,6 +24,8 @@ if [ $(uname) == 'Linux' ]; then
       --net=host \
       "
 elif [ $(uname) == 'Darwin' ]; then
+    # XQuartz must be installed and under Preferences > Security 
+    # both "Authenticate connections" and "Allow connections from network clients" must be ON
     echo "Detected Host System: OSX"
     localip=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
 
