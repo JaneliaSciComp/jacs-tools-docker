@@ -45,7 +45,7 @@ fpid=$!
 cd $TEMP_DIR
 for fin in *.avi; do
     fout=${fin%.avi}.mp4
-    ffmpeg -y -r 7 -i "$fin" -vcodec libx264 -b:v 2000000 -preset slow -tune film -pix_fmt yuv420p "$fout" \
+    /app/ffmpeg/ffmpeg -y -r 7 -i "$fin" -vcodec libx264 -b:v 2000000 -preset slow -tune film -pix_fmt yuv420p "$fout" \
         && rm $fin
 done
 

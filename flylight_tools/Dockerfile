@@ -14,6 +14,13 @@ WORKDIR /tmp
 ENV VAA3D_FILE=${VAA3D_VERSION}.tgz
 RUN curl -sLO https://github.com/JaneliaSciComp/tools-archive/releases/download/${TOOLS_ARCHIVE_RELEASE}/${VAA3D_FILE} && tar xfz ${VAA3D_FILE}
 
+FROM janeliascicomp/common-tools:1.0.2 as ffmpeg-builder
+ARG TOOLS_ARCHIVE_RELEASE=1.0.0
+ARG FFMPEG_VERSION=ffmpeg_20170107
+WORKDIR /tmp
+ENV FFMPEG_FILE=${FFMPEG_VERSION}.tgz
+RUN curl -sLO https://github.com/JaneliaSciComp/tools-archive/releases/download/${TOOLS_ARCHIVE_RELEASE}/${FFMPEG_FILE} && tar xfz ${FFMPEG_FILE}
+
 FROM janeliascicomp/common-tools:1.0.2 as conda-builder
 RUN curl -sL https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -o ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
@@ -29,14 +36,16 @@ RUN /opt/conda/bin/conda update conda -y \
 # Start with Fiji
 FROM janeliascicomp/fiji-zulu-8:$FIJI_VERSION
 ARG VAA3D_VERSION
+ARG FFMPEG_VERSION
 
 # Install dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
         libxext6 libxrender1 libxtst6 libxi6 libglu1-mesa qt4-default libqt4-opengl libxv-dev \
-        numactl rsync pbzip2 net-tools xvfb netpbm ffmpeg imagemagick
+        numactl rsync pbzip2 net-tools xvfb netpbm imagemagick
 
 COPY --from=ants-builder --chown=root:root /tmp/ANTS /app/ants
 COPY --from=vaa3d-builder --chown=root:root /tmp/$VAA3D_VERSION /app/vaa3d
+COPY --from=ffmpeg-builder --chown=root:root /tmp/$FFMPEG_VERSION/ /app/ffmpeg/
 COPY --from=conda-builder --chown=root:root /opt/conda /opt/conda
 COPY scripts /app/scripts
 COPY fiji_macros /app/fiji_macros
