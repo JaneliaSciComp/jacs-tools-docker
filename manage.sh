@@ -23,10 +23,9 @@ function findContainerDirs {
         fi
     done
     if [[ -z ${container_dirs} ]]; then
-        echo "No container directory not found for ${container_name}"
+        echo "No container directory was found for ${container_name}"
         exit 1
     fi
-
 }
 
 function build {
