@@ -185,6 +185,9 @@ ScopeNum="scope10";
 else if(ScopeNumST=="Scope #11")
 ScopeNum="scope11";
 
+else if(ScopeNumST=="Scope #12")
+ScopeNum="scope12";
+
 else if(ScopeNumST=="Aljoscha")
 ScopeNum="scope4";
 
