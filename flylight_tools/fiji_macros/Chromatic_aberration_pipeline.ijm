@@ -4,6 +4,7 @@ argstr=0;
 //63x
 //argstr="/test/Dist_Correction_test/Scope1/GMR_75F10_AE_01-20161007_22_A3~63x/,GMR_75F10_AE_01-20161007_22_A3_Ch3_FLFL_20161125150205110_242445.lsm,/test/Dist_Correction_test/Scope1/GMR_75F10_AE_01-20161007_22_A3~63x/Output/,Scope #1,63x,Thu Dec 08 19:01:25 EST 2016,1024,"+getDirectory("plugins")+"Chromatic_Aberration"+File.separator;//for test
 
+//argstr="/Users/otsunah/test/Dist_Correction_test/2022/,mesothoracic_JRC_SS72056-20220225_20_F4_3.zip,/Users/otsunah/test/Dist_Correction_test/2022/output/,Scope #1,63x,Sat Mar 26 12:15:28 EDT 2022,1024,"+getDirectory("plugins")+"Chromatic_Aberration"+File.separator;//for test
 //40x
 //argstr="/test/Dist_Correction_test/Scope6_40x/,FLFL_20170411171458477_279354.lsm,/test/Dist_Correction_test/Scope6_40x/Output/,Scope #5,40x";//for test
 //argstr="/test/Dist_Correction_test/40x_0/vnc/,FLFL_20170302124503877_268270_ch3.lsm,/test/Dist_Correction_test/40x_0/vnc/Output/,Scope #6,40x";//for test
@@ -39,6 +40,8 @@ print("filename; "+filename);
 print("outputdir; "+outputdir);
 print("ScopeNumST; "+ScopeNumST);
 print("ObjectiveST; "+ObjectiveST);
+print("CapDate; "+CapDate);
+print("Xdimension; "+Xdimension);
 print("JSONDIR; "+JSONDIR);
 
 exi=File.exists(outputdir);
@@ -49,10 +52,8 @@ if(exi!=1){
 logsum=getInfo("log");
 filepath=outputdir+"Distortion_Correction_log_"+filename+".txt";
 
-if(File.exists(filepath)!=1)
-File.saveString(logsum, filepath);
-
-print("\\Clear");
+//if(File.exists(filepath)!=1)
+//File.saveString(logsum, filepath);
 
 exi2=File.exists(dir+filename);
 if(exi2!=1){
@@ -159,37 +160,37 @@ print("CapTimeDOBint; "+CapTimeDOBint);
 //items=newArray("scope1", "scope2", "scope3","scope4", "scope5", "scope6");
 
 if(ScopeNumST=="Scope #1")
-ScopeNum="scope1";
+ScopeNum="scope1_";
 
 else if(ScopeNumST=="Scope #2")
-ScopeNum="scope2";
+ScopeNum="scope2_";
 
 else if(ScopeNumST=="Scope #3")
-ScopeNum="scope3";
+ScopeNum="scope3_";
 
 else if(ScopeNumST=="Scope #4")
-ScopeNum="scope4";
+ScopeNum="scope4_";
 
 else if(ScopeNumST=="Scope #5")
-ScopeNum="scope5";
+ScopeNum="scope5_";
 
 else if(ScopeNumST=="Scope #6")
-ScopeNum="scope6";
+ScopeNum="scope6_";
 
 else if(ScopeNumST=="Scope #9")
-ScopeNum="scope9";
+ScopeNum="scope9_";
 
 else if(ScopeNumST=="Scope #10")
-ScopeNum="scope10";
+ScopeNum="scope10_";
 
 else if(ScopeNumST=="Scope #11")
-ScopeNum="scope11";
+ScopeNum="scope11_";
 
 else if(ScopeNumST=="Scope #12")
-ScopeNum="scope12";
+ScopeNum="scope12_";
 
 else if(ScopeNumST=="Aljoscha")
-ScopeNum="scope4";
+ScopeNum="scope4_";
 
 if(ScopeNum==0){
 	print("ScopeNumST; "+ScopeNumST+" is wrong string. It must be Scope #1 ~ Scope #11, or Aljoscha.");
@@ -204,7 +205,7 @@ if(ScopeNum==0){
 BestJson=" "; BestJsonDOBint=0;
 
 for(jsonScan=0; jsonScan<Distlist.length; jsonScan++){
-	jsonname=Distlist[jsonScan];
+	jsonname=toLowerCase(Distlist[jsonScan]);
 	
 	//print("jsonname; "+jsonname);
 	
@@ -263,8 +264,8 @@ function jsonIntGeneration(jsonArray){
 
 print("BestJson; "+BestJson+"   BestJsonDOBint; "+BestJsonDOBint);
 
-logsum=getInfo("log");
-File.saveString(logsum, filepath);
+//logsum=getInfo("log");
+//File.saveString(logsum, filepath);
 
 if(BestJson==" "){
 	print("No json file for; "+ScopeNumST+"  "+ObjectiveST+"  "+Xdimension+"  "+CapDate);
@@ -331,5 +332,5 @@ if(File.exists(JSONPATH)==1){
 ""
 logsum=getInfo("log");
 filepath=outputdir+"Distortion_Correction_log_"+filename+".txt";
-File.append(logsum, filepath);
+File.saveString(logsum, filepath);
 run("Quit");

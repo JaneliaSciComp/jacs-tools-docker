@@ -1,6 +1,6 @@
 maru_version: 0.1.0
 name: flylight_tools
-version: 1.2.1
+version: 1.2.2
 build_args:
   TOOLS_ARCHIVE_RELEASE: 1.0.0
   ANTS_VERSION: ants-redhat-yuy2013

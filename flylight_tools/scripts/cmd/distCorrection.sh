@@ -39,7 +39,7 @@ FINAL_DIR=`dirname $DC_FILENAME`
 # Run Fiji macro
 echo "Executing:"
 echo "/app/fiji/fiji -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm \"$IN_DIR/,$IN_FNAME,$OUT_DIR,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR\""
-/app/fiji/fiji -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm "$IN_DIR/,$IN_FNAME,$OUT_DIR,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR" &
+/app/fiji/fiji -macro /app/fiji_macros/Chromatic_aberration_pipeline.ijm "$IN_DIR/,$IN_FNAME,$OUT_DIR,$MICROSCOPE,$OBJECTIVE,$CAPTURE_DATE,$DIMX,$DIST_JSON_DIR" > $OUT_DIR/Fiji_Output_${IN_FNAME}.log 2>&1 &
 
 # Monitor Fiji and take periodic screenshots, killing it eventually
 fpid=$!
@@ -51,6 +51,7 @@ ls -l $OUT_DIR
 # Save the log files
 echo "Saving log files"
 cp $OUT_DIR/Distortion_Correction_log*_${IN_FNAME}.txt .
+cp $OUT_DIR/Fiji_Output_${IN_FNAME}.log .
 
 # Save the final outputs
 echo "Moving outputs to $FINAL_DIR"
