@@ -10,10 +10,10 @@ RUN chmod 755 /opt/app-scripts/*.sh
 
 RUN echo "Installing dependencies"
 ENV EPEL_FILE=epel-release-latest-7.noarch.rpm
-RUN curl -s http://dl.fedoraproject.org/pub/epel/${EPEL_FILE} -o '#1'
+RUN curl -sL http://dl.fedoraproject.org/pub/epel/${EPEL_FILE} -o ${EPEL_FILE}
 RUN rpm -ivh $EPEL_FILE && /bin/rm -f $EPEL_FILE
 RUN yum install -y python-pip jq bc
-RUN pip install --upgrade pip
+#RUN pip install --upgrade pip
 
 WORKDIR /opt
 
@@ -25,7 +25,7 @@ RUN yum install -y libXtst-devel libXrender
 
 # Install Fiji
 ENV FIJI_FILE=fiji-1.52c.tgz
-RUN curl -s http://workstation.int.janelia.org/files/fiji/${FIJI_FILE} -o ${FIJI_FILE}
+RUN curl -sL https://github.com/JaneliaSciComp/tools-archive/releases/download/1.0.0/${FIJI_FILE} -o ${FIJI_FILE}
 RUN tar xvf $FIJI_FILE && /bin/rm -rf $FIJI_FILE
 RUN rm -rf Fiji
 RUN mv Fiji.app Fiji
