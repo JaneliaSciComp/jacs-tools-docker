@@ -2,11 +2,18 @@
 
 use strict;
 use DBI;
+use JSON;
+use LWP::Simple qw(get);
 my $dsn = "dbi:mysql:dbname=sage;host=mysql3;port=3306";
-my $username = "sageRead";
-my $password = "sageRead";
 
-my $dbh = DBI->connect( $dsn, $username, $password )
+my $CONFIG_SERVER = 'http://config.int.janelia.org/config';
+my $rest = $CONFIG_SERVER . '/db_config';
+my $response = get $rest;
+my $rvar;
+eval {$rvar = decode_json($response)};
+die($@) if ($@);
+my %config = %{$rvar->{config}};
+my $dbh = DBI->connect( $dsn, $config{sage}{prod}{user}, $config{sage}{prod}{password})
   or die("unable to open db handle");
 
 my $image_name = $ARGV[0];
