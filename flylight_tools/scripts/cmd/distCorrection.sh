@@ -50,7 +50,7 @@ ls -l $OUT_DIR
 
 # Save the log files
 echo "Saving log files"
-cp $OUT_DIR/Distortion_Correction_log*_${IN_FNAME}.txt .
+cp $OUT_DIR/Distortion_Correction*${IN_FNAME}.txt .
 cp $OUT_DIR/Fiji_Output_${IN_FNAME}.log .
 
 # Save the final outputs

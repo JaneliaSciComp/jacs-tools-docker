@@ -4,7 +4,7 @@ argstr=0;
 //63x
 //argstr="/test/Dist_Correction_test/Scope1/GMR_75F10_AE_01-20161007_22_A3~63x/,GMR_75F10_AE_01-20161007_22_A3_Ch3_FLFL_20161125150205110_242445.lsm,/test/Dist_Correction_test/Scope1/GMR_75F10_AE_01-20161007_22_A3~63x/Output/,Scope #1,63x,Thu Dec 08 19:01:25 EST 2016,1024,"+getDirectory("plugins")+"Chromatic_Aberration"+File.separator;//for test
 
-//argstr="/Users/otsunah/test/Dist_Correction_test/2022/,mesothoracic_JRC_SS72056-20220225_20_F4_3.zip,/Users/otsunah/test/Dist_Correction_test/2022/output/,Scope #1,63x,Sat Mar 26 12:15:28 EDT 2022,1024,"+getDirectory("plugins")+"Chromatic_Aberration"+File.separator;//for test
+//argstr="/Users/otsunah/otsunah/Distortion_correction/Scope_13/,JRC_SS90166-20221123_21_D3-f_3171330249027747999_63x_2ch.lsm,/Users/otsunah/otsunah/Distortion_correction/output/,Scope #13,63x,Sat Mar 26 12:15:28 EDT 2022,1024,"+getDirectory("plugins")+"Chromatic_Aberration"+File.separator;//for test
 //40x
 //argstr="/test/Dist_Correction_test/Scope6_40x/,FLFL_20170411171458477_279354.lsm,/test/Dist_Correction_test/Scope6_40x/Output/,Scope #5,40x";//for test
 //argstr="/test/Dist_Correction_test/40x_0/vnc/,FLFL_20170302124503877_268270_ch3.lsm,/test/Dist_Correction_test/40x_0/vnc/Output/,Scope #6,40x";//for test
@@ -188,6 +188,9 @@ ScopeNum="scope11_";
 
 else if(ScopeNumST=="Scope #12")
 ScopeNum="scope12_";
+
+else if(ScopeNumST=="Scope #13")
+ScopeNum="scope13_";
 
 else if(ScopeNumST=="Aljoscha")
 ScopeNum="scope4_";
