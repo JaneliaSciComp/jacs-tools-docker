@@ -12,7 +12,7 @@ __PACKAGE__->register_db(domain   => 'production',
                          type     => 'rw',
                          driver   => 'mysql',
                          database => 'sage',
-                         host     => 'mysql3.int.janelia.org',
+                         host     => 'sage-db.int.janelia.org',
                          username => 'sageApp',
                          password => 'h3ll0K1tty');
 
@@ -20,7 +20,7 @@ __PACKAGE__->register_db(domain   => 'production',
                          type     => 'r',
                          driver   => 'mysql',
                          database => 'sage.int.janelia.org',
-                         host     => 'mysql3',
+                         host     => 'sage-db',
                          username => 'sageRead',
                          password => 'sageRead');
 
