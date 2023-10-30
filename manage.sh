@@ -5,6 +5,7 @@ DEFAULT_SUDO=
 SUDO=${SUDO:-${DEFAULT_SUDO}}
 DOCKER=docker
 NAMESPACE=${NAMESPACE:-${DEFAULT_NAMESPACE}}
+BUILD_ARGS=
 
 container_dirs=()
 
@@ -37,7 +38,7 @@ function build {
 
     for cdir in ${container_dirs[@]}; do
         local container_name=$(basename "$cdir")
-        local BUILD_ARGS=""
+        local LOCAL_BUILD_ARGS=""
         if [[ -n ${NAMESPACE} ]]; then
             local container_version="";
             if [[ -e "${cdir}/VERSION" ]]; then
@@ -46,24 +47,24 @@ function build {
 
             if [[ -n ${container_version} ]]; then
                 local vname=${NAMESPACE}/${container_name}:${container_version}
-                BUILD_ARGS="${BUILD_ARGS} -t ${vname}"
+                LOCAL_BUILD_ARGS="${LOCAL_BUILD_ARGS} -t ${vname}"
             fi
             local lname=${NAMESPACE}/${container_name}:"latest"
-            BUILD_ARGS="${BUILD_ARGS} -t ${lname}"
+            LOCAL_BUILD_ARGS="${LOCAL_BUILD_ARGS} -t ${lname}"
         fi
 
 
         if [[ -e "${cdir}/TAGS" ]]; then
             local local_container_tags=($(awk '{ print($1)}' "$cdir/TAGS"))
             for t in ${local_container_tags[@]}; do
-                BUILD_ARGS="${BUILD_ARGS} -t ${t}"
+                LOCAL_BUILD_ARGS="${LOCAL_BUILD_ARGS} -t ${t}"
             done
         fi
 
         for t in ${_otherTags[@]}; do
-            BUILD_ARGS="${BUILD_ARGS} -t ${t}"
+            LOCAL_BUILD_ARGS="${LOCAL_BUILD_ARGS} -t ${t}"
         done
-        $SUDO $DOCKER build $BUILD_ARGS $cdir
+        $SUDO $DOCKER build $BUILD_ARGS $LOCAL_BUILD_ARGS $cdir
     done
 }
 
@@ -127,6 +128,11 @@ while [[ $# > 0 ]]; do
             container_tag="$1"
             shift
             container_tags=("${container_tags[@]}" ${container_tag})
+            ;;
+        --platform)
+            platform=$1
+            shift
+            BUILD_ARGS="${BUILD_ARGS} --platform ${platform}"
             ;;
         *)
             container_names=("${container_names[@]}" ${key})

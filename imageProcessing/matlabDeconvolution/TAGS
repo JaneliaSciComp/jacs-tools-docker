@@ -1,1 +1,2 @@
-registry.int.janelia.org/janeliascicomp/matlab-deconv:1.0
+registry.int.janelia.org/janeliascicomp/matlab-deconv:1.1
+public.ecr.aws/janeliascicomp/exm-analysis/matlab-deconv:1.1
