@@ -16,17 +16,17 @@ RUN echo "Installing Vaa3d"
 RUN yum install -y mesa-libGLU qt qt-x11 libXv numactl-libs
 
 # Install Vaa3d
-ENV VAA3D_FILE=vaa3d-redhat-mark10.tgz
-RUN curl -s http://workstation.int.janelia.org/files/tools/${VAA3D_FILE} -o ${VAA3D_FILE}
+ENV VAA3D_FILE=vaa3d-redhat-mark13.tgz
+RUN curl -sL https://github.com/JaneliaSciComp/tools-archive/releases/download/1.0.0/${VAA3D_FILE} -o ${VAA3D_FILE}
 RUN tar xvf ${VAA3D_FILE} && /bin/rm -f ${VAA3D_FILE}
-RUN ln -s /opt/vaa3d-redhat-mark10 Vaa3D
+RUN ln -s /opt/vaa3d-redhat-mark13 Vaa3D
 
 RUN echo "Installing Fiji"
 # Prereqs for Fiji
 RUN yum install -y libXtst-devel libXrender
 # Install Fiji
 ENV FIJI_FILE=fiji-1.52c.tgz
-RUN curl -s http://workstation.int.janelia.org/files/fiji/${FIJI_FILE} -o ${FIJI_FILE}
+RUN curl -sL https://github.com/JaneliaSciComp/tools-archive/releases/download/1.0.0/${FIJI_FILE} -o ${FIJI_FILE}
 RUN tar xvf $FIJI_FILE && /bin/rm -rf $FIJI_FILE
 RUN rm -rf Fiji
 RUN mv Fiji.app Fiji
@@ -41,7 +41,7 @@ RUN echo "Installing CMTK"
 RUN yum install -y fftw-libs-double
 # Install CMTK
 ENV CMTK_FILE=cmtk-20171001-sl7avx.tgz
-RUN curl -s http://workstation.int.janelia.org/files/tools/${CMTK_FILE} -o '#1'
+RUN curl -sL https://github.com/JaneliaSciComp/tools-archive/releases/download/1.0.0/${CMTK_FILE} -o ${CMTK_FILE}
 RUN tar xvf $CMTK_FILE && /bin/rm -f $CMTK_FILE
 RUN ln -s cmtk-scm-2017-10-01 CMTK
 

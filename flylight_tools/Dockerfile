@@ -31,7 +31,7 @@ FROM janeliascicomp/common-tools:1.0.2 as cmtk-builder
 ARG CMTK_VERSION=20171001-sl7avx
 ENV CMTK_FILE=cmtk-${CMTK_VERSION}.tgz
 WORKDIR /tmp/cmtk
-RUN curl -sLO http://workstation.int.janelia.org/files/tools/${CMTK_FILE} && tar xfz ${CMTK_FILE} --strip-components=1
+RUN curl -sLO https://github.com/JaneliaSciComp/tools-archive/releases/download/1.0.0/${CMTK_FILE} && tar xfz ${CMTK_FILE} --strip-components=1
 
 FROM janeliascicomp/common-tools:1.0.2 as conda-builder
 WORKDIR /app
