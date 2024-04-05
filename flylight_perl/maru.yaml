@@ -1,5 +1,5 @@
 maru_version: 0.1.1
 name: flylight_perl
-version: 1.0.1
+version: 1.0.5
 remotes:
 - registry.int.janelia.org/jacs-scripts
