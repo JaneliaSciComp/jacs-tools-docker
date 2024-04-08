@@ -159,41 +159,17 @@ print("CapTimeDOBint; "+CapTimeDOBint);
 
 //items=newArray("scope1", "scope2", "scope3","scope4", "scope5", "scope6");
 
-if(ScopeNumST=="Scope #1")
-ScopeNum="scope1_";
+scopeNumINT=0;
+sharpindex=lastIndexOf(ScopeNumST, "#");
+if(sharpindex!=-1)
+scopeNumINT=round(substring(ScopeNumST, sharpindex+1,lengthOf(ScopeNumST)));
 
-else if(ScopeNumST=="Scope #2")
-ScopeNum="scope2_";
+print("scopeNumINT; "+scopeNumINT);
 
-else if(ScopeNumST=="Scope #3")
-ScopeNum="scope3_";
-
-else if(ScopeNumST=="Scope #4")
+if(ScopeNumST=="Aljoscha")
 ScopeNum="scope4_";
-
-else if(ScopeNumST=="Scope #5")
-ScopeNum="scope5_";
-
-else if(ScopeNumST=="Scope #6")
-ScopeNum="scope6_";
-
-else if(ScopeNumST=="Scope #9")
-ScopeNum="scope9_";
-
-else if(ScopeNumST=="Scope #10")
-ScopeNum="scope10_";
-
-else if(ScopeNumST=="Scope #11")
-ScopeNum="scope11_";
-
-else if(ScopeNumST=="Scope #12")
-ScopeNum="scope12_";
-
-else if(ScopeNumST=="Scope #13")
-ScopeNum="scope13_";
-
-else if(ScopeNumST=="Aljoscha")
-ScopeNum="scope4_";
+else
+ScopeNum="scope"+scopeNumINT+"_";
 
 if(ScopeNum==0){
 	print("ScopeNumST; "+ScopeNumST+" is wrong string. It must be Scope #1 ~ Scope #11, or Aljoscha.");
