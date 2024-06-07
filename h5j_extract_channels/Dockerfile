@@ -12,7 +12,7 @@ RUN git clone --branch $GIT_TAG --depth 1 https://github.com/JaneliaSciComp/jacs
     && true
 
 # Create final image
-FROM continuumio/miniconda3:4.8.2
+FROM condaforge/miniforge3:24.3.0-0
 
 RUN conda create -n myenv python=3.6 h5py=2.8.0 -y \
     && conda clean --tarballs \
