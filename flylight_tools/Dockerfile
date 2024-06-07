@@ -36,9 +36,9 @@ RUN curl -sLO https://github.com/JaneliaSciComp/tools-archive/releases/download/
 FROM janeliascicomp/common-tools:1.0.2 as conda-builder
 WORKDIR /app
 
-RUN curl -sL https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -o ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh && \
+RUN curl -sL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -o ~/Miniforge3.sh && \
+    /bin/bash ~/Miniforge3.sh -b -p /opt/conda && \
+    rm ~/Miniforge3.sh && \
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
