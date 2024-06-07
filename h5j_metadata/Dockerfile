@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.8.2
+FROM condaforge/miniforge3:24.3.0-0
 
 RUN conda create -n py3 python=3 h5py=2.8.0 PyYAML=3.13 -y \
     && conda clean --tarballs \
